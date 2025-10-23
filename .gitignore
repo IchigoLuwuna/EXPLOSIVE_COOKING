@@ -1,0 +1,8 @@
+# Ignore directories
+.git/
+build/
+out/
+
+# Ignore files
+*.o
+*.nes
