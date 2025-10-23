@@ -5,6 +5,8 @@
   .byte 1               ; 1x  8KB CHR data
   .byte $01, $00        ; mapper 0, vertical mirroring
 
+.segment "ZEROPAGE_DATA"
+
 .segment "VECTORS"
   ;; When an NMI happens (once per frame if enabled) the label nmi:
   .addr nmi
