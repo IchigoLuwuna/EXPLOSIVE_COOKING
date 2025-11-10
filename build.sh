@@ -1,7 +1,6 @@
 #!/bin/sh
-for srcFile in *.s; do
-	objectFile="$srcFile.o"
-	ca65 $srcFile -o $objectFile
-done
+srcFile="main.s"
+objectFile="$srcFile.o"
+ca65 $srcFile -o $objectFile
 
-ld65 *.o -C linker.cfg -o project.nes
+ld65 $objectFile -C linker.cfg -o project.nes
