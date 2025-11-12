@@ -65,12 +65,12 @@ load_palettes:
 	lda #$00
 	sta $2006
 	ldx #$00
-@loop:
-	lda palettes, x
-	sta $2007
-	inx
-	cpx #$20
-	bne @loop
+	@loop:
+		lda palettes, x
+		sta $2007
+		inx
+		cpx #$20
+		bne @loop
 
 enable_rendering:
 	lda #%10000000	; Enable NMI
@@ -80,17 +80,17 @@ enable_rendering:
 
 
 forever:
-	lda #$00
-	@loop:
-	adc #$08
-	tay
-	ldx hello, y
+	ldx characterD
 	stx $0200
-	cmp #$04
-	bne @loop
-
-	ldx #$02
-	stx $4014
+	ldy #$01
+	ldx characterD, y
+	stx $0201
+	ldy #$02
+	ldx characterD, y
+	stx $0202
+	ldy #$03
+	ldx characterD, y
+	stx $0203
 
 	jmp forever
 
@@ -103,16 +103,11 @@ nmi:
 	tya
 	pha
 
-	ldx #$00 	; Set SPR-RAM address to 0
-	stx $2003
-@loop:
-	lda hello, x 	; Load the hello message into SPR-RAM
-	sta $2004
-	inx
-	cpx #$5c
-	bne @loop
+	; copy Shadow OAM to PPU OAM
+	ldx #$02 ; Shadow OAM is on page 2
+	stx $4014 ; write to OAMDMA PPU register at hardware address $4014
 
-	; pull state before interrupt
+	; pull state after interrupt
 	pla
 	tay
 	pla
@@ -122,23 +117,11 @@ nmi:
 	rti
 
 hello:
-	.byte $00, $00, $00, $00 	; Why do I need these here?
-	.byte $00, $00, $00, $00
-
-	.byte $6c, $03, $00, $4e ;h
-	.byte $6c, $04, $00, $58 ;e
-	.byte $6c, $05, $00, $62 ;l
-	.byte $6c, $05, $00, $6c ;l
-	.byte $6c, $01, $00, $76 ;o
-	.byte $6c, $00, $00, $8a
-	.byte $6c, $01, $00, $94
-	.byte $6c, $02, $00, $9e
-
-
+characterD: .byte $6c, $03, $00, $4e ; D
 
 palettes:
 	.include "palettes.s"
 
 ; Character memory
 .segment "CHARS"
-.include "sprites.s"
+.incbin "character_rom.chr"
