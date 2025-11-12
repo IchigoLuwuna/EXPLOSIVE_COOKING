@@ -141,4 +141,4 @@ palettes:
 
 ; Character memory
 .segment "CHARS"
-.include "testfile.s"
+.include "sprites.s"
