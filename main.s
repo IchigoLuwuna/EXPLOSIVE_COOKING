@@ -35,9 +35,7 @@ reset:
 	stx $4010 	; disable DMC IRQs
 
 ;; first wait for vblank to make sure PPU is ready
-vblankwait1:
-	bit $2002
-	bpl vblankwait1
+jsr subr_vblank_wait
 
 clear_memory:
 	lda #$00
@@ -53,11 +51,8 @@ clear_memory:
 	bne clear_memory
 
 ;; second wait for vblank, PPU is ready after this
-vblankwait2:
-	bit $2002
-	bpl vblankwait2
 
-main:
+; load palettes into PPU
 load_palettes:
 	lda $2002
 	lda #$3f
@@ -72,27 +67,46 @@ load_palettes:
 		cpx #$20
 		bne @loop
 
+jsr subr_vblank_wait
+
 enable_rendering:
 	lda #%10000000	; Enable NMI
 	sta $2000
 	lda #%00010000	; Enable Sprites
 	sta $2001
 
-
-forever:
-	ldx characterD
+initialize_oam:
+	ldx dheegLittleGuy
 	stx $0200
 	ldy #$01
-	ldx characterD, y
+	ldx dheegLittleGuy, y
 	stx $0201
 	ldy #$02
-	ldx characterD, y
+	ldx dheegLittleGuy, y
 	stx $0202
 	ldy #$03
-	ldx characterD, y
+	ldx dheegLittleGuy, y
 	stx $0203
 
+forever:
+	ldx $0203 ; move dheeg to the right
+	inx
+	stx $0203
+
+	jsr subr_vblank_wait
 	jmp forever
+
+subr_vblank_wait:
+	php
+	pha
+
+	@loop:
+		bit $2002
+		bpl @loop
+
+	pla
+	plp
+	rts
 
 nmi:
 	; push state before interrupt
@@ -116,12 +130,13 @@ nmi:
 	plp
 	rti
 
-hello:
-characterD: .byte $6c, $03, $00, $4e ; D
+dheeg:
+	dheegLittleGuy: .byte $6c, $00, $00, $2e ; the man himself
+	characterD: .byte $6c, $03, $00, $4e ; D
 
 palettes:
 	.include "palettes.s"
 
 ; Character memory
 .segment "CHARS"
-.incbin "character_rom.chr"
+	.incbin "character_rom.chr"
