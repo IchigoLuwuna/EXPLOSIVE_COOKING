@@ -105,12 +105,12 @@ nmi:
 
 	ldx #$00 	; Set SPR-RAM address to 0
 	stx $2003
-;@loop:
-	;lda $0200, x 	; Load the hello message into SPR-RAM
-	;sta $2004
-	;inx
-	;cpx #$5c
-	;bne @loop
+@loop:
+	lda hello, x 	; Load the hello message into SPR-RAM
+	sta $2004
+	inx
+	cpx #$5c
+	bne @loop
 
 	; pull state before interrupt
 	pla
@@ -137,17 +137,7 @@ hello:
 
 
 palettes:
-	; Background Palette
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-
-	; Sprite Palette
-	.byte $0f, $20, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
+	.include "palettes.s"
 
 ; Character memory
 .segment "CHARS"
