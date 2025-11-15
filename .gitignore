@@ -7,3 +7,4 @@ out/
 # Ignore files
 *.o
 *.nes
+.editorconfig

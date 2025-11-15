@@ -1,9 +1,10 @@
 .segment "HEADER"
-	; .byte "NES", $1A ; iNES header identifier
+
+	; .byte "NES", $1A      ; iNES header identifier
 	.byte $4E, $45, $53, $1A
-	.byte 2 	; 2x 16KB PRG code
-	.byte 1 ; 1x 8KB CHR data
-	.byte $01, $00 ; mapper 0, vertical mirroring
+	.byte 2               ; 2x 16KB PRG code
+	.byte 1               ; 1x  8KB CHR data
+	.byte $01, $00        ; mapper 0, vertical mirroring
 
 .segment "ZEROPAGE_DATA"
 
@@ -16,9 +17,9 @@
 	;; When the processor first turns on or is reset, it will jump to the label reset:
 	.addr reset
 	;; External interrupt IRQ (unused)
-	.addr 0
+	.addr $00
 
-; "nes" linker config requires a STARTUP section, even	
+; "nes" linker config requires a STARTUP section, even
 ; if it's empty
 .segment "STARTUP"
 
@@ -33,16 +34,14 @@ reset:
 	ldx #$40
 	stx $4017	; disable APU frame IRQ
 	ldx #$ff 	; Set up stack
-	txs		; .
+	txs		;  .
 	inx		; now X = 0
 	stx $2000	; disable NMI
 	stx $2001 	; disable rendering
 	stx $4010 	; disable DMC IRQs
 
 ;; first wait for vblank to make sure PPU is ready
-vblankwait1:
-	bit $2002
-	bpl vblankwait1
+jsr subr_vblank_wait
 
 clear_memory:
 	lda #$00
@@ -58,11 +57,8 @@ clear_memory:
 	bne clear_memory
 
 ;; second wait for vblank, PPU is ready after this
-vblankwait2:
-	bit $2002
-	bpl vblankwait2
 
-main:
+; load palettes into PPU
 load_palettes:
 	lda $2002
 	lda #$3f
@@ -70,12 +66,14 @@ load_palettes:
 	lda #$00
 	sta $2006
 	ldx #$00
-@loop:
-	lda palettes, x
-	sta $2007
-	inx
-	cpx #$20
-	bne @loop
+	@loop:
+		lda palettes, x
+		sta $2007
+		inx
+		cpx #$20
+		bne @loop
+
+jsr subr_vblank_wait
 
 enable_rendering:
 	lda #%10000000	; Enable NMI
@@ -83,105 +81,68 @@ enable_rendering:
 	lda #%00010000	; Enable Sprites
 	sta $2001
 
+initialize_oam:
+	ldx dheegLittleGuy
+	stx $0200
+	ldy #$01
+	ldx dheegLittleGuy, y
+	stx $0201
+	ldy #$02
+	ldx dheegLittleGuy, y
+	stx $0202
+	ldy #$03
+	ldx dheegLittleGuy, y
+	stx $0203
+
 forever:
+	ldx $0203 ; move dheeg to the right
+	inx
+	stx $0203
+
+	jsr subr_vblank_wait
 	jmp forever
 
+subr_vblank_wait:
+	php
+	pha
+
+	@loop:
+		bit $2002
+		bpl @loop
+
+	pla
+	plp
+	rts
+
 nmi:
-	ldx #$00 	; Set SPR-RAM address to 0
-	stx $2003
-@loop:	lda hello, x 	; Load the hello message into SPR-RAM
-	sta $2004
-	inx
-	cpx #$5c
-	bne @loop
+	; push state before interrupt
+	php
+	pha
+	txa
+	pha
+	tya
+	pha
+
+	; copy Shadow OAM to PPU OAM
+	ldx #$02 ; Shadow OAM is on page 2
+	stx $4014 ; write to OAMDMA PPU register at hardware address $4014
+
+	; pull state after interrupt
+	pla
+	tay
+	pla
+	tax
+	pla
+	plp
 	rti
 
-hello:
-	.byte $00, $00, $00, $00 	; Why do I need these here?
-	.byte $00, $00, $00, $00
-
-	.byte $6c, $03, $00, $4e ;h 
-	.byte $6c, $04, $00, $58 ;e
-	.byte $6c, $05, $00, $62 ;l
-	.byte $6c, $05, $00, $6c ;l
-	.byte $6c, $01, $00, $76 ;o
-	.byte $6c, $00, $00, $8a
-	.byte $6c, $01, $00, $94
-	.byte $6c, $02, $00, $9e
-
-
+dheeg:
+	dheegLittleGuy: .byte $6c, $00, $00, $2e ; the man himself
+	characterD: .byte $6c, $03, $00, $4e ; D
 
 palettes:
-	; Background Palette
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-
-	; Sprite Palette
-	.byte $0f, $20, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
-	.byte $0f, $00, $00, $00
+	.include "palettes.s"
 
 ; Character memory
 .segment "CHARS"
-	.byte %11111111	; T (00)
-	.byte %11111111
-	.byte %00011000
-	.byte %00011000
-	.byte %00011000
-	.byte %00011000
-	.byte %00011000
-	.byte %00011000
-	.byte $00, $00, $00, $00, $00, $00, $00, $00
-
-	.byte %11111111 ; O (01)
-	.byte %11111111
-	.byte %11000011
-	.byte %11000011
-	.byte %11000011
-	.byte %11000011
-	.byte %11111111
-	.byte %11111111
-	.byte $00, $00, $00, $00, $00, $00, $00, $00
-
-	.byte %11000011	; M (02)
-	.byte %11100111
-	.byte %11111111
-	.byte %11011011
-	.byte %11000011
-	.byte %11000011
-	.byte %11000011
-	.byte %11000011
-	.byte $00, $00, $00, $00, $00, $00, $00, $00
-
-	.byte %11000011	; H (03)
-	.byte %11000011
-	.byte %11000011
-	.byte %11111111
-	.byte %11111111
-	.byte %11000011
-	.byte %11000011
-	.byte %11000011
-	.byte $00, $00, $00, $00, $00, $00, $00, $00
-
-	.byte %11111111	; E (04)
-	.byte %11111111
-	.byte %11000000
-	.byte %11111100
-	.byte %11111100
-	.byte %11000000
-	.byte %11111111
-	.byte %11111111
-	.byte $00, $00, $00, $00, $00, $00, $00, $00
-
-	.byte %11000000	; L (05)
-	.byte %11000000
-	.byte %11000000
-	.byte %11000000
-	.byte %11000000
-	.byte %11000000
-	.byte %11111111
-	.byte %11111111
-	.byte $00, $00, $00, $00, $00, $00, $00, $00 
+	.incbin "character_rom.chr"
