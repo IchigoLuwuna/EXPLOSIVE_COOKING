@@ -1,4 +1,5 @@
 # Ignore directories
+.vscode/
 .git/
 build/
 out/

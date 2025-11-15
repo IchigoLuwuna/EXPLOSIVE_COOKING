@@ -1,11 +1,14 @@
 .segment "HEADER"
-	; .byte "NES", $1A      ; iNES header identifier
+	; .byte "NES", $1A ; iNES header identifier
 	.byte $4E, $45, $53, $1A
-	.byte 2               ; 2x 16KB PRG code
-	.byte 1               ; 1x  8KB CHR data
-	.byte $01, $00        ; mapper 0, vertical mirroring
+	.byte 2 	; 2x 16KB PRG code
+	.byte 1 ; 1x 8KB CHR data
+	.byte $01, $00 ; mapper 0, vertical mirroring
 
 .segment "ZEROPAGE_DATA"
+
+	joypad = $00	; 1bt: joypad info saved in $00
+	zapper = $01	; 1bt: zapper info saved in $01
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -22,13 +25,15 @@
 ; Main code segment for the program
 .segment "CODE"
 
+.include "input.s"	; include inputs file
+
 reset:
 	sei		; disable IRQs
 	cld		; disable decimal mode
 	ldx #$40
 	stx $4017	; disable APU frame IRQ
 	ldx #$ff 	; Set up stack
-	txs		;  .
+	txs		; .
 	inx		; now X = 0
 	stx $2000	; disable NMI
 	stx $2001 	; disable rendering
@@ -179,4 +184,4 @@ palettes:
 	.byte %11000000
 	.byte %11111111
 	.byte %11111111
-	.byte $00, $00, $00, $00, $00, $00, $00, $00  
+	.byte $00, $00, $00, $00, $00, $00, $00, $00 
