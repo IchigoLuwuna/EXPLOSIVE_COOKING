@@ -43,24 +43,16 @@ func_get_input:
     sta cport1  ; write 0 to controller port 1 to end polling input data
 
     ; read controller 1 data
-    lda cport1  ; read controller port 1 (first bit of button data) and write to a
-    asl         ; shift register a to the left
-    ora cport1  ; read second bit and write to a
-    asl         ; shift
-    ora cport1  ; third bit
-    asl
-    ora cport1  ; fourth bit
-    asl
-    ora cport1  ; fifth bit
-    asl
-    ora cport1  ; sixth bit
-    asl
-    ora cport1  ; seventh bit
-    asl
-    ora cport1  ; eigth bit, don't shift after this one
-                ; A is now [123465678] where 1 is first bit read and 8 last bit read
-    
-    sta joypad  ; store button data in joypad location ($00)
+	ldx #$00 ; for(int i{}; i < 8; ++i)
+	@loop:
+		lda cport1
+		lsr ; loads bit 0 into carry
+		ror joypad ; shifts carry left into joypad
+		inx
+		cpx #$08
+		bmi @loop
+	; bit order is now [Right, Left, Down, Up, Start, Select, B, A]
+	; 				   [    7,    6,    5,  4,     3,      2, 1, 0]
 
     ; function end
 
@@ -70,5 +62,6 @@ func_get_input:
     pla     ; pull x
     tax
     pla     ; pull a
+	plp
 
     rts ; return from subroutine
