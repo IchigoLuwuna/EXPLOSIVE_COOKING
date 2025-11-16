@@ -97,12 +97,36 @@ initialize_oam:
 forever:
 	jsr func_get_input	; get controller input and store in joypad ($00)
 	lda joypad
-	cmp #$00
-	beq :+
-
-	ldx $0203 ; move dheeg to the right
-	inx
-	stx $0203
+	and #%10000000
+	cmp #%10000000
+	bne :+
+		ldx $0203 ; move dheeg to the right
+		inx
+		stx $0203
+	:
+	lda joypad
+	and #%01000000
+	cmp #%01000000
+	bne :+
+		ldx $0203 ; move dheeg to the left
+		dex
+		stx $0203
+	:
+	lda joypad
+	and #%00100000
+	cmp #%00100000
+	bne :+
+		ldx $0200 ; move dheeg downwards
+		inx
+		stx $0200
+	:
+	lda joypad
+	and #%00010000
+	cmp #%00010000
+	bne :+
+		ldx $0200 ; move dheeg upwards
+		dex
+		stx $0200
 	:
 	
 	jsr subr_vblank_wait
