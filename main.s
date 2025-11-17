@@ -1,5 +1,4 @@
 .segment "HEADER"
-
 	; .byte "NES", $1A      ; iNES header identifier
 	.byte $4E, $45, $53, $1A
 	.byte 2               ; 2x 16KB PRG code
@@ -41,7 +40,7 @@ reset:
 	stx $4010 	; disable DMC IRQs
 
 ;; first wait for vblank to make sure PPU is ready
-jsr subr_vblank_wait
+jsr func_vblank_wait
 
 clear_memory:
 	lda #$00
@@ -73,7 +72,7 @@ load_palettes:
 		cpx #$20
 		bne @loop
 
-jsr subr_vblank_wait
+jsr func_vblank_wait
 
 enable_rendering:
 	lda #%10000000	; Enable NMI
@@ -129,10 +128,10 @@ forever:
 		stx $0200
 	:
 	
-	jsr subr_vblank_wait
+	jsr func_vblank_wait
 	jmp forever
 
-subr_vblank_wait:
+func_vblank_wait:
 	php
 	pha
 
