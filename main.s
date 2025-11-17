@@ -7,8 +7,12 @@
 
 .segment "ZEROPAGE_DATA"
 
-	joypad = $00	; 1bt: joypad info saved in $00
-	zapper = $01	; 1bt: zapper info saved in $01
+	reg_b = $00 ; 1bt: extra B register
+	reg_c = $01 ; 1bt: extra C register
+	reg_d = $02 ; 1bt: extra D register
+	clock = $04 ; 1bt: Clock counter
+	joypad = $10 ; 1bt: Controller readout
+	zapper = $11 ; 1bt: Zapper readout
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -127,7 +131,7 @@ forever:
 		dex
 		stx $0200
 	:
-	
+
 	jsr func_vblank_wait
 	jmp forever
 
