@@ -29,8 +29,6 @@
 ; Main code segment for the program
 .segment "CODE"
 
-.include "input.s"	; include inputs file
-
 reset:
 	sei		; disable IRQs
 	cld		; disable decimal mode
@@ -84,56 +82,7 @@ enable_rendering:
 	lda #%00010000	; Enable Sprites
 	sta $2001
 
-initialize_oam:
-	ldx dheegLittleGuy
-	stx $0200
-	ldy #$01
-	ldx dheegLittleGuy, y
-	stx $0201
-	ldy #$02
-	ldx dheegLittleGuy, y
-	stx $0202
-	ldy #$03
-	ldx dheegLittleGuy, y
-	stx $0203
-
-forever:
-	jsr func_get_input	; get controller input and store in joypad ($00)
-	lda joypad
-	and #%10000000
-	cmp #%10000000
-	bne :+
-		ldx $0203 ; move dheeg to the right
-		inx
-		stx $0203
-	:
-	lda joypad
-	and #%01000000
-	cmp #%01000000
-	bne :+
-		ldx $0203 ; move dheeg to the left
-		dex
-		stx $0203
-	:
-	lda joypad
-	and #%00100000
-	cmp #%00100000
-	bne :+
-		ldx $0200 ; move dheeg downwards
-		inx
-		stx $0200
-	:
-	lda joypad
-	and #%00010000
-	cmp #%00010000
-	bne :+
-		ldx $0200 ; move dheeg upwards
-		dex
-		stx $0200
-	:
-
-	jsr func_vblank_wait
-	jmp forever
+jmp state_game
 
 func_vblank_wait:
 	php
@@ -170,9 +119,12 @@ nmi:
 	rti
 
 dheeg:
-	dheegLittleGuy: .byte $6c, $00, $00, $2e ; the man himself
-	characterD: .byte $6c, $03, $00, $4e ; D
+	dheeg_top_left: .byte $7f, $00, $00, $7f
 
+; Includes
+.include "input.s"
+.include "game.s"
+.include "menus.s"
 palettes:
 	.include "palettes.s"
 
