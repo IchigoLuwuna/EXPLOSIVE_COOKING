@@ -10,6 +10,15 @@
 	reg_b = $00 ; 1bt: extra B register
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
+	game_flags = $03 ; 1bt: extra flags
+		; 0 and 1: gamestate
+			; %00 = menu
+			; %01 = playing
+			; %10 = win
+			; %11 = lose
+		; 2: zapper half-pulled
+	game_flags_mask_gamestate = #%00000011
+	game_flags_mask_zapper = #%00000100
 	clock = $04 ; 1bt: Clock counter
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
