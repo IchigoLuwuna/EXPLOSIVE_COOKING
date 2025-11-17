@@ -1,46 +1,17 @@
-; input memory is mapped in zero-page
-; starting at $00
-
-; func_template:
-;    ; push registers
-;    php     ; push processor
-;    pha     ; push a
-;    txa     ; push x
-;    pha
-;    tya     ; push y
-;    pha
-;
-;    ; function
-;
-;
-;    ; pull registers
-;    pla     ; pull y
-;    tay
-;    pla     ; pull x
-;    tax
-;    pla     ; pull a
-;
-;   rts ; return from subroutine
-
 cport1 = $4016  ; hardware address of controller port 1
 cport2 = $4017  ; hardware address of controller port 1
 
 func_get_input:
-    ; push registers
-    php     ; push processor
-    pha     ; push a
-    txa     ; push x
-    pha
-    tya     ; push y
-    pha
+    ; not pushing register because function is called at start of loop
 
     ; function start
 
+    ; get joypad input
     ; poll controller 1 input
     lda #$01
     sta cport1  ; write 1 to controller port 1 to start polling input data
     lda #$00
-    sta cport1  ; write 0 to controller port 1 to end polling input data
+    sta cport1  ; write 0 to controller port 1 to end polling input data/lip
 
     ; read controller 1 data
 	ldx #$00 ; for(int i{}; i < 8; ++i)
@@ -54,14 +25,20 @@ func_get_input:
 	; bit order is now [Right, Left, Down, Up, Start, Select, B, A]
 	; 				   [    7,    6,    5,  4,     3,      2, 1, 0]
 
-    ; function end
+    ; get zapper input
+    ; poll controller 1 input
+    lda #$01
+    sta cport2  ; write 1 to controller port 1 to start polling input data
+    lda #$00
+    sta cport2  ; write 0 to controller port 1 to end polling input data/lip
 
-    ; pull registers
-    pla     ; pull y
-    tay
-    pla     ; pull x
-    tax
-    pla     ; pull a
-	plp
+    lda cport2
+	sta zapper ; shifts carry left into joypad
+	; bit order is [ /, /, /, Trigger, Light, /, /, Serial data]
+	; 			   [ 7, 6, 5,       4,     3, 2, 1,           0]
+    ; Trigger: 0 is released or pulled, 1 is half pulled
+    ; Light: 0 is detected, 1 not detected
+
+    ; function end
 
     rts ; return from subroutine
