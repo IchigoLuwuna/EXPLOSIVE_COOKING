@@ -130,6 +130,10 @@ forever:
 		ldx $0200 ; move dheeg upwards
 		dex
 		stx $0200
+
+
+	; zapper test code
+	; if half pressed
 	:
 	lda zapper
 	and #%00010000
