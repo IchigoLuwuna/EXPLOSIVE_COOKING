@@ -7,6 +7,9 @@
 
 .segment "ZEROPAGE_DATA"
 
+	joypad = $00	; 1bt: joypad info saved in $00
+	zapper = $01	; 1bt: zapper info saved in $01
+
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
 	.addr nmi
@@ -21,6 +24,8 @@
 
 ; Main code segment for the program
 .segment "CODE"
+
+.include "input.s"	; include inputs file
 
 reset:
 	sei		; disable IRQs
@@ -89,10 +94,40 @@ initialize_oam:
 	stx $0203
 
 forever:
-	ldx $0203 ; move dheeg to the right
-	inx
-	stx $0203
-
+	jsr func_get_input	; get controller input and store in joypad ($00)
+	lda joypad
+	and #%10000000
+	cmp #%10000000
+	bne :+
+		ldx $0203 ; move dheeg to the right
+		inx
+		stx $0203
+	:
+	lda joypad
+	and #%01000000
+	cmp #%01000000
+	bne :+
+		ldx $0203 ; move dheeg to the left
+		dex
+		stx $0203
+	:
+	lda joypad
+	and #%00100000
+	cmp #%00100000
+	bne :+
+		ldx $0200 ; move dheeg downwards
+		inx
+		stx $0200
+	:
+	lda joypad
+	and #%00010000
+	cmp #%00010000
+	bne :+
+		ldx $0200 ; move dheeg upwards
+		dex
+		stx $0200
+	:
+	
 	jsr func_vblank_wait
 	jmp forever
 
