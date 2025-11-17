@@ -131,6 +131,14 @@ forever:
 		dex
 		stx $0200
 	:
+	lda zapper
+	and #%00010000
+	cmp #%00010000
+	bne :+
+		ldx $0200 ; move dheeg upwards
+		dex
+		stx $0200
+	:
 
 	jsr func_vblank_wait
 	jmp forever
