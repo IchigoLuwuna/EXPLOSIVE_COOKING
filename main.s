@@ -17,8 +17,8 @@
 			; %10 = win
 			; %11 = lose
 		; 2: zapper half-pulled
-	game_flags_mask_gamestate = #%00000011
-	game_flags_mask_zapper = #%00000100
+	game_flags_mask_gamestate = %00000011
+	game_flags_mask_zapper = %00000100
 	clock = $04 ; 1bt: Clock counter
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
