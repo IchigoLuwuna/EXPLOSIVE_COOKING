@@ -20,6 +20,7 @@
 	game_flags_mask_gamestate = %00000011
 	game_flags_mask_zapper = %00000100
 	clock = $04 ; 1bt: Clock counter
+	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 
@@ -37,7 +38,6 @@
 
 ; Main code segment for the program
 .segment "CODE"
-
 reset:
 	sei		; disable IRQs
 	cld		; disable decimal mode
@@ -135,10 +135,10 @@ dheeg:
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
+.include "random.s"
 .include "game.s"
 .include "menus.s"
-palettes:
-	.include "palettes.s"
+.include "palettes.s"
 
 ; Character memory
 .segment "CHARS"

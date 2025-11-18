@@ -1,3 +1,4 @@
+palettes:
 ; https://www.nesdev.org/wiki/PPU_palettes
 
 ; Background Palette

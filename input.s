@@ -1,27 +1,3 @@
-; input memory is mapped in zero-page
-; starting at $00
-
-; func_template:
-;    ; push registers
-;    php     ; push processor
-;    pha     ; push a
-;    txa     ; push x
-;    pha
-;    tya     ; push y
-;    pha
-;
-;    ; function
-;
-;
-;    ; pull registers
-;    pla     ; pull y
-;    tay
-;    pla     ; pull x
-;    tax
-;    pla     ; pull a
-;
-;   rts ; return from subroutine
-
 cport1 = $4016  ; hardware address of controller port 1
 cport2 = $4017  ; hardware address of controller port 1
 
