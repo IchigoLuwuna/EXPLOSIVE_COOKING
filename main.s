@@ -82,8 +82,10 @@ enable_rendering:
 	lda #%00010000	; Enable Sprites
 	sta $2001
 
-jmp state_game
+; Game Start
+jmp state_menu_start
 
+; Subroutines
 func_vblank_wait:
 	php
 	pha
@@ -122,6 +124,7 @@ dheeg:
 	dheeg_top_left: .byte $7f, $00, $00, $7f
 
 ; Includes
+.include "bitmasks.s"
 .include "input.s"
 .include "game.s"
 .include "menus.s"
