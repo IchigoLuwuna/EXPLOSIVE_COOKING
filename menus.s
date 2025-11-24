@@ -22,6 +22,8 @@ state_menu_start_loop:
 		jmp state_game
 	:
 
+	inc clock
+	jsr func_vblank_wait
 jmp @forever
 
 state_menu_pause:
@@ -40,4 +42,5 @@ state_menu_pause_loop:
 		jmp state_game_loop
 	:
 
+	jsr func_vblank_wait
 jmp @forever
