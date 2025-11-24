@@ -6,7 +6,6 @@
 	.byte $01, $00        ; mapper 0, vertical mirroring
 
 .segment "ZEROPAGE_DATA"
-
 	reg_b = $00 ; 1bt: extra B register
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
