@@ -130,10 +130,11 @@ nmi:
 	rti
 
 dheeg:
-	dheeg_top_left: .byte $7f, $00, $00, $7f
-	dheeg_top_right: .byte $7f, $00, $00, $7f
-	dheeg_bottom_left: .byte $7f, $00, $00, $7f
-	dheeg_bottom_right: .byte $7f, $00, $00, $7f
+	dheeg_16x16_addr = $00
+	dheeg_top_left: .byte $00, $00, $00, $00
+	dheeg_top_right: .byte $00, $00, $00, $00
+	dheeg_bottom_left: .byte $00, $00, $00, $00
+	dheeg_bottom_right: .byte $00, $00, $00, $00
 
 ; Includes
 .include "bitmasks.s"

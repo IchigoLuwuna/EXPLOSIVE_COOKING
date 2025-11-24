@@ -19,6 +19,10 @@ state_game_init:
 		iny
 	cpy #$10
 	bmi :-
+	ldx #$7F
+	ldy #$7F
+	lda dheeg_16x16_addr
+	jsr func_move_16x16
 
 ; allows jumping without reinitialising
 state_game_loop:
