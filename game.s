@@ -14,10 +14,10 @@ state_game_init:
 	; Initialize OAM
 	ldy #$00
 	:
-		lda dheeg_top_left, y
+		lda dheeg, y
 		sta $0200, y
 		iny
-	cpy #$04
+	cpy #$10
 	bmi :-
 
 ; allows jumping without reinitialising

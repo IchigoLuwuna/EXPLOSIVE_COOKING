@@ -130,6 +130,9 @@ nmi:
 
 dheeg:
 	dheeg_top_left: .byte $7f, $00, $00, $7f
+	dheeg_top_right: .byte $7f, $00, $00, $7f
+	dheeg_bottom_left: .byte $7f, $00, $00, $7f
+	dheeg_bottom_right: .byte $7f, $00, $00, $7f
 
 ; Includes
 .include "bitmasks.s"
@@ -138,6 +141,7 @@ dheeg:
 .include "game.s"
 .include "menus.s"
 .include "palettes.s"
+.include "sprite_utils.s"
 
 ; Character memory
 .segment "CHARS"
