@@ -80,6 +80,9 @@ enable_rendering:
 	lda #%00010000	; Enable Sprites
 	sta $2001
 
+	jsr initialize_oam
+	jsr initialize_oam_enemy
+
 initialize_oam:
 	ldx dheegLittleGuy
 	stx $0200
@@ -92,6 +95,23 @@ initialize_oam:
 	ldy #$03
 	ldx dheegLittleGuy, y
 	stx $0203
+
+initialize_oam_enemy:
+	ldx evilDheeg
+	stx $0204 ; Y position of the enemy 
+
+	ldy #$01 
+	ldx evilDheeg, y ; Tile index of the enemy
+	stx $0205
+
+	ldy #$02
+	ldx evilDheeg, y ; Attributes of the enemy
+	stx $0206
+	
+	ldy #$03
+	ldx evilDheeg, y ; X position of the enemy
+	stx $0207
+
 
 forever:
 	jsr func_get_input	; get controller input and store in joypad ($00)
@@ -128,6 +148,16 @@ forever:
 		stx $0200
 	:
 	
+	;-------------- ENEMY MOVEMENT --------------
+	ldx $0207 ; x position of enemy
+	dex
+	stx $0207 ; move my evil man to the left
+	;--------------------------------------------
+	
+	; wait for vblank
+
+
+
 	jsr func_vblank_wait
 	jmp forever
 
@@ -168,6 +198,9 @@ nmi:
 dheeg:
 	dheegLittleGuy: .byte $6c, $00, $00, $2e ; the man himself
 	characterD: .byte $6c, $03, $00, $4e ; D
+
+evilDheeg:
+	.byte $80 , $00 , $00 , $F0; evil dheeg is real
 
 palettes:
 	.include "palettes.s"
