@@ -143,6 +143,7 @@ dheeg:
 .include "menus.s"
 .include "palettes.s"
 .include "sprite_utils.s"
+.include "math.s"
 
 ; Character memory
 .segment "CHARS"
