@@ -1,5 +1,7 @@
 state_game:
 state_game_init:
+	jsr func_seed_random
+
 	; Flush OAM
 	ldy #$00
 	:
@@ -59,12 +61,14 @@ state_game_loop:
 	lda joypad
 	and #PAD_START
 	cmp #PAD_START
-	bne :+
+	bne :++
 		and reg_c
 		cmp #PAD_START
 		beq :+ ; skip if start is held
-		jmp state_menu_pause
+			jmp state_menu_pause
+		:
 	:
 
+	inc clock
 	jsr func_vblank_wait
 jmp @forever
