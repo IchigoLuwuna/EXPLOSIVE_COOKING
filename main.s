@@ -9,6 +9,7 @@
 	reg_b = $00 ; 1bt: extra B register
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
+	reg_swap = $FF ; 1bt: volatile register
 	game_flags = $03 ; 1bt: extra flags
 		; 0 and 1: gamestate
 			; %00 = menu

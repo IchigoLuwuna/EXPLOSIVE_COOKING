@@ -30,34 +30,26 @@ state_game_loop:
 	and #PAD_RIGHT
 	cmp #PAD_RIGHT
 	bne :+
-		ldx $0203 ; move dheeg to the right
-		inx
-		stx $0203
 	:
+
 	lda joypad
 	and #PAD_LEFT
 	cmp #PAD_LEFT
 	bne :+
-		ldx $0203 ; move dheeg to the left
-		dex
-		stx $0203
 	:
+
 	lda joypad
 	and #PAD_DOWN
 	cmp #PAD_DOWN
 	bne :+
-		ldx $0200 ; move dheeg downwards
-		inx
-		stx $0200
 	:
+
 	lda joypad
 	and #PAD_UP
 	cmp #PAD_UP
 	bne :+
-		ldx $0200 ; move dheeg upwards
-		dex
-		stx $0200
 	:
+
 	lda joypad
 	and #PAD_START
 	cmp #PAD_START
