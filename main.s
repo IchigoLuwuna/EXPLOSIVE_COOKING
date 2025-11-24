@@ -138,6 +138,7 @@ dheeg:
 .include "game.s"
 .include "menus.s"
 .include "palettes.s"
+.include "math.s"
 
 ; Character memory
 .segment "CHARS"
