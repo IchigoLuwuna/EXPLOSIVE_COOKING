@@ -13,8 +13,10 @@ func_move_16x16:
 	; Move by x
 	tay ; put A into Y so we can use to offset $0203
 	lda $0203, y
+	clc
 	stx reg_swap
 	adc reg_swap ; add with X
+	clc
 	sta $0203, y
 	tya ; put Y back into A
 
@@ -25,26 +27,38 @@ func_move_16x16:
 	lda reg_swap ; pull A from swap
 	;
 
-	; push X
-	sta reg_swap ; put A into swap
-	txa
-	pha ; put X on the stack
-	lda reg_swap ; pull A from swap
-	;
-
 	; Move by y
 	tax ; put A into X so we can use to offset $0200
 	lda $0200, x
 	sty reg_swap
 	adc reg_swap ; add with Y
+	clc
 	sta $0200, x
-	txa ; put X back into A
 	;
 
-	; pull X
-	sta reg_swap ; put A into swap
-	pla ; pull X from the stack
-	tax
-	lda reg_swap ; pull A from swap
-	;
+	; Allign other subsprites
+	; X contains base sprite location
+	; Top-Right
+	lda $0200, x
+	sta $0204, x
+	lda $0203, x
+	adc #$08
+	clc
+	sta $0207, x
+	; Bottom-Left
+	lda $0200, x
+	adc #$08
+	clc
+	sta $0208, x
+	lda $0203, x
+	sta $020b, x
+	; Bottom-Right
+	lda $0200, x
+	adc #$08
+	clc
+	sta $020C, x
+	lda $0203, x
+	adc #$08
+	clc
+	sta $020F, x
 rts

@@ -30,24 +30,44 @@ state_game_loop:
 	and #PAD_RIGHT
 	cmp #PAD_RIGHT
 	bne :+
+		ldx #$01
+		ldy #$00
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
 	and #PAD_LEFT
 	cmp #PAD_LEFT
 	bne :+
+		lda #$01
+		jsr func_opposite_a
+		tax
+		ldy #$00
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
 	and #PAD_DOWN
 	cmp #PAD_DOWN
 	bne :+
+		ldx #$00
+		ldy #$01
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
 	and #PAD_UP
 	cmp #PAD_UP
 	bne :+
+		ldx #$00
+		lda #$01
+		jsr func_opposite_a
+		tay
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
