@@ -1,3 +1,4 @@
+.include "famistudio_ca65.s"
 .include "shoot_sfx.s"
 
 ; a: sfx index

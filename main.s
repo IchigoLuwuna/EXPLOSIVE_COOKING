@@ -21,6 +21,8 @@
 	game_flags_mask_zapper = %00000100
 	clock = $04 ; 1bt: Clock counter
 	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
+	sfx_channel = $06	; 1bt: which channel sound will be played on
+						; FAMISTUDIO_SFX_CH0 ... FAMISTUDIO_SFX_CH3
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 
@@ -145,6 +147,7 @@ dheeg:
 .include "palettes.s"
 .include "sprite_utils.s"
 .include "math.s"
+.include "sound.s"
 
 ; Character memory
 .segment "CHARS"
