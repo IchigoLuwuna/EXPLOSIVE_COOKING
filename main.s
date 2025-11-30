@@ -6,9 +6,23 @@
 	.byte $01, $00        ; mapper 0, vertical mirroring
 
 .segment "ZEROPAGE_DATA"
-
-	joypad = $00	; 1bt: joypad info saved in $00
-	zapper = $01	; 1bt: zapper info saved in $01
+	reg_b = $00 ; 1bt: extra B register
+	reg_c = $01 ; 1bt: extra C register
+	reg_d = $02 ; 1bt: extra D register
+	reg_swap = $FF ; 1bt: volatile register
+	game_flags = $03 ; 1bt: extra flags
+		; 0 and 1: gamestate
+			; %00 = menu
+			; %01 = playing
+			; %10 = win
+			; %11 = lose
+		; 2: zapper half-pulled
+	game_flags_mask_gamestate = %00000011
+	game_flags_mask_zapper = %00000100
+	clock = $04 ; 1bt: Clock counter
+	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
+	joypad = $10 ; 1bt: Controller readout
+	zapper = $11 ; 1bt: Zapper readout
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -24,9 +38,6 @@
 
 ; Main code segment for the program
 .segment "CODE"
-
-.include "input.s"	; include inputs file
-
 reset:
 	sei		; disable IRQs
 	cld		; disable decimal mode
@@ -80,87 +91,10 @@ enable_rendering:
 	lda #%00010000	; Enable Sprites
 	sta $2001
 
-	jsr initialize_oam
-	jsr initialize_oam_enemy
+; Game Start
+jmp state_menu_start
 
-initialize_oam:
-	ldx dheegLittleGuy
-	stx $0200
-	ldy #$01
-	ldx dheegLittleGuy, y
-	stx $0201
-	ldy #$02
-	ldx dheegLittleGuy, y
-	stx $0202
-	ldy #$03
-	ldx dheegLittleGuy, y
-	stx $0203
-
-initialize_oam_enemy:
-	ldx evilDheeg
-	stx $0204 ; Y position of the enemy 
-
-	ldy #$01 
-	ldx evilDheeg, y ; Tile index of the enemy
-	stx $0205
-
-	ldy #$02
-	ldx evilDheeg, y ; Attributes of the enemy
-	stx $0206
-	
-	ldy #$03
-	ldx evilDheeg, y ; X position of the enemy
-	stx $0207
-
-
-forever:
-	jsr func_get_input	; get controller input and store in joypad ($00)
-	lda joypad
-	and #%10000000
-	cmp #%10000000
-	bne :+
-		ldx $0203 ; move dheeg to the right
-		inx
-		stx $0203
-	:
-	lda joypad
-	and #%01000000
-	cmp #%01000000
-	bne :+
-		ldx $0203 ; move dheeg to the left
-		dex
-		stx $0203
-	:
-	lda joypad
-	and #%00100000
-	cmp #%00100000
-	bne :+
-		ldx $0200 ; move dheeg downwards
-		inx
-		stx $0200
-	:
-	lda joypad
-	and #%00010000
-	cmp #%00010000
-	bne :+
-		ldx $0200 ; move dheeg upwards
-		dex
-		stx $0200
-	:
-	
-	;-------------- ENEMY MOVEMENT --------------
-	ldx $0207 ; x position of enemy
-	dex
-	stx $0207 ; move my evil man to the left
-	;--------------------------------------------
-	
-	; wait for vblank
-
-
-
-	jsr func_vblank_wait
-	jmp forever
-
+; Subroutines
 func_vblank_wait:
 	php
 	pha
@@ -196,14 +130,24 @@ nmi:
 	rti
 
 dheeg:
-	dheegLittleGuy: .byte $6c, $00, $00, $2e ; the man himself
-	characterD: .byte $6c, $03, $00, $4e ; D
+	dheeg_16x16_addr = $00
+	dheeg_top_left: .byte $00, $00, $00, $00
+	dheeg_top_right: .byte $00, $00, $00, $00
+	dheeg_bottom_left: .byte $00, $00, $00, $00
+	dheeg_bottom_right: .byte $00, $00, $00, $00
 
 evilDheeg:
 	.byte $80 , $00 , $00 , $F0; evil dheeg is real
 
-palettes:
-	.include "palettes.s"
+; Includes
+.include "bitmasks.s"
+.include "input.s"
+.include "random.s"
+.include "game.s"
+.include "menus.s"
+.include "palettes.s"
+.include "sprite_utils.s"
+.include "math.s"
 
 ; Character memory
 .segment "CHARS"
