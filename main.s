@@ -136,10 +136,9 @@ dheeg:
 	dheeg_bottom_left: .byte $00, $00, $00, $00
 	dheeg_bottom_right: .byte $00, $00, $00, $00
 
-evilDheeg:
-	.byte $80 , $00 , $00 , $F0; y , x , tile , attr
-evilDheeg2:
-  .byte $40, $10, $01, $F0  ; Enemy 2
+evilDheegs:
+	.byte $80 , $00 , $00 , $F0; y ,tile , attrib , x
+	.byte $81 , $00, $00 , $F8 ; y ,tile , attrib , x
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
@@ -153,4 +152,4 @@ evilDheeg2:
 ; Character memory
 .segment "CHARS"
 	.incbin "character_rom.chr"
-	.incbin "Typeface.chr"
+
