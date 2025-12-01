@@ -97,7 +97,7 @@ state_game_loop:
 		:
 	:
 
-	ldy (amount_of_evilDheegs * 4) + 3 ; point to last enemy's x attribute
+	ldy #$07 ; point to last enemy's x attribute
 	
 
 	loop_enemies:
@@ -105,6 +105,7 @@ state_game_loop:
 		sec
 		sbc #$01 ; move left by 1 pixel
 		sta evilDheegs , y
+		
 		dey ; decrement y to point to x attribute
 		bpl loop_enemies
 

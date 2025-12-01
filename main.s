@@ -131,16 +131,16 @@ nmi:
 
 dheeg:
 	dheeg_16x16_addr = $00
-	dheeg_top_left: .byte $00, $00, $00, $00
-	dheeg_top_right: .byte $00, $00, $00, $00
-	dheeg_bottom_left: .byte $00, $00, $00, $00
-	dheeg_bottom_right: .byte $00, $00, $00, $00
+	dheeg_top_left: .byte $00, $01, $00, $00
+	dheeg_top_right: .byte $00, $02, $00, $00
+	dheeg_bottom_left: .byte $00, $01, $00, $00
+	dheeg_bottom_right: .byte $00, $01, $00, $00
 
 evilDheegs:
-	evilDheeg_addr = $00
-	amount_of_evilDheegs = $01
-	.byte $80 , $00 , $00 , $F0; y ,tile , attrib , x
-	.byte $98 , $00, $00 , $00 ; y ,tile , attrib , x
+
+	amount_of_evilDheegs = $02
+	.byte $80 , $01 , $00 , $F0; y ,tile , attrib , x
+	.byte $88 , $01, $00 , $00 ; y ,tile , attrib , x
 	
 ; Includes
 .include "bitmasks.s"
