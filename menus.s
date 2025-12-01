@@ -10,6 +10,15 @@ state_menu_start_init:
 	cpy #$FF
 	bmi @flush
 
+	
+
+
+    ; Enable NMI and background rendering
+    lda #%10000000
+    sta $2000  ; PPUCTRL (enable NMI)
+    lda #%00001000
+    sta $2001  ; PPUMASK (enable background)
+
 
 state_menu_start_loop:
 @forever:
@@ -46,3 +55,5 @@ state_menu_pause_loop:
 
 	jsr func_vblank_wait
 jmp @forever
+
+
