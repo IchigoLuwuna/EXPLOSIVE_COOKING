@@ -24,6 +24,10 @@
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 
+	station_index = $20
+	cooking_status = $21
+	bullets = $22
+
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
 	.addr nmi
