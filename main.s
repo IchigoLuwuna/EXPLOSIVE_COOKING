@@ -10,6 +10,7 @@
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
 	reg_swap = $FF ; 1bt: volatile register
+	reg_oam_addr = $0F ; stores OAM page, for zapper
 	game_flags = $03 ; 1bt: extra flags
 		; 0 and 1: gamestate
 			; %00 = menu
@@ -92,6 +93,8 @@ enable_rendering:
 	sta $2001
 
 ; Game Start
+lda #$02
+sta reg_oam_addr
 jmp state_menu_start
 
 ; Subroutines
@@ -117,8 +120,8 @@ nmi:
 	pha
 
 	; copy Shadow OAM to PPU OAM
-	ldx #$02 ; Shadow OAM is on page 2
-	stx $4014 ; write to OAMDMA PPU register at hardware address $4014
+	lda reg_oam_addr
+	sta $4014 ; write to OAMDMA PPU register at hardware address $4014
 
 	; pull state after interrupt
 	pla
@@ -130,17 +133,18 @@ nmi:
 	rti
 
 dheeg:
-	dheeg_16x16_addr = $00
 	dheeg_top_left: .byte $00, $00, $00, $00
 	dheeg_top_right: .byte $00, $00, $00, $00
 	dheeg_bottom_left: .byte $00, $00, $00, $00
 	dheeg_bottom_right: .byte $00, $00, $00, $00
+	dheeg_16x16_addr = $00
 
 evilDheeg:
 	.byte $80 , $00 , $00 , $F0; y , x , tile , attr
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
+.include "zap.s"
 .include "random.s"
 .include "game.s"
 .include "menus.s"

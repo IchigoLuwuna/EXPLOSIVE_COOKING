@@ -7,7 +7,7 @@ state_menu_start_init:
 		sta $0200, y
 		iny
 	cpy #$FF
-	bmi :-
+	bne :-
 
 state_menu_start_loop:
 @forever:
