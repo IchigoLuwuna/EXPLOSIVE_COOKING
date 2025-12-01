@@ -137,8 +137,11 @@ dheeg:
 	dheeg_bottom_right: .byte $00, $00, $00, $00
 
 evilDheegs:
+	evilDheeg_addr = $00
+	amount_of_evilDheegs = $01
 	.byte $80 , $00 , $00 , $F0; y ,tile , attrib , x
-	.byte $81 , $00, $00 , $F8 ; y ,tile , attrib , x
+	.byte $98 , $00, $00 , $00 ; y ,tile , attrib , x
+	
 ; Includes
 .include "bitmasks.s"
 .include "input.s"

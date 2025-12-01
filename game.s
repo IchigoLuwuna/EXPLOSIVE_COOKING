@@ -97,17 +97,19 @@ state_game_loop:
 		:
 	:
 
-	; Update evilDheeg position YAYYYYYYYYYYYYY
-	lda $0213 ; get current X position
-	clc
-	sbc #$01 ; move left by 1 pixel
-	sta $0213 ; store new X position
+	ldy (amount_of_evilDheegs * 4) + 3 ; point to last enemy's x attribute
+	
 
-	;second enemy test
-	lda $0217; x position 2 :D
-	clc 
-	sbc #$02 ; move left by 2 pixels
-	sta $0217 ; store new X position
+	loop_enemies:
+		lda evilDheegs , y
+		sec
+		sbc #$01 ; move left by 1 pixel
+		sta evilDheegs , y
+		
+		dey ; decrement y to point to x attribute
+		bpl loop_enemies
+
+
 
 	inc clock
 	jsr func_vblank_wait
