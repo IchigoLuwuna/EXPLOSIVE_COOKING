@@ -138,6 +138,8 @@ dheeg:
 
 evilDheeg:
 	.byte $80 , $00 , $00 , $F0; y , x , tile , attr
+evilDheeg2:
+  .byte $40, $10, $01, $F0  ; Enemy 2
 ; Includes
 .include "bitmasks.s"
 .include "input.s"

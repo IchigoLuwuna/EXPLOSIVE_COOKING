@@ -1,13 +1,15 @@
+.segment "CODE"
 state_menu_start:
 state_menu_start_init:
 	; Flush OAM
 	ldy #$00
-	:
-		lda #$00
-		sta $0200, y
-		iny
+@flush:
+	lda #$00
+	sta $0200, y
+	iny
 	cpy #$FF
-	bmi :-
+	bmi @flush
+
 
 state_menu_start_loop:
 @forever:

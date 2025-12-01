@@ -20,24 +20,27 @@ state_game_init:
 	cpy #$10
 	bmi :-
 
-	;intialize evilDheeg position
 
+	;intialize evilDheeg position
 	ldx evilDheeg
-	stx $0204 ; Y position of the enemy 
+	stx $0210 ; Y position of the enemy 
 
 	ldy #$01
 
 	ldx evilDheeg, y ; Tile index of the enemy
-	stx $0205
+	stx $0211
 	
 	ldy #$02
 	ldx evilDheeg, y ; Attributes of the enemy
-	stx $0206
+	stx $0212
 	
 	ldy #$03
 	ldx evilDheeg, y ; X position of the enemy
-	stx $0207
+	stx $0213
 	; set dheeg initial position
+
+
+
 
 	ldx #$7F
 	ldy #$7F
@@ -105,10 +108,13 @@ state_game_loop:
 		:
 	:
 
-	; Update evilDheeg position
-	ldx $0207
-	dex
-	stx $0207
+	; Update evilDheeg position YAYYYYYYYYYYYYY
+	lda $0213 ; get current X position
+	clc
+	sbc #$01 ; move left by 1 pixel
+	sta $0213 ; store new X position
+
+
 
 	inc clock
 	jsr func_vblank_wait
