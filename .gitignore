@@ -7,3 +7,6 @@ out/
 *.o
 *.nes
 .editorconfig
+.vscode/compile.bat
+.vscode/launch.json
+.vscode/tasks.json
