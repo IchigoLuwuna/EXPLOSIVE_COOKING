@@ -130,15 +130,11 @@ nmi:
 	rti
 
 dheeg:
-	; dheeg is 16x16 right now, so 4 sprites
 	dheeg_16x16_addr = $00
 	dheeg_top_left: .byte $00, $00, $00, $00
 	dheeg_top_right: .byte $00, $00, $00, $00
 	dheeg_bottom_left: .byte $00, $00, $00, $00
 	dheeg_bottom_right: .byte $00, $00, $00, $00
-
-evilDheeg:
-	.byte $80 , $00 , $00 , $F0; evil dheeg is 4 bytes atm
 
 ; Includes
 .include "bitmasks.s"

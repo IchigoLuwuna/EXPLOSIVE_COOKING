@@ -19,26 +19,6 @@ state_game_init:
 		iny
 	cpy #$10
 	bmi :-
-
-	; ------evildheeg initiliation------
-	ldx evildheeg
-	sta $0204 ; x position
-
-	ldy #$01
-
-	ldx evilDheeg ,y 
-	stx $0205, y ; y position
-	
-	ldy #$01
-
-	ldx evilDheeg ,y
-	stx $0206, y ; tile index
-
-	ldy #$03
-	ldx evilDheeg ,y
-	stx $0207, y ; attributes
-	; ----------------------------------
-
 	ldx #$7F
 	ldy #$7F
 	lda dheeg_16x16_addr
@@ -104,14 +84,6 @@ state_game_loop:
 			jmp state_menu_pause
 		:
 	:
-
-	; ------enemy movement--------
-
-	ldx $0204 ; load x position of evil dheeg
-	dex
-	stx $0204 ; move evil dheeg left by 1 pixel :D!!! this is for now to just see everything works
-
-	; ----------------------------
 
 	inc clock
 	jsr func_vblank_wait
