@@ -19,6 +19,26 @@ state_game_init:
 		iny
 	cpy #$10
 	bmi :-
+
+	;intialize evilDheeg position
+
+	ldx evilDheeg
+	stx $0204 ; Y position of the enemy 
+
+	ldy #$01
+
+	ldx evilDheeg, y ; Tile index of the enemy
+	stx $0205
+	
+	ldy #$02
+	ldx evilDheeg, y ; Attributes of the enemy
+	stx $0206
+	
+	ldy #$03
+	ldx evilDheeg, y ; X position of the enemy
+	stx $0207
+	; set dheeg initial position
+
 	ldx #$7F
 	ldy #$7F
 	lda dheeg_16x16_addr
@@ -84,6 +104,11 @@ state_game_loop:
 			jmp state_menu_pause
 		:
 	:
+
+	; Update evilDheeg position
+	ldx $0207
+	dex
+	stx $0207
 
 	inc clock
 	jsr func_vblank_wait
