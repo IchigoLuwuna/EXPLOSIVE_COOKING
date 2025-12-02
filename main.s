@@ -139,8 +139,16 @@ dheeg:
 evilDheegs:
 
 	amount_of_evilDheegs = $02
-	.byte $80 , $01 , $00 , $F0; y ,tile , attrib , x
-	.byte $88 , $01, $00 , $00 ; y ,tile , attrib , x
+; Enemy 0
+    .byte $80, $01, $00, $F0  ; top-left
+    .byte $80, $02, $00, $F0+8 ; top-right
+    .byte $88, $03, $00, $F0   ; bottom-left
+    .byte $88, $04, $00, $F0+8 ; bottom-right
+	; Enemy 1
+    .byte $90, $01, $00, $10   ; top-left
+    .byte $90, $02, $00, $18   ; top-right
+    .byte $98, $03, $00, $10   ; bottom-left
+    .byte $98, $04, $00, $18   ; bottom-right
 	
 ; Includes
 .include "bitmasks.s"

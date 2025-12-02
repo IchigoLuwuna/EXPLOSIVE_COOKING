@@ -20,13 +20,13 @@ state_game_init:
 	cpy #$10
 	bmi :-
 
-	ldy #$00
-	:
-		lda evilDheegs,y
-		sta $0210, y
-		iny
-	cpy #$08
-	bmi :-
+ldy #$00
+copy_enemies_to_oam:
+    lda evilDheegs, y
+    sta $0210, y      ; $0210 = shadow OAM for enemies
+    iny
+    cpy #$20           ; 16 bytes per enemy * 2 enemies = 32
+    bne copy_enemies_to_oam
 	
 
 
@@ -97,21 +97,18 @@ forever:
 		:
 	:
 
-    ldx #$03           ; first enemy X byte (0210 + 3 = 0213)
+    ; Enemy 0 (top-left at $0210)
+    lda #$10           ; low byte of top-left sprite in shadow OAM
+    ldx #$FF           ; -1 → move left
+    ldy #$00
+    jsr func_move_16x16
 
-move_enemies:
-    lda $0210, x       ; load X from shadow OAM
-    sec
-    sbc #$01           ; X -= 1
-    sta $0210, x       ; store back into shadow OAM
+    ; Enemy 1 (top-left at $0220)
+    lda #$20
+    ldx #$FF           ; -1 → move left
+    ldy #$00
+    jsr func_move_16x16
 
-    inx
-    inx
-    inx
-    inx                ; move to next enemy's X byte
-
-    cpx #$0B           ; 3 + 8 = 11 -> past last X
-    bne move_enemies
 
 	inc clock
 	jsr func_vblank_wait
