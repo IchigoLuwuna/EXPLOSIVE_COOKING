@@ -26,7 +26,6 @@ state_game_init:
 	bmi :-
 
 
-
 ;-------- Copy enemy sprites to OAM and randomize---------
 
 
@@ -133,27 +132,39 @@ forever:
 			jmp state_menu_pause
 		:
 	:
-	lda enemyflags
-	and #%00000001
-	bne @skip_enemy0
-		; Enemy 0 (top-left at $0210)
-		lda #$10           ; low byte of top-left sprite in shadow OAM
-		ldx #$FF           ; -1  so moving to the left YIPPIE
-		ldy #$00
-		jsr func_move_16x16
-@skip_enemy0:
 
-	lda enemyflags
-	and #%00000010
-    bne @skip_enemy1
-		lda #$20
-		ldx #$FF           ; -1  so moving to the left YIPPIE
-		ldy #$00
-		jsr func_move_16x16
+   lda #0
+    sta reg_d              ; enemy index = 0
 
-@skip_enemy1:
+enemy_loop:
 
-	;
+    lda reg_d              ; A = enemy index
+    tay                    ; Y = enemy index
+
+    lda enemyflags
+    and mask,y         ; mask bit
+    bne enemy_skip         ; if bit=1 → skip enemy
+
+    ; Compute OAM offset (A = index)
+
+    tya
+    asl
+    asl
+    asl
+    asl                    ; ×16
+    clc
+    adc #$10               ; base OAM offset
+
+    ; movement
+    ldx #$FF               ; dx
+    ldy #$00               ; dy
+    jsr func_move_16x16
+
+enemy_skip:
+    inc reg_d
+    lda reg_d
+    cmp #2
+    bne enemy_loop
 
 	inc clock
 	jsr func_vblank_wait

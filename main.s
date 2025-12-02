@@ -24,6 +24,7 @@
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
+	mask = $40       ; one byte to hold bitmask
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
