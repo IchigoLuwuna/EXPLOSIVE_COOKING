@@ -2,6 +2,9 @@ state_game:
 state_game_init:
 	jsr func_seed_random
 
+    lda #$00
+    sta enemyflags    ; all enemies alive (0 = alive)
+
 	; Flush OAM
 	ldy #$00
 	:
@@ -11,6 +14,8 @@ state_game_init:
 	cpy #$FF
 	bmi :-
 
+
+
 	; Initialize OAM
 	ldy #$00
 	:
@@ -19,6 +24,7 @@ state_game_init:
 		iny
 	cpy #$10
 	bmi :-
+
 
 
 ;-------- Copy enemy sprites to OAM and randomize---------
@@ -127,19 +133,27 @@ forever:
 			jmp state_menu_pause
 		:
 	:
+	lda enemyflags
+	and #%00000001
+	bne @skip_enemy0
+		; Enemy 0 (top-left at $0210)
+		lda #$10           ; low byte of top-left sprite in shadow OAM
+		ldx #$FF           ; -1  so moving to the left YIPPIE
+		ldy #$00
+		jsr func_move_16x16
+@skip_enemy0:
 
-    ; Enemy 0 (top-left at $0210)
-    lda #$10           ; low byte of top-left sprite in shadow OAM
-    ldx #$FF           ; -1 → move left
-    ldy #$00
-    jsr func_move_16x16
+	lda enemyflags
+	and #%00000010
+    bne @skip_enemy1
+		lda #$20
+		ldx #$FF           ; -1  so moving to the left YIPPIE
+		ldy #$00
+		jsr func_move_16x16
 
-    ; Enemy 1 (top-left at $0220)
-    lda #$20
-    ldx #$FF           ; -1 → move left
-    ldy #$00
-    jsr func_move_16x16
+@skip_enemy1:
 
+	;
 
 	inc clock
 	jsr func_vblank_wait
