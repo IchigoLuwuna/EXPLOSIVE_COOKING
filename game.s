@@ -20,7 +20,11 @@ state_game_init:
 	cpy #$10
 	bmi :-
 
-ldy #$00
+
+;-------- Copy enemy sprites to OAM and randomize---------
+
+
+	ldy #$00
 copy_enemies_to_oam:
     lda evilDheegs, y
     sta $0210, y      ; $0210 = shadow OAM for enemies
@@ -29,6 +33,33 @@ copy_enemies_to_oam:
     bne copy_enemies_to_oam
 	
 
+
+	ldy #$00
+
+	
+	randomize_enemies:
+	jsr func_random_to_acc
+	and #%01111111
+	sta $0210
+	lda $0210
+	clc
+	adc #8
+	sta $0214
+	sta $0218
+	adc #8
+	sta $021C
+
+	jsr func_random_to_acc
+	and #%01111111
+	sta $0220
+	lda $0220
+	clc
+	adc #8
+	sta $0224
+	sta $0228
+	adc #8
+	sta $022C
+;-----------------------------------------------------------
 
 
 	ldx #$7F
