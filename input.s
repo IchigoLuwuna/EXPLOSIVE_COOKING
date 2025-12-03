@@ -11,6 +11,8 @@ func_get_input:
     pha
 
     ; function start
+    lda joypad  ; save previous joypad state
+    sta joypad_previous
 
     ; poll controller 1 input
     lda #$01

@@ -22,6 +22,7 @@
 	clock = $04 ; 1bt: Clock counter
 	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
 	joypad = $10 ; 1bt: Controller readout
+	joypad_previous = $12 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 
 	station_index = $20
