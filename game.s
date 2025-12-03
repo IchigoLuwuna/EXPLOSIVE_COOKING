@@ -85,6 +85,8 @@ state_game_loop:
 		:
 	:
 
+	jsr func_handle_interactions
+
 	inc clock
 	jsr func_vblank_wait
 jmp @forever
