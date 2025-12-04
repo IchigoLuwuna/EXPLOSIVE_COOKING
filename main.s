@@ -142,6 +142,8 @@ dheeg:
 	dheeg_bottom_left: .byte $00, $00, $00, $00
 	dheeg_bottom_right: .byte $00, $00, $00, $00
 
+evilDheeg:
+	.byte $80 , $00 , $00 , $F0; y , x , tile , attr
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
