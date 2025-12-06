@@ -9,7 +9,7 @@ state_game_init:
 		sta $0200, y
 		iny
 	cpy #$FF
-	bmi :-
+	bne :-
 
 	; Initialize OAM
 	ldy #$00

@@ -99,15 +99,9 @@ jmp state_menu_start
 
 ; Subroutines
 func_vblank_wait:
-	php
-	pha
-
 	@loop:
 		bit $2002
 		bpl @loop
-
-	pla
-	plp
 	rts
 
 nmi:
