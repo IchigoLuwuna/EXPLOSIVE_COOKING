@@ -2,6 +2,9 @@ state_game:
 state_game_init:
 	jsr func_seed_random
 
+    lda #$00
+    sta enemyflags    ; all enemies alive (0 = alive)
+
 	; Flush OAM
 	ldy #$00
 	:
@@ -10,6 +13,8 @@ state_game_init:
 		iny
 	cpy #$FF
 	bmi :-
+
+
 
 	; Initialize OAM
 	ldy #$00
@@ -20,24 +25,44 @@ state_game_init:
 	cpy #$10
 	bmi :-
 
-	;intialize evilDheeg position
 
-	ldx evilDheeg
-	stx $0210 ; Y position of the enemy
+;-------- Copy enemy sprites to OAM and randomize---------
+	ldy #$00
+copy_enemies_to_oam:
+    lda evilDheegs, y
+    sta $0210, y      ; $0210 = shadow OAM for enemies
+    iny
+    cpy #$20           ; 16 bytes per enemy * 2 enemies = 32
+    bne copy_enemies_to_oam
+	
 
-	ldy #$01
 
-	ldx evilDheeg, y ; Tile index of the enemy
-	stx $0211
+	ldy #$00
 
-	ldy #$02
-	ldx evilDheeg, y ; Attributes of the enemy
-	stx $0212
+	
+	randomize_enemies:
+	jsr func_random_to_acc
+	and #%01111111
+	sta $0210
+	lda $0210
+	clc
+	adc #8
+	sta $0214
+	sta $0218
+	adc #8
+	sta $021C
 
-	ldy #$03
-	ldx evilDheeg, y ; X position of the enemy
-	stx $0213
-	; set dheeg initial position
+	jsr func_random_to_acc
+	and #%01111111
+	sta $0220
+	lda $0220
+	clc
+	adc #8
+	sta $0224
+	sta $0228
+	adc #8
+	sta $022C
+;-----------------------------------------------------------
 
 	ldx #$7F
 	ldy #$7F
@@ -46,7 +71,7 @@ state_game_init:
 
 ; allows jumping without reinitialising
 state_game_loop:
-@forever:
+forever:
 	lda joypad
 	sta reg_c ; store state of joypad on previous frame in reg_c -> allows for non-repeating actions on held input
 	jsr func_get_input	; get controller input and store in joypad ($00)
@@ -105,11 +130,39 @@ state_game_loop:
 		:
 	:
 
-	; Update evilDheeg position
-	ldx $0213
-	dex
-	stx $0213
+   lda #0
+    sta reg_d              ; enemy index = 0
+
+enemy_loop:
+
+    lda reg_d              ; A = enemy index
+    tay                    ; Y = enemy index
+
+    lda enemyflags
+    and mask,y         ; mask bit
+    bne enemy_skip         ; if bit=1 → skip enemy
+
+    ; Compute OAM offset (A = index)
+
+    tya
+    asl
+    asl
+    asl
+    asl                    ; ×16
+    clc
+    adc #$10               ; base OAM offset
+
+    ; movement
+    ldx #$FF               ; dx
+    ldy #$00               ; dy
+    jsr func_move_16x16
+
+enemy_skip:
+    inc reg_d
+    lda reg_d
+    cmp #2
+    bne enemy_loop
 
 	inc clock
 	jsr func_vblank_wait
-jmp @forever
+jmp forever

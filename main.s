@@ -23,6 +23,8 @@
 	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
+	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
+	mask = $40       ; one byte to hold bitmask
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -131,13 +133,25 @@ nmi:
 
 dheeg:
 	dheeg_16x16_addr = $00
-	dheeg_top_left: .byte $00, $00, $00, $00
-	dheeg_top_right: .byte $00, $00, $00, $00
-	dheeg_bottom_left: .byte $00, $00, $00, $00
-	dheeg_bottom_right: .byte $00, $00, $00, $00
+	dheeg_top_left: .byte $00, $01, $00, $00
+	dheeg_top_right: .byte $00, $02, $00, $00
+	dheeg_bottom_left: .byte $00, $03, $00, $00
+	dheeg_bottom_right: .byte $00, $04, $00, $00
 
-evilDheeg:
-	.byte $80 , $00 , $00 , $F0; y , x , tile , attr
+evilDheegs:
+
+	amount_of_evilDheegs = $02
+; Enemy 0
+    .byte $80, $01, $00, $F0  ; top-left
+    .byte $80, $02, $00, $F0+8 ; top-right
+    .byte $88, $03, $00, $F0   ; bottom-left
+    .byte $88, $04, $00, $F0+8 ; bottom-right
+	; Enemy 1
+    .byte $90, $01, $00, $10   ; top-left
+    .byte $90, $02, $00, $18   ; top-right
+    .byte $98, $03, $00, $10   ; bottom-left
+    .byte $98, $04, $00, $18   ; bottom-right
+	
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
