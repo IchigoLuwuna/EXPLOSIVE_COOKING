@@ -22,9 +22,15 @@
 	clock = $04 ; 1bt: Clock counter
 	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
 	joypad = $10 ; 1bt: Controller readout
+	joypad_previous = $12 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
 	mask = $40       ; one byte to hold bitmask
+
+	station_index = $20
+	cooking_status = $21
+	bullets = $22
+	material_inventory = $23
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -161,6 +167,7 @@ evilDheegs:
 .include "palettes.s"
 .include "sprite_utils.s"
 .include "math.s"
+.include "interaction.s"
 
 ; Character memory
 .segment "CHARS"

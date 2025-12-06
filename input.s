@@ -5,6 +5,8 @@ func_get_input:
     ; not pushing register because function is called at start of loop
 
     ; function start
+    lda joypad  ; save previous joypad state
+    sta joypad_previous
 
     ; get joypad input
     ; poll controller 1 input
