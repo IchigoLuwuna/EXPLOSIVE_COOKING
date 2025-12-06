@@ -10,8 +10,8 @@ MAT_SCRAP_POSY = $10
 
 ; station: cooking pot
 STTN_POT_INDEX = %00000010
-STTN_POT_POSX = $50
-STTN_POT_POSY = $50
+STTN_POT_POSX = $30
+STTN_POT_POSY = $10
 
 ; player
 ;   bool at_station     :: game flags bit 3
@@ -60,6 +60,31 @@ func_handle_interactions:
                 bmi :+
                     ; runs if x and y are within 8 pixels
                     lda #MAT_SCRAP_INDEX    ; set station index to the one collided with
+                    sta station_index
+                    lda #AT_STATION         ; set at_station flag to true
+                    ora game_flags
+                    sta game_flags
+                    jmp input_handling
+    :
+
+    ; check x
+    lda #STTN_POT_POSX
+    sbc PLR_POSX_ADDR
+    clc
+    cmp #INTERACT_OFFSET_PLS
+    bpl :+  ; if x is outside range, skip other checks
+        cmp #INTERACT_OFFSET_MNS
+        bmi :+  ; if x is outside range, skip other checks
+            ; check y
+            lda #STTN_POT_POSY
+            sbc PLR_POSY_ADDR
+            clc
+            cmp #INTERACT_OFFSET_PLS
+            bpl :+  ; if y is outside range, skip other checks
+                cmp #INTERACT_OFFSET_MNS
+                bmi :+
+                    ; runs if x and y are within 8 pixels
+                    lda #STTN_POT_INDEX    ; set station index to the one collided with
                     sta station_index
                     lda #AT_STATION         ; set at_station flag to true
                     ora game_flags
@@ -116,6 +141,7 @@ input_handling:
         :
         jmp interaction_end ; break
     :
+
 interaction_end:
     rts
 
