@@ -12,7 +12,7 @@ state_game_init:
 		sta $0200, y
 		iny
 	cpy #$FF
-	bmi :-
+	bne :-
 
 
 
@@ -74,7 +74,24 @@ state_game_loop:
 forever:
 	lda joypad
 	sta reg_c ; store state of joypad on previous frame in reg_c -> allows for non-repeating actions on held input
+	lda zapper
+	sta reg_d ; store state of zapper on previous frame
 	jsr func_get_input	; get controller input and store in joypad ($00)
+
+	; Read zapper
+	lda reg_d
+	and #ZAPPER_HALF_PULLED
+	cmp #ZAPPER_HALF_PULLED ; if was half pulled last frame
+	bne :++
+		lda zapper
+		and #ZAPPER_HALF_PULLED
+		cmp #00 ; if not half pulled this frame
+		bne :+
+			jsr game_sub_state_zap
+		:
+	:
+
+	; Read joypad
 	lda joypad
 	and #PAD_RIGHT
 	cmp #PAD_RIGHT
@@ -89,9 +106,7 @@ forever:
 	and #PAD_LEFT
 	cmp #PAD_LEFT
 	bne :+
-		lda #$01
-		jsr func_opposite_a
-		tax
+		ldx #$FF ; -1
 		ldy #$00
 		lda #$00
 		jsr func_move_16x16
@@ -112,9 +127,7 @@ forever:
 	cmp #PAD_UP
 	bne :+
 		ldx #$00
-		lda #$01
-		jsr func_opposite_a
-		tay
+		ldy #$FF ; -1
 		lda #$00
 		jsr func_move_16x16
 	:
