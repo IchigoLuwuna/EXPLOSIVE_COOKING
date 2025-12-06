@@ -169,4 +169,4 @@ evilDheegs:
 
 ; Character memory
 .segment "CHARS"
-	.incbin "character_rom.chr"
+	.incbin "spriteRom.chr"
