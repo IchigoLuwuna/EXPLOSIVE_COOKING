@@ -147,10 +147,7 @@ forever:
     sta reg_d              ; enemy index = 0
 
 enemy_loop:
-
-    lda reg_d              ; A = enemy index
-    tay                    ; Y = enemy index
-
+    ldy reg_d              ; A = enemy index
     lda enemyflags
     and mask,y         ; mask bit
     bne enemy_skip         ; if bit=1 → skip enemy
