@@ -24,7 +24,7 @@
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
-	mask = $40       ; one byte to hold bitmask
+	enemyMask = $40       ; one byte to hold bitmask
 	menu_selection = $31  ; 0 = START, 1 = EXIT
 	arrow_x = $32
 	arrow_y = $33

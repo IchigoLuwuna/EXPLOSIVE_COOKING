@@ -43,27 +43,17 @@ copy_enemies_to_oam:
 
 	
 	randomize_enemies:
-	jsr func_random_to_acc
-	and #%01111111
-	sta $0210
-	lda $0210
-	clc
-	adc #8
-	sta $0214
-	sta $0218
-	adc #8
-	sta $021C
+	jsr func_random_to_acc      ; get random byte in A
+	and #%01111111              ; limit to 0-127 (screen height)
+	ldy #$00                     ; base sprite offset in OAM for enemy 0
+	lda #$00
+	jsr func_move_16x16          ; X=0, Y=A → only move vertically
 
 	jsr func_random_to_acc
 	and #%01111111
-	sta $0220
-	lda $0220
-	clc
-	adc #8
-	sta $0224
-	sta $0228
-	adc #8
-	sta $022C
+	ldy #$10                     ; base sprite offset in OAM for enemy 1 (next 16x16 block)
+	lda #$00
+	jsr func_move_16x16          ; X=0, Y=A
 ;-----------------------------------------------------------
 
 
@@ -138,11 +128,11 @@ forever:
 
 enemy_loop:
 
-    lda reg_d              ; A = enemy index
-    tay                    ; Y = enemy index
+    ldy reg_d              ; A = enemy index
+                        ; Y = enemy index
 
     lda enemyflags
-    and mask,y         ; mask bit
+    and enemyMask,y         ; mask bit
     bne enemy_skip         ; if bit=1 → skip enemy
 
     ; Compute OAM offset (A = index)

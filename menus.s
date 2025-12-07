@@ -158,14 +158,19 @@ state_menu_start_loop:
     sta $4014        ; DMA to OAM
 
 ; Check START button
+; Check START button
     lda joypad
     and #PAD_START
-    beq @wait_vblank
+    beq @wait_vblank        ; not pressed, skip
     lda reg_c
     and #PAD_START
-    bne @wait_vblank
-    jmp state_game
+    bne @wait_vblank        ; held from previous frame, skip
 
+    ; Only start game if START is selected
+    lda menu_selection
+    cmp #$00                ; 0 = START
+    bne @wait_vblank        ; if not START, do nothing
+    jmp state_game           ; otherwise start game
 @wait_vblank:
     jsr func_vblank_wait
     jmp @forever
