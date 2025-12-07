@@ -2,7 +2,7 @@ state_game:
 state_game_init:
 	jsr func_seed_random
 
-    lda #$00
+    lda #$10
     sta enemyflags    ; all enemies alive (0 = alive)
 
 	; Flush OAM
