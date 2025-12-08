@@ -33,6 +33,8 @@
 	bullets = $22
 	material_inventory = $23
 
+	first_wall_addr = $E0	; 16bt array
+
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
 	.addr nmi
@@ -166,6 +168,7 @@ evilDheegs:
 .include "sprite_utils.s"
 .include "math.s"
 .include "interaction.s"
+.include "collision.s"
 
 ; Character memory
 .segment "CHARS"
