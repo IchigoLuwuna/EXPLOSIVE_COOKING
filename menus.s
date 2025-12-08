@@ -24,10 +24,10 @@ state_menu_start_init:
     ; ----------------------------
     ; Initialize arrow sprite
     ; ----------------------------
-; Initialize arrow sprite near START menu item
+
     lda #$60        ; row 12 tile = 96
     sec
-    sbc #$02        ; add 2 pixels down to align with letters visually
+    sbc #$02        
     sta arrow_y
 	lda #$60           ; column for X position
 	sec
@@ -38,7 +38,8 @@ state_menu_start_init:
 	sta arrow_tile
 	lda #$00           ; start on first menu item
 	sta menu_selection
-	; Set scroll to 0,0 
+	
+    ; Set scroll to 0,0 
 
     lda #$00
     sta $2005

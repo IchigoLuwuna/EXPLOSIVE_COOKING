@@ -23,12 +23,13 @@
 	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
-	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
-	enemyMask = $40       ; one byte to hold bitmask
+	enemyAlive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
 	menu_selection = $31  ; 0 = START, 1 = EXIT
 	arrow_x = $32
 	arrow_y = $33
 	arrow_tile = $34
+	enemyMask = $40       ; one byte to hold bitmask
+	ammoCount = $41 ; holds the amount of bullets (starts at max)
 
 
 .segment "VECTORS"
@@ -154,6 +155,7 @@ dheeg:
 .include "sprite_utils.s"
 .include "math.s"
 .include "enemies.s"
+.include "counterAmmo.s"
 ; Character memory
 .segment "CHARS"
 	.incbin "character_rom.chr"

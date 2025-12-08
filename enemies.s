@@ -34,7 +34,7 @@ enemy_loop:
     ldy reg_d              ; A = enemy index
                         ; Y = enemy index
 
-    lda enemyflags
+    lda enemyAlive
     and enemyMask,y         ; mask bit
     bne enemy_skip         ; if bit=1 → skip enemy
 
