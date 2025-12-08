@@ -10,6 +10,7 @@
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
 	reg_swap = $FF ; 1bt: volatile register
+	reg_oam_addr = $0F ; stores OAM page, for zapper
 	game_flags = $03 ; 1bt: extra flags
 		; 0 and 1: gamestate
 			; %00 = menu
@@ -24,6 +25,8 @@
 	joypad = $10 ; 1bt: Controller readout
 	joypad_previous = $12 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
+	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
+	mask = $40       ; one byte to hold bitmask
 
 	station_index = $20
 	cooking_status = $21
@@ -98,19 +101,15 @@ enable_rendering:
 	sta $2001
 
 ; Game Start
+lda #$02
+sta reg_oam_addr
 jmp state_menu_start
 
 ; Subroutines
 func_vblank_wait:
-	php
-	pha
-
 	@loop:
 		bit $2002
 		bpl @loop
-
-	pla
-	plp
 	rts
 
 nmi:
@@ -123,8 +122,8 @@ nmi:
 	pha
 
 	; copy Shadow OAM to PPU OAM
-	ldx #$02 ; Shadow OAM is on page 2
-	stx $4014 ; write to OAMDMA PPU register at hardware address $4014
+	lda reg_oam_addr
+	sta $4014 ; write to OAMDMA PPU register at hardware address $4014
 
 	; pull state after interrupt
 	pla
@@ -136,17 +135,30 @@ nmi:
 	rti
 
 dheeg:
+	dheeg_top_left: .byte $00, $01, $00, $00
+	dheeg_top_right: .byte $00, $02, $00, $00
+	dheeg_bottom_left: .byte $00, $03, $00, $00
+	dheeg_bottom_right: .byte $00, $04, $00, $00
 	dheeg_16x16_addr = $00
-	dheeg_top_left: .byte $00, $00, $00, $00
-	dheeg_top_right: .byte $00, $00, $00, $00
-	dheeg_bottom_left: .byte $00, $00, $00, $00
-	dheeg_bottom_right: .byte $00, $00, $00, $00
 
-evilDheeg:
-	.byte $80 , $00 , $00 , $F0; y , x , tile , attr
+evilDheegs:
+
+	amount_of_evilDheegs = $02
+; Enemy 0
+    .byte $80, $01, $00, $F0  ; top-left
+    .byte $80, $02, $00, $F0+8 ; top-right
+    .byte $88, $03, $00, $F0   ; bottom-left
+    .byte $88, $04, $00, $F0+8 ; bottom-right
+	; Enemy 1
+    .byte $90, $01, $00, $10   ; top-left
+    .byte $90, $02, $00, $18   ; top-right
+    .byte $98, $03, $00, $10   ; bottom-left
+    .byte $98, $04, $00, $18   ; bottom-right
+	
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
+.include "zap.s"
 .include "random.s"
 .include "game.s"
 .include "menus.s"
@@ -157,4 +169,4 @@ evilDheeg:
 
 ; Character memory
 .segment "CHARS"
-	.incbin "character_rom.chr"
+	.incbin "spriteRom.chr"
