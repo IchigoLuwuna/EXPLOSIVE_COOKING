@@ -10,21 +10,26 @@ state_menu_start_init:
 	cpy #$FF
 	bmi @flush
 
+	jsr func_clear_nametable
+
 
     ; Drawing menu the middle
+	lda #$00
+	sta $2000
+	sta $2001
 
 	lda #$20        ; high byte of $2000
 	sta $2006
 	lda #$AE        ; low byte
 	sta $2006
 
-	; Set scroll to 0,0 
+	; Set scroll to 0,0
 	lda #$00
 	sta $2005
 	lda #$00
 	sta $2005
 
-	ldx #$00        
+	ldx #$00
 menu_text_loop:
     lda menu_text, x
     sta $2007      ; write tile to PPU
@@ -35,7 +40,7 @@ menu_text_loop:
 	; Enable NMI and rendering
 	lda #%10000000   ; enable NMI
 	sta $2000
-	lda #%00011110   ; show background + sprites 
+	lda #%00011110   ; show background + sprites
 	sta $2001
 
 state_menu_start_loop:
