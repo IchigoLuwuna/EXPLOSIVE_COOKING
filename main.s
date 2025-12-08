@@ -10,7 +10,7 @@
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
 	reg_swap = $FF ; 1bt: volatile register
-	reg_oam_addr = $0F ; stores OAM page, for zapper
+	reg_oam_addr = $02 ; stores OAM page, for zapper
 	game_flags = $03 ; 1bt: extra flags
 		; 0 and 1: gamestate
 			; %00 = menu
@@ -25,8 +25,8 @@
 	joypad = $10 ; 1bt: Controller readout
 	joypad_previous = $12 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
-	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
-	mask = $40       ; one byte to hold bitmask
+	enemy_alive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
+	enemy_mask = $40       ; one byte to hold bitmask
 
 	station_index = $20
 	cooking_status = $21
@@ -154,7 +154,7 @@ evilDheegs:
     .byte $90, $02, $00, $18   ; top-right
     .byte $98, $03, $00, $10   ; bottom-left
     .byte $98, $04, $00, $18   ; bottom-right
-	
+
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
