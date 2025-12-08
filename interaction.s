@@ -1,28 +1,18 @@
-; station   :: in ROM
-;   1bt index
-;       even = station, odd is material
-;   2bt position
-
 ; material: scrap
-MAT_SCRAP_INDEX = %00000011
-MAT_SCRAP_POSX = $10
-MAT_SCRAP_POSY = $10
+MAT_SCRAP_INDEX =   %00000011
+MAT_SCRAP_POSX =    $10
+MAT_SCRAP_POSY =    $10
 
 ; station: cooking pot
-STTN_POT_INDEX = %00000010
-STTN_POT_POSX = $30
-STTN_POT_POSY = $10
+STTN_POT_INDEX =    %00000010
+STTN_POT_POSX =     $30
+STTN_POT_POSY =     $10
 
-; player
-;   bool at_station     :: game flags bit 3
-;   1bt station_index   :: zpg $20
-;   1bt cooking_status  :: zpg $21
-;       int counter for times pressed
-;   1bt material_inventory  :: zpg $23
-;       bit 0, 1: scrap (0-3)
-;       bit 2, 3: ... (0-3)
-;   1bt bullets         :: zpg $22
-;       type and amount
+; station: forge
+STTN_FORGE_INDEX =  %00000100
+
+; station: ammo
+STTN_AMMO_INDEX =  %00000110
 
 ; player
 PLR_POSX_ADDR = $0203
@@ -30,16 +20,31 @@ PLR_POSY_ADDR = $0200
 
 INTERACT_HEIGHT = $10
 
+;------------------------------
+;------------------------------
+func_initialize_cook:
+    ; randomly select required materials
+    ; randomly select required button inputs
+    ; set cooking status to #$0000
+    rts
 
+
+;------------------------------
+; for(station in cooking_stations)
+;   if(player.position within 8 pixels)
+;       station_index = station.index
+;       at_station = true
+;       jmp input handling
+; else
+;   at_station = false
+;
+; if(station_index.isMaterial())
+;   HandleMaterial();
+; else
+;   Cook()
+;------------------------------
 func_handle_interactions:
     ; get current cooking station index
-
-    ; for(station in cooking_stations)
-    ;   if(player.position within 8 pixels)
-    ;       station_index = station.index
-    ;       at_station = true
-    ;       jmp input handling
-    ; at_station = false
 
     ; check x
     lda #MAT_SCRAP_POSX
@@ -70,13 +75,174 @@ func_handle_interactions:
     lda #INV_AT_STATION     ; set at_station flag to false
     and game_flags
     sta game_flags
-    lda #$00                ; reset cooking_status
-    sta cooking_status
     jmp interaction_end     ; skip input handling
     
 input_handling:
-    ; switch(station_index)
+    ; if first bit is 1: handle material
     lda station_index
+    and #%00000001
+    cmp #%0000000
+    bne :++
+        jsr func_handle_material
+        jmp interaction_end
+    :
+    ; else: cook
+    jsr func_cook
+
+interaction_end:
+    rts
+
+
+;------------------------------
+; switch(cooking_status)
+; {
+;   case start:
+;       if station_index == pot.index
+;           if current_material == required_material
+;               if a is held
+;                   cooking_status.type = forging;
+;       break;
+;   case forging:
+;       if station_index == forge.index
+;           reg_a = GetForgeInput();
+;
+;           switch(reg_a)
+;           {
+;               case UP:
+;                   if up is pressed and no other directional input
+;                       ++cooking_status;
+;                       if cooking_status == 3
+;                           cooking_status.type = ready;
+;                   break;
+;               ...
+;           }
+;
+;       break;
+;   case ready:
+;       if station_index == ammo.index
+;           if a is held
+;               FinishCook();
+;       break;
+; }
+;------------------------------
+func_cook:
+    ; switch(cooking_status)
+    lda cooking_status
+    and #COOKING_STATUS_TYPE
+    cmp #%00000000
+    bne :++  ; case start:
+        ; if station is pot: check required materials
+        lda station_index
+        cmp #STTN_POT_INDEX
+        bne :+
+            ; if current materials == required materials: check input
+            lda required_materials
+            cmp material_inventory
+            bne :+
+                ; if A is held: all checks succeeded -> set status to forging
+                lda joypad
+                and PAD_A
+                cmp #$00
+                beq :+
+                    ; set status to forging
+                    lda cooking_status
+                    and #%11001111
+                    ora #%00010000
+                    sta cooking_status
+        :
+        jmp cook_end    ; break
+    :
+    cmp #%00010000
+    bne :++++++++++  ; case forging:
+        ; if station is forge: check required input
+        lda station_index
+        cmp #STTN_FORGE_INDEX
+        bne :+++++++++
+            ; put next input into register A
+            jsr func_get_cooking_input
+            ; switch(reg_a)
+            cmp #$00
+            bne :++  ; case UP
+                ; if pressing up and no other directional input: increment cooking status
+                lda joypad
+                and #%11110000
+                cmp #PAD_UP
+                bne :+
+                    jmp cook_forge
+                :
+                jmp cook_end    ; break
+            :
+            cmp #$01
+            bne :++  ; case RIGHT
+                ; if pressing right and no other directional input: increment cooking status
+                lda joypad
+                and #%11110000
+                cmp #PAD_RIGHT
+                bne :+
+                    jmp cook_forge
+                :
+                jmp cook_end    ; break
+            :
+            cmp #$02
+            bne :++  ; case DOWN
+                ; if pressing down and no other directional input: increment cooking status
+                lda joypad
+                and #%11110000
+                cmp #PAD_DOWN
+                bne :+
+                    jmp cook_forge
+                :
+                jmp cook_end    ; break
+            :
+            cmp #$03
+            bne :++  ; case LEFT
+                ; if pressing left and no other directional input: increment cooking status
+                lda joypad
+                and #%11110000
+                cmp #PAD_LEFT
+                bne :+
+                    jmp cook_forge
+                :
+                jmp cook_end    ; break
+            :
+        :
+        jmp cook_end    ; break
+    :
+    cmp #%00100000
+    bne :++  ; case ready:
+        ; if station is ammo drop off zone: check required input
+        lda station_index
+        cmp #STTN_AMMO_INDEX
+        bne :+
+            lda joypad
+            and #PAD_A
+            cmp #PAD_A
+            bne :+
+                jsr func_finish_cook
+                lda #$00
+                sta cooking_status
+        :
+        jmp cook_end    ; break
+    :
+    jmp cook_end
+cook_forge:
+    lda cooking_status
+    adc #$01
+    clc
+    sta cooking_status
+    and #%00001111
+    cmp #$03
+    bne :+
+        ; succeeded 4 inputs: set state to ready
+        lda cooking_status
+        and #%11001111
+        ora #%00100000
+        sta cooking_status
+cook_end:
+    rts
+
+func_handle_material:
+    lda station_index ; switch(station_index)
     cmp #MAT_SCRAP_INDEX    ; case material_scrap:
     bne :++
         lda joypad                      ; if A is pressed
@@ -91,42 +257,41 @@ input_handling:
                 iny
                 sty material_inventory
         :
-        jmp interaction_end ; break
-    :
-    cmp #STTN_POT_INDEX     ; case station_pot:
-    bne :+++
-        lda joypad                      ; if Up is pressed
-	    and #PAD_UP
-	    cmp #PAD_UP
-	    bne :++
-            lda joypad_previous         ; if Up was not pressed last frame
-	        and #PAD_UP
-	        cmp #PAD_UP
-	        beq :++
-                lda cooking_status      ; increment cooking_status
-                adc #$01
-                clc
-                cmp #$04                ; if pressed 4 or more times
-                bne :+
-                    jsr func_finish_cook    ; cooking successful
-                    lda #$00                ; reset cooking_status
-                :
-                sta cooking_status
-        :
-        jmp interaction_end ; break
+        rts ; break
     :
 
-interaction_end:
     rts
 
 
-
-; not propery implemented yet
+;------------------------------
+;------------------------------
 func_finish_cook:
     ; add bullets or something?
-    lda bullets
-    adc #$04
-    clc
-    sta bullets
+    rts
+
+
+;------------------------------
+; load the next input in the input sequence into register A
+;------------------------------
+func_get_cooking_input:
+    lda input_sequence
+    sta reg_b
+
+@loop:
+    lda cooking_status
+    and #COOKING_STATUS_COUNTER
+    cmp #$00
+    beq :+
+        sbc #$01
+        clc
+        lda reg_b
+        lsr
+        lsr
+        sta reg_b
+        jmp @loop
+    :
+
+    lda reg_b
+    and #%00000011
 
     rts
