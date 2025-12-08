@@ -80,6 +80,7 @@ jsr func_vblank_wait
 lda #%00010000 ; set bit 4 (render sprites) to 1
 sta $2001
 
+; Display zap frame
 jsr func_vblank_wait
 
 game_sub_state_zap_return:
