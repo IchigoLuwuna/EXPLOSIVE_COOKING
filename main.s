@@ -166,6 +166,7 @@ evilDheegs:
 .include "sprite_utils.s"
 .include "math.s"
 .include "interaction.s"
+.include "collision.s"
 
 ; Character memory
 .segment "CHARS"
