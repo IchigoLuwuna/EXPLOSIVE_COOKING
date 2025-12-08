@@ -6,7 +6,6 @@ enemies_to_oam:
     cpy #$20           ; 16 bytes per enemy * 2 enemies = 32
     bne enemies_to_oam
     rts
-	
 
 
 
@@ -66,7 +65,7 @@ evilDheegs:
 
 	amount_of_evilDheegs = $02
 ; Enemy 0
-    .byte $80, $01, $00, $F0  ; top-left
+    .byte $80, $01, $00, $F0  ; top-left ; Y pos , tile , attr , x pos
     .byte $80, $02, $00, $F0+8 ; top-right
     .byte $88, $03, $00, $F0   ; bottom-left
     .byte $88, $04, $00, $F0+8 ; bottom-right

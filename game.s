@@ -25,11 +25,11 @@ state_game_init:
 	cpy #$10
 	bmi :-
 
-
-
 	jsr enemies_to_oam
 
 	jsr enemies_init
+
+	jsr ammo_oam
 
 	ldx #$7F
 	ldy #$7F
