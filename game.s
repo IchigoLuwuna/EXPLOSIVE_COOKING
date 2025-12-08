@@ -3,7 +3,7 @@ state_game_init:
 	jsr func_seed_random
 
     lda #$00
-    sta enemyflags    ; all enemies alive (0 = alive)
+    sta enemy_alive ; all enemies alive (0 = alive)
 
 	; Flush OAM
 	ldy #$00
@@ -34,12 +34,12 @@ copy_enemies_to_oam:
     iny
     cpy #$20           ; 16 bytes per enemy * 2 enemies = 32
     bne copy_enemies_to_oam
-	
+
 
 
 	ldy #$00
 
-	
+
 	randomize_enemies:
 	jsr func_random_to_acc
 	and #%01111111
@@ -135,11 +135,12 @@ forever:
 	lda joypad
 	and #PAD_START
 	cmp #PAD_START
-	bne :++
+	bne :+++
 		and reg_c
 		cmp #PAD_START
-		beq :+ ; skip if start is held
-			jmp state_menu_pause
+		beq :++ ; skip if start is held
+			:
+			jmp :-
 		:
 	:
 
@@ -148,8 +149,8 @@ forever:
 
 enemy_loop:
     ldy reg_d              ; A = enemy index
-    lda enemyflags
-    and mask,y         ; mask bit
+    lda enemy_alive
+    and enemy_mask,y         ; mask bit
     bne enemy_skip         ; if bit=1 → skip enemy
 
     ; Compute OAM offset (A = index)
