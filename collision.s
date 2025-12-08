@@ -1,23 +1,8 @@
-; Handle collisions between player and walls
-
-; player:
-;   16x16 square
-;       topleft coordinate
-;       width = height
-;   Only position changes
-
 ; wall;
 ;   AxB rectangle
 ;       topleft coordinate
 ;       width
 ;       height
-
-; pointer for wall index
-; walls should be contiguous in memory
-
-; loop over all walls
-
-
 
 ; when attempt movement, check if it would cause collisions
 ;   Don't allow movement if it would cause collisions
@@ -25,17 +10,12 @@
 ; wall* pWall{address of first wall};
 ; for(count{0}; count < 4; ++count)
 ; {
-;   if(!(player_pos inside *pWall))
+;   if(player_future_pos inside *pWall)
 ;   {
-;       Return to prev pos
+;       Return #$01
 ;   }
 ;   pWall += 4;
 ; }
-
-; needs:
-;   Way to move back
-;   Address of first wall
-
 
 
 ; loads #$01 into A if colliding with wall (otherwise #$00)
@@ -44,6 +24,20 @@
 func_player_walls_collision:
     lda #first_wall_addr    ; store pWall in register b
     sta reg_b
+
+    stx reg_c   ; store x movement in register c
+    sty reg_d   ; store y movement in register d
+
+    ; set player pos to the one if it would move
+    lda PLR_POSX_ADDR
+    adc reg_c
+    clc
+    sta PLR_POSX_ADDR
+
+    lda PLR_POSY_ADDR
+    adc reg_d
+    clc
+    sta PLR_POSY_ADDR
 
     ; loop over all walls
 @loop:
@@ -88,4 +82,14 @@ next_loop:
 
     lda #$00
 player_walls_collision_end:
+    lda PLR_POSX_ADDR
+    sbc reg_c
+    clc
+    sta PLR_POSX_ADDR
+
+    lda PLR_POSY_ADDR
+    sbc reg_d
+    clc
+    sta PLR_POSY_ADDR
+
     rts
