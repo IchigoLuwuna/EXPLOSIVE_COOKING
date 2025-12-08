@@ -143,20 +143,7 @@ dheeg:
 	dheeg_bottom_left: .byte $00, $03, $00, $00
 	dheeg_bottom_right: .byte $00, $04, $00, $00
 
-evilDheegs:
 
-	amount_of_evilDheegs = $02
-; Enemy 0
-    .byte $80, $01, $00, $F0  ; top-left
-    .byte $80, $02, $00, $F0+8 ; top-right
-    .byte $88, $03, $00, $F0   ; bottom-left
-    .byte $88, $04, $00, $F0+8 ; bottom-right
-	; Enemy 1
-    .byte $90, $01, $00, $10   ; top-left
-    .byte $90, $02, $00, $18   ; top-right
-    .byte $98, $03, $00, $10   ; bottom-left
-    .byte $98, $04, $00, $18   ; bottom-right
-	
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
@@ -166,7 +153,7 @@ evilDheegs:
 .include "palettes.s"
 .include "sprite_utils.s"
 .include "math.s"
-
+.include "enemies.s"
 ; Character memory
 .segment "CHARS"
 	.incbin "character_rom.chr"
