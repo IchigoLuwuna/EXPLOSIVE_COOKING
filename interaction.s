@@ -28,8 +28,7 @@ STTN_POT_POSY = $10
 PLR_POSX_ADDR = $0203
 PLR_POSY_ADDR = $0200
 
-INTERACT_OFFSET_PLS = $08
-INTERACT_OFFSET_MNS = %11111000 ; -$08
+INTERACT_HEIGHT = $10
 
 
 func_handle_interactions:
@@ -46,45 +45,20 @@ func_handle_interactions:
     lda #MAT_SCRAP_POSX
     sbc PLR_POSX_ADDR
     clc
-    cmp #INTERACT_OFFSET_PLS
+    cmp #INTERACT_HEIGHT
     bpl :+  ; if x is outside range, skip other checks
-        cmp #INTERACT_OFFSET_MNS
+        cmp #$10
         bmi :+  ; if x is outside range, skip other checks
             ; check y
             lda #MAT_SCRAP_POSY
             sbc PLR_POSY_ADDR
             clc
-            cmp #INTERACT_OFFSET_PLS
+            cmp #INTERACT_HEIGHT
             bpl :+  ; if y is outside range, skip other checks
-                cmp #INTERACT_OFFSET_MNS
+                cmp #$10
                 bmi :+
                     ; runs if x and y are within 8 pixels
                     lda #MAT_SCRAP_INDEX    ; set station index to the one collided with
-                    sta station_index
-                    lda #AT_STATION         ; set at_station flag to true
-                    ora game_flags
-                    sta game_flags
-                    jmp input_handling
-    :
-
-    ; check x
-    lda #STTN_POT_POSX
-    sbc PLR_POSX_ADDR
-    clc
-    cmp #INTERACT_OFFSET_PLS
-    bpl :+  ; if x is outside range, skip other checks
-        cmp #INTERACT_OFFSET_MNS
-        bmi :+  ; if x is outside range, skip other checks
-            ; check y
-            lda #STTN_POT_POSY
-            sbc PLR_POSY_ADDR
-            clc
-            cmp #INTERACT_OFFSET_PLS
-            bpl :+  ; if y is outside range, skip other checks
-                cmp #INTERACT_OFFSET_MNS
-                bmi :+
-                    ; runs if x and y are within 8 pixels
-                    lda #STTN_POT_INDEX    ; set station index to the one collided with
                     sta station_index
                     lda #AT_STATION         ; set at_station flag to true
                     ora game_flags
