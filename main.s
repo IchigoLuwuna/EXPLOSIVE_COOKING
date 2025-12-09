@@ -32,7 +32,8 @@
 	cooking_status = $21
 	bullets = $22
 	material_inventory = $23
-
+	L_byte = $42 ; low byte for the background
+	H_byte = $43 ; high byte for the background
 	first_wall_addr = $E0	; 16bt array
 
 .segment "VECTORS"
