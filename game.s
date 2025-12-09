@@ -1,5 +1,6 @@
 state_game:
 state_game_init:
+	jsr func_clear_nametable
 	jsr func_seed_random
 
     lda #$00
