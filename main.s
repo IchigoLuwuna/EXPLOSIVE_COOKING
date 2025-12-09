@@ -27,7 +27,7 @@
 	zapper = $11 ; 1bt: Zapper readout
 	enemy_alive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
 	enemy_mask = $40       ; one byte to hold bitmask
-
+	ammo_count = $41 ; holds the amount of bullets (starts at max)
 	station_index = $20
 	cooking_status = $21
 	bullets = $22
