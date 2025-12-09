@@ -30,15 +30,15 @@ draw_background:
 next_page:
     ldy #$00
 page_loop:
-    lda (L_byte), y
+    lda (L_byte), y ; load byte from bg
     sta $2007
     iny
-    bne page_loop
+    bne page_loop ; loop until 256 bytes written
 
     inc H_byte
     inx
     cpx #$03
-    bne next_page
+    bne next_page ; loop for 4 pages
 
     ; last 192 bytes
     ldy #$00
@@ -47,7 +47,7 @@ last_chunk:
     sta $2007
     iny
     cpy #192
-    bne last_chunk
+    bne last_chunk ; loop until 192 bytes written
 
 
     ;Reset scroll
