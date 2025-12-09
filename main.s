@@ -30,8 +30,9 @@
 	arrow_tile = $34
 	enemy_mask = $40       ; one byte to hold bitmask
 	ammo_count = $41 ; holds the amount of bullets (starts at max)
-	L_byte = $42
-	H_byte = $43
+	L_byte = $42 ; low byte for the background
+	H_byte = $43 ; high byte for the background
+	update_ammo = $44 ; flag to indicate ammo counter needs updating
 
 
 .segment "VECTORS"
@@ -157,10 +158,10 @@ dheeg:
 .include "sprite_utils.s"
 .include "math.s"
 .include "enemies.s"
-.include "counterAmmo.s"
-bg:                      ; <-- label for the data
-    .incbin "levelBackgroundBinary.nam"
+.include "counter_ammo.s"
 .include "background.s"
+bg:
+    .incbin "level_background_binary.nam"
 ; Character memory
 .segment "CHARS"
 	.incbin "spriteRom.chr"

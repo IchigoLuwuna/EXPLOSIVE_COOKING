@@ -48,4 +48,13 @@ last_chunk:
     iny
     cpy #192
     bne last_chunk
+
+
+    ;Reset scroll
+	jsr draw_ammo_number
+    lda #$00
+    sta $2005
+    lda #$00
+    sta $2005
+
     rts

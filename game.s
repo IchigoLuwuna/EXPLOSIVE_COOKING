@@ -30,8 +30,8 @@ state_game_init:
 
 	jsr enemies_to_oam
 	jsr enemies_init
-	jsr ammo_oam
 
+	
 	; Set player initial position
 	ldx #$7F
 	ldy #$7F
@@ -39,7 +39,10 @@ state_game_init:
 	jsr func_move_16x16
 
 
+
 	jsr draw_background  ; rendering off inside
+	jsr draw_ammo_number
+
 	lda #%10000000 
     sta $2000
 	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
@@ -112,7 +115,8 @@ forever:
  	sta reg_d              ; enemy index = 0
 
 	jsr enemy_loop
-
+	
 	inc clock
 	jsr func_vblank_wait
+	jsr check_update_ammo
 jmp forever
