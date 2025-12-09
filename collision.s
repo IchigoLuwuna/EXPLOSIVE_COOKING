@@ -77,7 +77,7 @@ next_loop:
         adc #$04
         clc
         sta reg_b
-
+        jmp @loop
     :
 
     lda #$00
