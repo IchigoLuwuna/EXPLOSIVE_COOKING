@@ -23,13 +23,13 @@
 	lfsr = $05  ; 1bt: linear feedback shift register (used for rng)
 	joypad = $10 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
-	enemyAlive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
+	enemy_alive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
 	menu_selection = $31  ; 0 = START, 1 = EXIT
 	arrow_x = $32
 	arrow_y = $33
 	arrow_tile = $34
-	enemyMask = $40       ; one byte to hold bitmask
-	ammoCount = $41 ; holds the amount of bullets (starts at max)
+	enemy_mask = $40       ; one byte to hold bitmask
+	ammo_count = $41 ; holds the amount of bullets (starts at max)
 
 
 .segment "VECTORS"

@@ -1,7 +1,7 @@
 
 add_ammo:
-    lda ammoCount
-    inc ammoCount
+    lda ammo_count
+    inc ammo_count
     rts
 dec_counter:
 
@@ -13,7 +13,7 @@ cant_shoot:
 can_shoot:
     ;just jump to your zapper func here
 
-    dec ammoCount
+    dec ammo_count
     rts
 
 ammo_oam:
@@ -23,9 +23,9 @@ draw_ammo:
 
 
 check_ammo:
-    lda ammoCount
+    lda ammo_count
     beq cant_shoot
     jmp can_shoot
 
 
-ammoSprite: .byte $00 , $34 , $01, $80 ; y , tile , attr , x
+ammo_sprite: .byte $00 , $34 , $01, $80 ; y , tile , attr , x

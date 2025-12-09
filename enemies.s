@@ -1,10 +1,12 @@
 
 enemies_to_oam:
+    ldy #$00
+@loop:
     lda evilDheegs, y
-    sta $0210, y      ; $0210 = shadow OAM for enemies
+    sta $0210, y
     iny
-    cpy #$20           ; 16 bytes per enemy * 2 enemies = 32
-    bne enemies_to_oam
+    cpy #$20
+    bne @loop
     rts
 
 
@@ -33,8 +35,8 @@ enemy_loop:
     ldy reg_d              ; A = enemy index
                         ; Y = enemy index
 
-    lda enemyAlive
-    and enemyMask,y         ; mask bit
+    lda enemy_alive
+    and enemy_mask,y         ; mask bit
     bne enemy_skip         ; if bit=1 → skip enemy
 
     ; Compute OAM offset (A = index)
@@ -44,9 +46,8 @@ enemy_loop:
     asl
     asl
     asl                    ; ×16
-    clc
     adc #$10               ; base OAM offset
-
+    clc
     ; movement
     ldx #$FF               ; dx
     ldy #$00               ; dy
