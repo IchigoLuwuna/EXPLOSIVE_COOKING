@@ -30,6 +30,8 @@
 	arrow_tile = $34
 	enemy_mask = $40       ; one byte to hold bitmask
 	ammo_count = $41 ; holds the amount of bullets (starts at max)
+	L_byte = $42
+	H_byte = $43
 
 
 .segment "VECTORS"
@@ -156,6 +158,10 @@ dheeg:
 .include "math.s"
 .include "enemies.s"
 .include "counterAmmo.s"
+bg:                      ; <-- label for the data
+    .incbin "levelBackgroundBinary.nam"
+.include "background.s"
 ; Character memory
 .segment "CHARS"
-	.incbin "character_rom.chr"
+	.incbin "spriteRom.chr"
+

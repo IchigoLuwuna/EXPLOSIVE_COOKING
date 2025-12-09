@@ -1,40 +1,49 @@
 state_game:
 state_game_init:
+
+	jsr func_clear_nametable
 	jsr func_seed_random
 
-    lda #$00
-    sta enemy_alive    ; all enemies alive (0 = alive)
+	lda #$00
+	sta enemy_alive
 
-	; Flush OAM
-	ldy #$00
-	:
+	jsr func_vblank_wait ; wait for safe vblank
+
+
+
+	; Flush shadow OAM
+	@clear_oam:
 		lda #$00
 		sta $0200, y
 		iny
-	cpy #$FF
-	bmi :-
+		cpy #$00   ; loop until Y wraps from $FF to $00
+		bne @clear_oam
 
-
-
-	; Initialize OAM
+	; Initialize OAM 
 	ldy #$00
-	:
-		lda dheeg, y
-		sta $0200, y
-		iny
-	cpy #$10
-	bmi :-
+	: 
+		lda dheeg, y 
+		sta $0200, y 
+		iny 
+		cpy #$10
+	bmi :- 
 
 	jsr enemies_to_oam
-
 	jsr enemies_init
-
 	jsr ammo_oam
 
+	; Set player initial position
 	ldx #$7F
 	ldy #$7F
 	lda dheeg_16x16_addr
 	jsr func_move_16x16
+
+
+	jsr draw_background  ; rendering off inside
+	lda #%10000000 
+    sta $2000
+	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
+	sta $2001
 
 ; allows jumping without reinitialising
 state_game_loop:

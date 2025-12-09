@@ -1,5 +1,6 @@
 .segment "CODE"
 state_menu_start:
+    jmp state_game_init   ; Skip menu, go straight to the game for debugging
 state_menu_start_init:
 
 
@@ -55,7 +56,7 @@ state_menu_start_init:
 	sbc #$08           ; shift left to sit before text
 	sta arrow_x
 
-	lda #$20           ; CHR tile index for arrow
+	lda #$33         ; CHR tile index for arrow
 	sta arrow_tile
 	lda #$00           ; start on first menu item
 	sta menu_selection
