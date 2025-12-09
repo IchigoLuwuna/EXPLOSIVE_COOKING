@@ -1,6 +1,6 @@
 .segment "CODE"
 state_menu_start:
-    jmp state_game_init   ; Skip menu, go straight to the game for debugging
+
 state_menu_start_init:
 
 

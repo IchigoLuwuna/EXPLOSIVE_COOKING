@@ -158,7 +158,7 @@ dheeg:
 .include "sprite_utils.s"
 .include "math.s"
 .include "enemies.s"
-.include "counter_ammo.s"
+.include "ammo_count.s"
 .include "background.s"
 bg:
     .incbin "level_background_binary.nam"
