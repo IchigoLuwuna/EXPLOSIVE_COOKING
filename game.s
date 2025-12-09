@@ -77,7 +77,7 @@ copy_enemies_to_oam:
     lda #%10000000 
     sta $2000
     lda #%00011110 ; enables sprites, background, leftmost 8 pixels
-    sta $200
+    sta $2001
 
 ; allows jumping without reinitialising
 state_game_loop:
