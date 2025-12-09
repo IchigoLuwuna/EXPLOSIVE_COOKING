@@ -159,4 +159,3 @@ dheeg:
 ; Character memory
 .segment "CHARS"
 	.incbin "character_rom.chr"
-

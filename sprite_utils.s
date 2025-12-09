@@ -62,3 +62,43 @@ func_move_16x16:
 	clc
 	sta $020F, x
 rts
+
+func_clear_nametable:
+	; Disable rendering
+	lda #$00
+	sta $2000 ; disable nmi
+	sta $2001 ; disable sprite & bg
+
+	lda #$20 ; high byte of nametable
+	sta $2006 ; write to PPUADDR
+	lda #$00 ; low byte of nametable
+	sta $2006 ; PPUADDR is now $2000
+
+	lda #$00 ; prepare 0 to be written
+	ldy #$00 ; prepare y to be index
+	:
+		sta $2007
+	iny
+	bne :-
+	ldy #$00 ; prepare y to be index
+	:
+		sta $2007
+	iny
+	bne :-
+	ldy #$00 ; prepare y to be index
+	:
+		sta $2007
+	iny
+	bne :-
+	ldy #$00 ; prepare y to be index
+	:
+		sta $2007
+	iny
+	bne :-
+
+	; Enable rendering
+	lda #%00011000
+	sta $2001 ; enable sprite & bg
+	lda #%10000000
+	sta $2000 ; enable nmi
+rts

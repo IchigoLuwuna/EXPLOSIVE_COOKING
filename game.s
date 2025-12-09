@@ -3,7 +3,7 @@ state_game_init:
 	jsr func_seed_random
 
     lda #$10
-    sta enemyflags    ; all enemies alive (0 = alive)
+    sta enemyAlive    ; all enemies alive (0 = alive)
 
 	; Flush OAM
 	ldy #$00

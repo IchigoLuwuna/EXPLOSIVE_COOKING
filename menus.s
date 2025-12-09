@@ -20,8 +20,29 @@ state_menu_start_init:
     cpy #$FF
     bne @clear_oam
 
+    jsr func_clear_nametable
+   
+	
+    ; Drawing menu the middle
+	lda #$00
+	sta $2000
+	sta $2001
 
-    ; ----------------------------
+
+    ; Set scroll to 0,0 
+
+    lda #$00
+    sta $2005
+    lda #$00
+    sta $2005
+    
+    lda $2002
+    lda #$21      ; high byte (row 12)
+    sta $2006
+    lda #$8E      ; low byte (column 12)
+    sta $2006
+
+     ; ----------------------------
     ; Initialize arrow sprite
     ; ----------------------------
 
@@ -38,19 +59,6 @@ state_menu_start_init:
 	sta arrow_tile
 	lda #$00           ; start on first menu item
 	sta menu_selection
-	
-    ; Set scroll to 0,0 
-
-    lda #$00
-    sta $2005
-    lda #$00
-    sta $2005
-    
-    lda $2002
-    lda #$21      ; high byte (row 12)
-    sta $2006
-    lda #$8E      ; low byte (column 12)
-    sta $2006
 
 ldx #$00
 @menu_loop:
