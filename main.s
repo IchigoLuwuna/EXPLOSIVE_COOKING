@@ -169,6 +169,7 @@ evilDheegs:
 .include "math.s"
 .include "interaction.s"
 .include "collision.s"
+.include "background.s"
 bg:
     .incbin "level_background_binary.nam"
 
