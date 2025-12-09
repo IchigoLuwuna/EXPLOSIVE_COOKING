@@ -1,84 +1,79 @@
 state_game:
 state_game_init:
-	jsr func_clear_nametable
-	jsr func_seed_random
+    jsr func_clear_nametable
+    jsr func_seed_random
+    jsr func_vblank_wait        ; ensure safe vblank before huge writes
 
     lda #$00
-    sta enemy_alive ; all enemies alive (0 = alive)
+    sta enemy_alive
 
-	; Flush OAM
-	ldy #$00
-	:
-		lda #$00
-		sta $0200, y
-		iny
-	cpy #$FF
-	bne :-
+    ; --- Flush full 256 bytes of OAM ($0200..$02FF) ---
+    ldy #$00
+clear_oam:
+    lda #$00
+    sta $0200, y
+    iny
+    cpy #$00
+    bne clear_oam
 
+    ; Initialize OAM primary sprites (first 16 bytes)
+    ldy #$00
+init_oam:
+    lda dheeg, y
+    sta $0200, y
+    iny
+    cpy #$10
+    bmi init_oam
 
-
-	; Initialize OAM
-	ldy #$00
-	:
-		lda dheeg, y
-		sta $0200, y
-		iny
-	cpy #$10
-	bmi :-
-
-
-;-------- Copy enemy sprites to OAM and randomize---------
-	ldy #$00
+    ; Copy enemy shadow sprites into CPU RAM shadow region ($0210..)
+    ldy #$00
 copy_enemies_to_oam:
     lda evilDheegs, y
-    sta $0210, y      ; $0210 = shadow OAM for enemies
+    sta $0210, y
     iny
-    cpy #$20           ; 16 bytes per enemy * 2 enemies = 32
+    cpy #$20
     bne copy_enemies_to_oam
 
+    ; Randomize enemy positions (still rendering off)
+    jsr func_random_to_acc
+    and #%01111111
+    sta $0210
+    lda $0210
+    clc
+    adc #8
+    sta $0214
+    sta $0218
+    adc #8
+    sta $021C
 
+    jsr func_random_to_acc
+    and #%01111111
+    sta $0220
+    lda $0220
+    clc
+    adc #8
+    sta $0224
+    sta $0228
+    adc #8
+    sta $022C
 
-	ldy #$00
+    ; Player start
+    ldx #$7F
+    ldy #$7F
+    lda dheeg_16x16_addr
+    jsr func_move_16x16
 
+    ; Build background (should disable rendering and do $2002/$2006/$2007 internally)
+    jsr draw_background
 
-	randomize_enemies:
-	jsr func_random_to_acc
-	and #%01111111
-	sta $0210
-	lda $0210
-	clc
-	adc #8
-	sta $0214
-	sta $0218
-	adc #8
-	sta $021C
-
-	jsr func_random_to_acc
-	and #%01111111
-	sta $0220
-	lda $0220
-	clc
-	adc #8
-	sta $0224
-	sta $0228
-	adc #8
-	sta $022C
-;-----------------------------------------------------------
-
-	ldx #$7F
-	ldy #$7F
-	lda dheeg_16x16_addr
-	jsr func_move_16x16
-
-
-    jsr draw_background  ; rendering off inside
-
-
-    lda #%10000000 
+    ; Wait for vblank and enable rendering safely
+    jsr func_vblank_wait
+    lda #%10000000
     sta $2000
-    lda #%00011110 ; enables sprites, background, leftmost 8 pixels
+    lda #%00011110
     sta $2001
 
+    ; continue to main loop...
 ; allows jumping without reinitialising
 state_game_loop:
 forever:
