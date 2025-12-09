@@ -52,6 +52,12 @@ last_chunk:
 
     ;Reset scroll
 
-    jsr reset_scroll
+
+        ; back to 0,0 scroll
+        lda #$00
+        sta $2005
+        lda #$00
+        sta $2005
+        rts
 
     rts
