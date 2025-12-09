@@ -52,9 +52,6 @@ last_chunk:
 
     ;Reset scroll
 	jsr draw_ammo_number
-    lda #$00
-    sta $2005
-    lda #$00
-    sta $2005
+    jsr reset_scroll
 
     rts

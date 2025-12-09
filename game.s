@@ -39,9 +39,9 @@ state_game_init:
 	jsr func_move_16x16
 
 
-
+ 
 	jsr draw_background  ; rendering off inside
-	jsr draw_ammo_number
+
 
 	lda #%10000000 
     sta $2000

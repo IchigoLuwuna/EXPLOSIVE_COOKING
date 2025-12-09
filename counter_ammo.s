@@ -3,6 +3,14 @@
 ammo_addr_hi = $20    ; high byte of $2010
 ammo_addr_lo = $30    ; low byte of $2010
 
+init_ammo:
+    lda #$01
+    sta ammo_count
+    lda #$01
+    sta update_ammo
+
+    rts
+
 add_ammo:
     lda ammo_count
     cmp #$03
@@ -14,9 +22,13 @@ add_ammo:
     rts
 
 
-dec_counter: ; not done yet 
-    dec ammo_count
-    jsr draw_ammo_number
+dec_counter:
+    lda ammo_count    ; load current ammo
+    beq @done         ; if 0, don’t decrement
+    dec ammo_count    ; decrease ammo
+    jsr draw_ammo_number  ; update display
+    jsr reset_scroll
+@done:
     rts
 
 
@@ -33,10 +45,7 @@ check_update_ammo:
     jsr draw_ammo_number
     lda #$00
     sta update_ammo
-    lda #$00
-    sta $2005
-    lda #$00
-    sta $2005
+    jsr reset_scroll
 
 @skip:
     rts
