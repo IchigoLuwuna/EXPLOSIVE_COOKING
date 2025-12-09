@@ -30,7 +30,7 @@ state_game_init:
 
 	jsr enemies_to_oam
 	jsr enemies_init
-
+	jsr init_ammo
 	
 	; Set player initial position
 	ldx #$7F
@@ -109,7 +109,7 @@ forever:
 		:
 	:
 
-	
+	jsr add_ammo
 
    lda #0
  	sta reg_d              ; enemy index = 0
@@ -118,5 +118,5 @@ forever:
 	
 	inc clock
 	jsr func_vblank_wait
-	jsr check_update_ammo
+
 jmp forever

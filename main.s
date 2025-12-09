@@ -32,7 +32,7 @@
 	ammo_count = $41 ; holds the amount of bullets (starts at max)
 	L_byte = $42 ; low byte for the background
 	H_byte = $43 ; high byte for the background
-	update_ammo = $44 ; flag to indicate ammo counter needs updating
+
 
 
 .segment "VECTORS"

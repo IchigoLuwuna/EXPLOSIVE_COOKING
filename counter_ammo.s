@@ -1,75 +1,51 @@
 
+ammo_sprite_slot = $0230
 
-ammo_addr_hi = $20    ; high byte of $2010
-ammo_addr_lo = $30    ; low byte of $2010
 
 init_ammo:
     lda #$01
     sta ammo_count
-    lda #$01
-    sta update_ammo
-
+    jsr draw_ammo
     rts
 
 add_ammo:
     lda ammo_count
-    cmp #$03
+    cmp #$03          ; max ammo = 3
     bcs @done
     inc ammo_count
-    lda #%00000001   ; set "update ammo" flag
-    sta update_ammo
 @done:
+    jsr update_ammo
     rts
 
-
-dec_counter:
-    lda ammo_count    ; load current ammo
-    beq @done         ; if 0, don’t decrement
-    dec ammo_count    ; decrease ammo
-    jsr draw_ammo_number  ; update display
-    jsr reset_scroll
-@done:
-    rts
-
-
-can_shoot:
-    ;just jump to your zapper func here
-
-    dec ammo_count
-    rts
-
-
-check_update_ammo:
-    lda update_ammo
-    beq @skip
-    jsr draw_ammo_number
-    lda #$00
-    sta update_ammo
-    jsr reset_scroll
-
-@skip:
-    rts
-
-
-
-draw_ammo_number:
-    lda $2002          ; reset latch
-
-    lda #ammo_addr_hi
-    sta $2006          ; set high byte
-
-    lda #ammo_addr_lo
-    sta $2006          ; set low byte ($2010)
-
+dec_ammo:
     lda ammo_count
-    tay
-    lda ammo_tiles, y  ; get the tile for 0–3
-    sta $2007          ; write ONE TILE
+    beq @done
+    dec ammo_count
+@done:
+    jsr update_ammo
+    rts
 
+update_ammo:
+
+    ldy ammo_count
+    lda ammo_tiles, y
+    sta ammo_sprite_slot+1    ; update tile in sprite
+    rts
+
+draw_ammo:
+    ldy #$0        ; start at offset 0
+copy_loop:
+    lda ammo_sprite, y
+    sta ammo_sprite_slot, y
+    iny
+    cpy #$04       ; we have 4 bytes: Y, tile, attr, X
+    bne copy_loop
     rts
 
 ammo_tiles: 
-    .byte $20  ; tile for 0
-    .byte $21  ; tile for 1
-    .byte $22  ; tile for 2
-    .byte $23  ; tile for 3
+    .byte $20  ; tile 0
+    .byte $21  ; tile 1
+    .byte $22  ; tile 2
+    .byte $23  ; tile 3
+
+ammo_sprite: .byte $05, $20, $00, $10  ; Y=5, tile=0, attr=1, X=16

@@ -51,7 +51,7 @@ last_chunk:
 
 
     ;Reset scroll
-	jsr draw_ammo_number
+
     jsr reset_scroll
 
     rts
