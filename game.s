@@ -25,7 +25,7 @@ state_game_init:
 	cpy #$10
 	bmi :-
 
-
+	jsr init_ammo
 ;-------- Copy enemy sprites to OAM and randomize---------
 	ldy #$00
 copy_enemies_to_oam:

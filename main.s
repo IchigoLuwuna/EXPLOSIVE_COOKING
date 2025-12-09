@@ -169,6 +169,7 @@ evilDheegs:
 .include "math.s"
 .include "interaction.s"
 .include "collision.s"
+.include "ammo_count.s"
 
 ; Character memory
 .segment "CHARS"
