@@ -102,3 +102,11 @@ func_clear_nametable:
 	lda #%10000000
 	sta $2000 ; enable nmi
 rts
+
+reset_scroll:
+	; back to 0,0 scroll
+    lda #$00
+    sta $2005
+    lda #$00
+    sta $2005
+	rts

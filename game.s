@@ -69,7 +69,7 @@ copy_enemies_to_oam:
 	lda dheeg_16x16_addr
 	jsr func_move_16x16
 
-	 
+
     jsr draw_background  ; rendering off inside
 
 
