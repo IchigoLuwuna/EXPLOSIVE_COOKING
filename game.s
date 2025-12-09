@@ -109,7 +109,7 @@ forever:
 		:
 	:
 
-	jsr add_ammo
+
 
    lda #0
  	sta reg_d              ; enemy index = 0
