@@ -169,6 +169,8 @@ evilDheegs:
 .include "math.s"
 .include "interaction.s"
 .include "collision.s"
+bg:
+    .incbin "level_background_binary.nam"
 
 ; Character memory
 .segment "CHARS"

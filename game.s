@@ -69,6 +69,15 @@ copy_enemies_to_oam:
 	lda dheeg_16x16_addr
 	jsr func_move_16x16
 
+	 
+    jsr draw_background  ; rendering off inside
+
+
+    lda #%10000000 
+    sta $2000
+    lda #%00011110 ; enables sprites, background, leftmost 8 pixels
+    sta $200
+
 ; allows jumping without reinitialising
 state_game_loop:
 forever:
