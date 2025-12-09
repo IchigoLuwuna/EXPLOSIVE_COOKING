@@ -1,73 +1,57 @@
 state_game:
 state_game_init:
+
     jsr func_clear_nametable
     jsr func_seed_random
-    jsr func_vblank_wait        ; ensure safe vblank before huge writes
 
     lda #$00
     sta enemy_alive
 
-    ; --- Flush full 256 bytes of OAM ($0200..$02FF) ---
+    jsr func_vblank_wait        ; ensure safe vblank
+
+
+    ;-----------------------------
+    ; Flush shadow OAM ($0200-02FF)
+    ;-----------------------------
     ldy #$00
-clear_oam:
-    lda #$00
-    sta $0200, y
-    iny
-    cpy #$00
-    bne clear_oam
+@clear_oam:
+        lda #$00
+        sta $0200, y
+        iny
+        cpy #$00        ; loop until Y wraps 0xFF→0x00
+        bne @clear_oam
 
-    ; Initialize OAM primary sprites (first 16 bytes)
+
+    ;-----------------------------
+    ; Load player sprite into OAM
+    ;-----------------------------
     ldy #$00
-init_oam:
-    lda dheeg, y
-    sta $0200, y
-    iny
-    cpy #$10
-    bmi init_oam
+@init_oam:
+        lda dheeg, y
+        sta $0200, y
+        iny
+        cpy #$10
+        bmi @init_oam
 
-    ; Copy enemy shadow sprites into CPU RAM shadow region ($0210..)
-    ldy #$00
-copy_enemies_to_oam:
-    lda evilDheegs, y
-    sta $0210, y
-    iny
-    cpy #$20
-    bne copy_enemies_to_oam
-
-    ; Randomize enemy positions (still rendering off)
-    jsr func_random_to_acc
-    and #%01111111
-    sta $0210
-    lda $0210
-    clc
-    adc #8
-    sta $0214
-    sta $0218
-    adc #8
-    sta $021C
-
-    jsr func_random_to_acc
-    and #%01111111
-    sta $0220
-    lda $0220
-    clc
-    adc #8
-    sta $0224
-    sta $0228
-    adc #8
-    sta $022C
-
-    ; Player start
+    ;-----------------------------
+    ; Set player initial position
+    ;-----------------------------
     ldx #$7F
     ldy #$7F
     lda dheeg_16x16_addr
     jsr func_move_16x16
 
-    ; Build background (should disable rendering and do $2002/$2006/$2007 internally)
+
+    ;-----------------------------
+    ; Build background (PPU off)
+    ;-----------------------------
     jsr draw_background
 
-    ; Wait for vblank and enable rendering safely
-    jsr func_vblank_wait
+
+    ;-----------------------------
+    ; ENABLE RENDERING SAFELY
+    ;-----------------------------
+    jsr func_vblank_wait        ; <-- REQUIRED before turning on PPU
     lda #%10000000
     sta $2000
     lda #%00011110
