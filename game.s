@@ -19,19 +19,19 @@ state_game_init:
 		cpy #$00   ; loop until Y wraps from $FF to $00
 		bne @clear_oam
 
-	; Initialize OAM 
+	; Initialize OAM
 	ldy #$00
-	: 
-		lda dheeg, y 
-		sta $0200, y 
-		iny 
+	:
+		lda dheeg, y
+		sta $0200, y
+		iny
 		cpy #$10
-	bmi :- 
+	bmi :-
 
 	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo
-	
+
 	; Set player initial position
 	ldx #$7F
 	ldy #$7F
@@ -39,11 +39,11 @@ state_game_init:
 	jsr func_move_16x16
 
 
- 
+
 	jsr draw_background  ; rendering off inside
 
 
-	lda #%10000000 
+	lda #%10000000
     sta $2000
 	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
 	sta $2001
@@ -52,7 +52,7 @@ state_game_init:
 state_game_loop:
 forever:
 	lda joypad
-	sta reg_c ; store state of joypad on previous frame in reg_c -> allows for non-repeating actions on held input
+	sta joypad_previous; store state of joypad on previous frame -> allows for non-repeating actions on held input
 	lda zapper
 	sta reg_d ; store state of zapper on previous frame
 	jsr func_get_input	; get controller input and store in joypad ($00)
@@ -115,7 +115,7 @@ forever:
 	and #PAD_START
 	cmp #PAD_START
 	bne :++
-		and reg_c
+		and joypad_previous
 		cmp #PAD_START
 		beq :+ ; skip if start is held
 			jmp state_menu_pause
@@ -124,11 +124,11 @@ forever:
 
 
 
-   lda #0
- 	sta reg_d              ; enemy index = 0
+	lda #0
+	sta reg_d              ; enemy index = 0
 
 	jsr enemy_loop
-	
+
 	inc clock
 	jsr func_vblank_wait
 

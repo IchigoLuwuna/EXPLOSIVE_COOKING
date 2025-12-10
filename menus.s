@@ -22,21 +22,21 @@ state_menu_start_init:
     bne @clear_oam
 
     jsr func_clear_nametable
-   
-	
+
+
     ; Drawing menu the middle
 	lda #$00
 	sta $2000
 	sta $2001
 
 
-    ; Set scroll to 0,0 
+    ; Set scroll to 0,0
 
     lda #$00
     sta $2005
     lda #$00
     sta $2005
-    
+
     lda $2002
     lda #$21      ; high byte (row 12)
     sta $2006
@@ -49,7 +49,7 @@ state_menu_start_init:
 
     lda #$60        ; row 12 tile = 96
     sec
-    sbc #$02        
+    sbc #$02
     sta arrow_y
 	lda #$60           ; column for X position
 	sec
@@ -186,10 +186,6 @@ state_menu_start_loop:
     jmp @forever
 
 state_menu_pause:
-	lda #%00011000
-	sta $2001
-	lda #$02
-	sta reg_oam_addr
 state_menu_pause_loop:
 @forever:
 	lda joypad

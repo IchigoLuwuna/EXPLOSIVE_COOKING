@@ -338,7 +338,7 @@ game_sub_state_zap_return:
 	sta reg_oam_addr
 
 	; Enable sprites and bg
-	lda #%00011000 ; set bit 3 (render bg) and 4 (render sprites) to 1
+	lda #%00011110 ; set bit 3 (render bg) and 4 (render sprites) to 1
 	sta $2001
 rts
 
