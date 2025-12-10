@@ -1,12 +1,12 @@
 ; material: scrap
 MAT_SCRAP_INDEX =   %00000011
-MAT_SCRAP_POSX =    $10
-MAT_SCRAP_POSY =    $10
+MAT_SCRAP_POSX =    $4E
+MAT_SCRAP_POSY =    $66
 
 ; station: cooking pot
 STTN_POT_INDEX =    %00000010
-STTN_POT_POSX =     $30
-STTN_POT_POSY =     $10
+STTN_POT_POSX =     $6E
+STTN_POT_POSY =     $66
 
 ; station: forge
 STTN_FORGE_INDEX =  %00000100
@@ -21,11 +21,16 @@ PLR_POSY_ADDR = $0200
 INTERACT_HEIGHT = $10
 
 ;------------------------------
+; requiredMaterials = random(0,255);
+; requiredButtons = random(0,255);
+; cookingStatus = 0;
 ;------------------------------
 func_initialize_cook:
     ; randomly select required materials
     ; randomly select required button inputs
-    ; set cooking status to #$0000
+    lda #$00
+    sta cooking_status
+
     rts
 
 
@@ -46,29 +51,32 @@ func_initialize_cook:
 func_handle_interactions:
     ; get current cooking station index
 
-    ; check x
+    ; check material scrap
     lda #MAT_SCRAP_POSX
-    sbc PLR_POSX_ADDR
-    clc
-    cmp #INTERACT_HEIGHT
-    bpl :+  ; if x is outside range, skip other checks
-        cmp #$10
-        bmi :+  ; if x is outside range, skip other checks
-            ; check y
-            lda #MAT_SCRAP_POSY
-            sbc PLR_POSY_ADDR
-            clc
-            cmp #INTERACT_HEIGHT
-            bpl :+  ; if y is outside range, skip other checks
-                cmp #$10
-                bmi :+
-                    ; runs if x and y are within 8 pixels
-                    lda #MAT_SCRAP_INDEX    ; set station index to the one collided with
-                    sta station_index
-                    lda #AT_STATION         ; set at_station flag to true
-                    ora game_flags
-                    sta game_flags
-                    jmp input_handling
+    sta reg_b
+    lda #MAT_SCRAP_POSY
+    sta reg_c
+    lda #MAT_SCRAP_INDEX
+    sta reg_d
+
+    jsr func_check_station_collision
+    cmp #$00
+    beq :+
+        jmp input_handling
+    :
+
+    ; check station pot
+    lda #STTN_POT_POSX
+    sta reg_b
+    lda #STTN_POT_POSY
+    sta reg_c
+    lda #STTN_POT_INDEX
+    sta reg_d
+    
+    jsr func_check_station_collision
+    cmp #$00
+    beq :+
+        jmp input_handling
     :
     
     ; if x and y of every station are outside 8 pixel range
@@ -81,8 +89,8 @@ input_handling:
     ; if first bit is 1: handle material
     lda station_index
     and #%00000001
-    cmp #%0000000
-    bne :++
+    cmp #%00000001
+    bne :+
         jsr func_handle_material
         jmp interaction_end
     :
@@ -141,7 +149,7 @@ func_cook:
             bne :+
                 ; if A is held: all checks succeeded -> set status to forging
                 lda joypad
-                and PAD_A
+                and #PAD_A
                 cmp #$00
                 beq :+
                     ; set status to forging
@@ -294,4 +302,49 @@ func_get_cooking_input:
     lda reg_b
     and #%00000011
 
+    rts
+
+
+;------------------------------
+; reg_b: station x
+; reg_c: station y
+; reg_d: station index
+; returns:
+;       register A: #$00 if no collision, #$01 if collision
+;------------------------------
+func_check_station_collision:
+    ; check x
+    lda reg_b ; if(station x - player width - player x < 0)
+    sec
+    sbc #$10
+    clc
+    cmp PLR_POSX_ADDR
+    bpl :+  ; if x is outside range, skip other checks
+        lda reg_b ; if(station x + station width - player x > 0)
+        adc #$10
+        clc
+        cmp PLR_POSX_ADDR
+        bmi :+  ; if x is outside range, skip other checks
+            ; check y
+            lda reg_c ; if(station y - player height - player y < 0)
+            sec
+            sbc #$10
+            clc
+            cmp PLR_POSY_ADDR
+            bpl :+  ; if y is outside range, skip other checks
+                lda reg_c ; if(station y + station height - player y > 0)
+                adc #$10
+                clc
+                cmp PLR_POSY_ADDR
+                bmi :+
+                    ; runs if x and y are within 8 pixels
+                    lda reg_d    ; set station index to the one collided with
+                    sta station_index
+                    lda #AT_STATION         ; set at_station flag to true
+                    ora game_flags
+                    sta game_flags
+                    lda #$01
+                    rts
+    :
+    lda #$00
     rts
