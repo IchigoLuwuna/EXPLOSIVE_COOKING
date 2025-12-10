@@ -3,6 +3,7 @@ state_game_init:
 
 	jsr func_clear_nametable
 	jsr func_seed_random
+	jsr func_initialize_walls
 
     lda #$00
     sta enemy_alive ; all enemies alive (0 = alive)
@@ -77,18 +78,23 @@ forever:
 	bne :+
 		ldx #$01
 		ldy #$00
-		lda #$00
-		jsr func_move_16x16
+		jsr func_player_walls_collision
+		cmp #$01
+		beq :+
+			lda #$00
+			jsr func_move_16x16
 	:
-
 	lda joypad
 	and #PAD_LEFT
 	cmp #PAD_LEFT
 	bne :+
 		ldx #$FF ; -1
 		ldy #$00
-		lda #$00
-		jsr func_move_16x16
+		jsr func_player_walls_collision
+		cmp #$01
+		beq :+
+			lda #$00
+			jsr func_move_16x16
 	:
 
 	lda joypad
@@ -97,8 +103,11 @@ forever:
 	bne :+
 		ldx #$00
 		ldy #$01
-		lda #$00
-		jsr func_move_16x16
+		jsr func_player_walls_collision
+		cmp #$01
+		beq :+
+			lda #$00
+			jsr func_move_16x16
 	:
 
 	lda joypad
@@ -107,8 +116,11 @@ forever:
 	bne :+
 		ldx #$00
 		ldy #$FF ; -1
-		lda #$00
-		jsr func_move_16x16
+		jsr func_player_walls_collision
+		cmp #$01
+		beq :+
+			lda #$00
+			jsr func_move_16x16
 	:
 
 	lda joypad

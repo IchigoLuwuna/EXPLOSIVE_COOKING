@@ -25,44 +25,54 @@ func_player_walls_collision:
     lda #first_wall_addr    ; store pWall in register b
     sta reg_b
 
-    stx reg_c   ; store x movement in register c
-    sty reg_d   ; store y movement in register d
-
-    ; set player pos to the one if it would move
-    lda PLR_POSX_ADDR
-    adc reg_c
+    ; store player pos in reg_c and reg_d
+    txa
+    adc PLR_POSX_ADDR
     clc
-    sta PLR_POSX_ADDR
+    sta reg_c
 
-    lda PLR_POSY_ADDR
-    adc reg_d
+    tya
+    adc PLR_POSY_ADDR
     clc
-    sta PLR_POSY_ADDR
+    sta reg_d
+
+    txa
+    pha
+    tya
+    pha
 
     ; loop over all walls
-func_player_walls_collision_loop:
+loop:
     ; collision checks with current wall
-    lda reg_b + $00   ; wall x
-    sbc #$10        ; player width
+    ldy reg_b
+    lda $00, y   ; wall x
+    sec
+    sbc #$10     ; player width
     clc
-    cmp PLR_POSX_ADDR
+    cmp reg_c
     bpl :+  ; if player position x is too low to collide, skip
-        lda reg_b + $00   ; wall x
-        adc reg_b + $02   ; wall width
+        lda $00, y      ; wall x
+        adc $02, y      ; wall width
         clc
-        cmp PLR_POSX_ADDR
+        cmp reg_c
         bmi :+  ; if player position x is too high to collide, skip
-            lda reg_b + $01   ; wall y
+            lda $01, y      ; wall y
+            sec
             sbc #$10        ; player height
             clc
-            cmp PLR_POSY_ADDR
+            cmp reg_d
             bpl :+  ; if player position y is too low to collide, skip
-                lda reg_b + $01   ; wall y
-                adc reg_b + $03   ; wall height
+                lda $01, y      ; wall y
+                adc $03, y      ; wall height
                 clc
-                cmp PLR_POSY_ADDR
+                cmp reg_d
                 bmi :+  ; if player position y is too high to collide, skip
                     ; player will collide with this wall
+                    pla
+                    tay
+                    pla
+                    tax
+
                     lda #$01
                     jmp player_walls_collision_end
     :
@@ -70,26 +80,63 @@ func_player_walls_collision_loop:
     ; to next iteration or break out of loop
 next_loop:
     lda reg_b
-    sbc #$12
+    sec
+    sbc #$0C
     clc
     cmp #first_wall_addr
     beq :+
-        adc #$04
+        adc #$10
         clc
         sta reg_b
-        jmp func_player_walls_collision_loop
+        jmp loop
     :
+
+    pla
+    tay
+    pla
+    tax
 
     lda #$00
 player_walls_collision_end:
-    lda PLR_POSX_ADDR
-    sbc reg_c
-    clc
-    sta PLR_POSX_ADDR
+    rts
 
-    lda PLR_POSY_ADDR
-    sbc reg_d
-    clc
-    sta PLR_POSY_ADDR
+
+
+func_initialize_walls:
+    lda #$46
+    sta first_wall_addr + $00
+    lda #$50
+    sta first_wall_addr + $01
+    lda #$08
+    sta first_wall_addr + $02
+    lda #$80
+    sta first_wall_addr + $03
+
+    lda #$48
+    sta first_wall_addr + $04
+    lda #$4E
+    sta first_wall_addr + $05
+    lda #$80
+    sta first_wall_addr + $06
+    lda #$08
+    sta first_wall_addr + $07
+
+    lda #$B3
+    sta first_wall_addr + $08
+    lda #$50
+    sta first_wall_addr + $09
+    lda #$08
+    sta first_wall_addr + $0A
+    lda #$80
+    sta first_wall_addr + $0B
+
+    lda #$48
+    sta first_wall_addr + $0C
+    lda #$A7
+    sta first_wall_addr + $0D
+    lda #$80
+    sta first_wall_addr + $0E
+    lda #$08
+    sta first_wall_addr + $0F
 
     rts
