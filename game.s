@@ -1,73 +1,52 @@
 state_game:
 state_game_init:
+
+	jsr func_clear_nametable
 	jsr func_seed_random
 
     lda #$00
     sta enemy_alive ; all enemies alive (0 = alive)
 
-	; Flush OAM
-	ldy #$00
-	:
+	jsr func_vblank_wait ; wait for safe vblank
+
+
+
+	; Flush shadow OAM
+	@clear_oam:
 		lda #$00
 		sta $0200, y
 		iny
-	cpy #$FF
-	bne :-
+		cpy #$00   ; loop until Y wraps from $FF to $00
+		bne @clear_oam
 
-
-
-	; Initialize OAM
+	; Initialize OAM 
 	ldy #$00
-	:
-		lda dheeg, y
-		sta $0200, y
-		iny
-	cpy #$10
-	bmi :-
+	: 
+		lda dheeg, y 
+		sta $0200, y 
+		iny 
+		cpy #$10
+	bmi :- 
 
-
-;-------- Copy enemy sprites to OAM and randomize---------
-	ldy #$00
-copy_enemies_to_oam:
-    lda evilDheegs, y
-    sta $0210, y      ; $0210 = shadow OAM for enemies
-    iny
-    cpy #$20           ; 16 bytes per enemy * 2 enemies = 32
-    bne copy_enemies_to_oam
-
-
-
-	ldy #$00
-
-
-	randomize_enemies:
-	jsr func_random_to_acc
-	and #%01111111
-	sta $0210
-	lda $0210
-	clc
-	adc #8
-	sta $0214
-	sta $0218
-	adc #8
-	sta $021C
-
-	jsr func_random_to_acc
-	and #%01111111
-	sta $0220
-	lda $0220
-	clc
-	adc #8
-	sta $0224
-	sta $0228
-	adc #8
-	sta $022C
-;-----------------------------------------------------------
-
+	jsr enemies_to_oam
+	jsr enemies_init
+	jsr init_ammo
+	
+	; Set player initial position
 	ldx #$7F
 	ldy #$7F
 	lda dheeg_16x16_addr
 	jsr func_move_16x16
+
+
+ 
+	jsr draw_background  ; rendering off inside
+
+
+	lda #%10000000 
+    sta $2000
+	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
+	sta $2001
 
 ; allows jumping without reinitialising
 state_game_loop:
@@ -143,38 +122,14 @@ forever:
 		:
 	:
 
+
+
    lda #0
-    sta reg_d              ; enemy index = 0
+ 	sta reg_d              ; enemy index = 0
 
-enemy_loop:
-    ldy reg_d              ; A = enemy index
-    lda enemy_alive
-    and enemy_mask,y         ; mask bit
-    bne enemy_skip         ; if bit=1 → skip enemy
-
-    ; Compute OAM offset (A = index)
-
-    tya
-    asl
-    asl
-    asl
-    asl                    ; ×16
-    clc
-    adc #$10               ; base OAM offset
-
-    ; movement
-    ldx #$FF               ; dx
-    ldy #$00               ; dy
-    jsr func_move_16x16
-
-enemy_skip:
-    inc reg_d
-    lda reg_d
-    cmp #2
-    bne enemy_loop
-
-	jsr func_handle_interactions
-
+	jsr enemy_loop
+	
 	inc clock
 	jsr func_vblank_wait
+
 jmp forever
