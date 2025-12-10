@@ -36,50 +36,68 @@ func_player_walls_collision:
     clc
     sta reg_d
 
+    txa
+    pha
+    tya
+    pha
+
     ; loop over all walls
 loop:
     ; collision checks with current wall
-    lda reg_b + $00   ; wall x
-    sbc #$10        ; player width
+    ldy reg_b
+    lda $00, y   ; wall x
+    sec
+    sbc #$10     ; player width
     clc
     cmp reg_c
     bpl :+  ; if player position x is too low to collide, skip
-        lda reg_b + $00   ; wall x
-        adc reg_b + $02   ; wall width
+        lda $00, y      ; wall x
+        adc $02, y      ; wall width
         clc
         cmp reg_c
         bmi :+  ; if player position x is too high to collide, skip
-            lda reg_b + $01   ; wall y
+            lda $01, y      ; wall y
+            sec
             sbc #$10        ; player height
             clc
             cmp reg_d
             bpl :+  ; if player position y is too low to collide, skip
-                lda reg_b + $01   ; wall y
-                adc reg_b + $03   ; wall height
+                lda $01, y      ; wall y
+                adc $03, y      ; wall height
                 clc
                 cmp reg_d
                 bmi :+  ; if player position y is too high to collide, skip
                     ; player will collide with this wall
+                    pla
+                    tay
+                    pla
+                    tax
+
                     lda #$01
                     jmp player_walls_collision_end
     :
     
     ; to next iteration or break out of loop
-;next_loop:
-;    lda reg_b
-;    sbc #$00
-;    clc
-;    cmp #first_wall_addr
-;    beq :+
-;        adc #$10
-;        clc
-;        sta reg_b
-;        jmp loop
-;    :
+next_loop:
+    lda reg_b
+    sec
+    sbc #$0C
+    clc
+    cmp #first_wall_addr
+    beq :+
+        adc #$10
+        clc
+        sta reg_b
+        jmp loop
+    :
+
+    pla
+    tay
+    pla
+    tax
 
     lda #$00
 player_walls_collision_end:
-
     rts
 
 
@@ -91,7 +109,34 @@ func_initialize_walls:
     sta first_wall_addr + $01
     lda #$08
     sta first_wall_addr + $02
-    lda #$30
+    lda #$80
     sta first_wall_addr + $03
+
+    lda #$10
+    sta first_wall_addr + $04
+    lda #$10
+    sta first_wall_addr + $05
+    lda #$70
+    sta first_wall_addr + $06
+    lda #$08
+    sta first_wall_addr + $07
+
+    lda #$B0
+    sta first_wall_addr + $08
+    lda #$10
+    sta first_wall_addr + $09
+    lda #$08
+    sta first_wall_addr + $0A
+    lda #$80
+    sta first_wall_addr + $0B
+
+    lda #$10
+    sta first_wall_addr + $0C
+    lda #$B0
+    sta first_wall_addr + $0D
+    lda #$70
+    sta first_wall_addr + $0E
+    lda #$08
+    sta first_wall_addr + $0F
 
     rts
