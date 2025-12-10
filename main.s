@@ -161,7 +161,7 @@ dheeg:
 .include "ammo_count.s"
 .include "background.s"
 bg:
-    .incbin "level_background_binary.nam"
+    .incbin "lvlMap_Checked.nam"
 ; Character memory
 .segment "CHARS"
 	.incbin "spriteRom.chr"
