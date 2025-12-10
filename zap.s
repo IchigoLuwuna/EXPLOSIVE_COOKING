@@ -73,7 +73,7 @@ game_sub_state_zap_enter:
 	tya
 	adc #$10
 	tay
-	cpy #$40 ; compare with 32
+	cpy #$80 ; loop over all 8 enemies
 	bne :-
 
 	; Enable NMI
