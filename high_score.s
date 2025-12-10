@@ -1,4 +1,3 @@
-
 reset_score: ; call at the start of the game
     ldy #$00
 score_loop:
@@ -81,9 +80,9 @@ try10:
 
 display_score:
     ; Set PPU address to top-right, row 1, col 30
-    lda #$20     ; high byte of $203E
+    lda #$20    ; high byte of $203E
     sta $2006
-    lda #$58    ; low byte of $203E
+    lda #$38    ; low byte of $203E
     sta $2006
 
     lda score+2
