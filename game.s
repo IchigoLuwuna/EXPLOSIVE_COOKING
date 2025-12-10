@@ -1,6 +1,7 @@
 state_game:
 state_game_init:
 	jsr func_seed_random
+	jsr func_initialize_walls
 
     lda #$00
     sta enemyflags    ; all enemies alive (0 = alive)
@@ -104,7 +105,6 @@ forever:
 			lda #$00
 			jsr func_move_16x16
 	:
-
 	lda joypad
 	and #PAD_LEFT
 	cmp #PAD_LEFT
