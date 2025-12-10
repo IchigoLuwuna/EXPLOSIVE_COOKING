@@ -21,13 +21,13 @@ state_game_init:
 
 	; Initialize OAM 
 	ldy #$00
-	: 
+	init_oam_loop:
 		lda dheeg, y 
 		sta $0200, y 
 		iny 
 		cpy #$10
-	bmi :- 
-
+	bmi init_oam_loop
+	
 	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo

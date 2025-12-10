@@ -6,6 +6,7 @@
 	.byte $01, $00        ; mapper 0, vertical mirroring
 
 .segment "ZEROPAGE_DATA"
+
 	reg_b = $00 ; 1bt: extra B register
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
@@ -32,8 +33,9 @@
 	ammo_count = $41 ; holds the amount of bullets (starts at max)
 	L_byte = $42 ; low byte for the background
 	H_byte = $43 ; high byte for the background
-
-
+	score  = $44  ; uses $44, $45, $46
+	update = $47  ; single byte
+	temp   = $48  ; uses $48-$4D (6 bytes)
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
