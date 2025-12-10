@@ -63,6 +63,10 @@ state_menu_start_loop:
 
 
 state_menu_pause:
+	lda #%00011000
+	sta $2001
+	lda #$02
+	sta reg_oam_addr
 state_menu_pause_loop:
 @forever:
 	lda joypad

@@ -98,11 +98,8 @@ forever:
 	bne :+
 		ldx #$01
 		ldy #$00
-		jsr func_player_walls_collision
-		cmp #$01
-		beq :+
-			lda #$00
-			jsr func_move_16x16
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
@@ -111,11 +108,8 @@ forever:
 	bne :+
 		ldx #$FF ; -1
 		ldy #$00
-		jsr func_player_walls_collision
-		cmp #$01
-		beq :+
-			lda #$00
-			jsr func_move_16x16
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
@@ -124,11 +118,8 @@ forever:
 	bne :+
 		ldx #$00
 		ldy #$01
-		jsr func_player_walls_collision
-		cmp #$01
-		beq :+
-			lda #$00
-			jsr func_move_16x16
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
@@ -137,22 +128,18 @@ forever:
 	bne :+
 		ldx #$00
 		ldy #$FF ; -1
-		jsr func_player_walls_collision
-		cmp #$01
-		beq :+
-			lda #$00
-			jsr func_move_16x16
+		lda #$00
+		jsr func_move_16x16
 	:
 
 	lda joypad
 	and #PAD_START
 	cmp #PAD_START
-	bne :+++
+	bne :++
 		and reg_c
 		cmp #PAD_START
-		beq :++ ; skip if start is held
-			:
-			jmp :-
+		beq :+ ; skip if start is held
+			jmp state_menu_pause
 		:
 	:
 

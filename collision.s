@@ -40,7 +40,7 @@ func_player_walls_collision:
     sta PLR_POSY_ADDR
 
     ; loop over all walls
-@loop:
+func_player_walls_collision_loop:
     ; collision checks with current wall
     lda reg_b + $00   ; wall x
     sbc #$10        ; player width
@@ -66,7 +66,7 @@ func_player_walls_collision:
                     lda #$01
                     jmp player_walls_collision_end
     :
-    
+
     ; to next iteration or break out of loop
 next_loop:
     lda reg_b
@@ -77,7 +77,7 @@ next_loop:
         adc #$04
         clc
         sta reg_b
-        jmp @loop
+        jmp func_player_walls_collision_loop
     :
 
     lda #$00
