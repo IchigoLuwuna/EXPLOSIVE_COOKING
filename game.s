@@ -49,6 +49,10 @@ state_game_init:
 	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
 	sta $2001
 
+	lda #5
+	jsr add_score
+
+
 ; allows jumping without reinitialising
 state_game_loop:
 forever:
@@ -119,5 +123,6 @@ forever:
 	
 	inc clock
 	jsr func_vblank_wait
-
+	jsr display_score   ; safe to write to PPU now
+	jsr reset_scroll
 jmp forever

@@ -15,7 +15,7 @@ score_loop:
 add_score:
 ; we cant add more than 99 at a time to the score or else it"ll break
 ; example of adding score:
-;           lda #25
+;           lda #2 = 20 points
 ;           jsr add_score
     clc
     adc score
@@ -42,7 +42,7 @@ add_score:
     sta score+2 
 
 @skip:
-    lda #$01
+    lda #%00000001
     ora update ; ora = logical inclusive OR on accumulator
     sta update
     rts
