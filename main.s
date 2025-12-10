@@ -25,8 +25,17 @@
 	joypad = $10 ; 1bt: Controller readout
 	joypad_previous = $12 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
-	enemyflags = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
-	mask = $40       ; one byte to hold bitmask
+	enemy_alive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
+	menu_selection = $31  ; 0 = START, 1 = EXIT
+	arrow_x = $32
+	arrow_y = $33
+	arrow_tile = $34
+	enemy_mask = $40       ; one byte to hold bitmask
+	ammo_count = $41 ; holds the amount of bullets (starts at max)
+	L_byte = $42 ; low byte for the background
+	H_byte = $43 ; high byte for the background
+
+
 
 	station_index = $20
 	cooking_status = $21 ; 1bt
@@ -42,6 +51,8 @@
 		; 	%01 = right
 		;	%10 = down
 		; 	%11 = left
+
+	first_wall_addr = $E0	; 16bt array
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -151,20 +162,7 @@ dheeg:
 	dheeg_bottom_right: .byte $00, $04, $00, $00
 	dheeg_16x16_addr = $00
 
-evilDheegs:
 
-	amount_of_evilDheegs = $02
-; Enemy 0
-    .byte $80, $01, $00, $F0  ; top-left
-    .byte $80, $02, $00, $F0+8 ; top-right
-    .byte $88, $03, $00, $F0   ; bottom-left
-    .byte $88, $04, $00, $F0+8 ; bottom-right
-	; Enemy 1
-    .byte $90, $01, $00, $10   ; top-left
-    .byte $90, $02, $00, $18   ; top-right
-    .byte $98, $03, $00, $10   ; bottom-left
-    .byte $98, $04, $00, $18   ; bottom-right
-	
 ; Includes
 .include "bitmasks.s"
 .include "input.s"
@@ -176,7 +174,12 @@ evilDheegs:
 .include "sprite_utils.s"
 .include "math.s"
 .include "interaction.s"
-
+.include "collision.s"
+.include "enemies.s"
+.include "ammo_count.s"
+.include "background.s"
+bg:
+    .incbin "level_background_binary.nam"
 ; Character memory
 .segment "CHARS"
 	.incbin "spriteRom.chr"
