@@ -160,6 +160,7 @@ dheeg:
 .include "enemies.s"
 .include "ammo_count.s"
 .include "background.s"
+.include "high_score.s"
 bg:
     .incbin "level_background_binary.nam"
 ; Character memory
