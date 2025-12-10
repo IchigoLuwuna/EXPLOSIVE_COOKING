@@ -159,7 +159,7 @@ game_sub_state_zap_rr:
 
 	jsr func_is_light_detected
 	cmp reg_b
-	beq :+
+	bne :+
 	; if light is not detected
 		; case rrr
 		lda #%00000001 ; enemy slot 0
@@ -199,7 +199,7 @@ game_sub_state_zap_rl:
 
 	jsr func_is_light_detected
 	cmp reg_b
-	beq :+
+	bne :+
 	; if light is not detected
 		; case rlr
 		lda #%00000100 ; enemy slot 2
@@ -277,7 +277,7 @@ game_sub_state_zap_lr:
 
 	jsr func_is_light_detected
 	cmp reg_b
-	beq :+
+	bne :+
 	; if light is not detected
 		; case lrr
 		lda #%00010000 ; enemy slot 4
@@ -318,7 +318,7 @@ game_sub_state_zap_ll:
 
 	jsr func_is_light_detected
 	cmp reg_b
-	beq :+
+	bne :+
 	; if light is not detected
 		; case lrr
 		lda #%01000000 ; enemy slot 6
