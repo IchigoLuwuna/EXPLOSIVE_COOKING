@@ -56,7 +56,7 @@ state_menu_start_init:
 	sbc #$08           ; shift left to sit before text
 	sta arrow_x
 
-	lda #$33         ; CHR tile index for arrow
+	lda #$39         ; CHR tile index for arrow
 	sta arrow_tile
 	lda #$00           ; start on first menu item
 	sta menu_selection
