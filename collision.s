@@ -103,38 +103,38 @@ player_walls_collision_end:
 
 
 func_initialize_walls:
-    lda #$10
+    lda #$46
     sta first_wall_addr + $00
-    lda #$10
+    lda #$50
     sta first_wall_addr + $01
     lda #$08
     sta first_wall_addr + $02
     lda #$80
     sta first_wall_addr + $03
 
-    lda #$10
+    lda #$48
     sta first_wall_addr + $04
-    lda #$10
+    lda #$4E
     sta first_wall_addr + $05
-    lda #$70
+    lda #$80
     sta first_wall_addr + $06
     lda #$08
     sta first_wall_addr + $07
 
-    lda #$B0
+    lda #$B3
     sta first_wall_addr + $08
-    lda #$10
+    lda #$50
     sta first_wall_addr + $09
     lda #$08
     sta first_wall_addr + $0A
     lda #$80
     sta first_wall_addr + $0B
 
-    lda #$10
+    lda #$48
     sta first_wall_addr + $0C
-    lda #$B0
+    lda #$A7
     sta first_wall_addr + $0D
-    lda #$70
+    lda #$80
     sta first_wall_addr + $0E
     lda #$08
     sta first_wall_addr + $0F
