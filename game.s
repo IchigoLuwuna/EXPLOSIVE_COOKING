@@ -4,6 +4,7 @@ state_game_init:
 	jsr func_clear_nametable
 	jsr func_seed_random
 	jsr func_initialize_walls
+	jsr func_initialize_cook
 
 	lda #$00
 	sta enemy_alive
@@ -134,9 +135,9 @@ forever:
 		:
 	:
 
+	jsr func_handle_interactions
 
-
-   lda #0
+    lda #0
  	sta reg_d              ; enemy index = 0
 
 	jsr enemy_loop
