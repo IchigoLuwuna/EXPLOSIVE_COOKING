@@ -48,9 +48,14 @@ last_chunk:
     iny
     cpy #192
     bne last_chunk ; loop until 192 bytes written
+; Load background palettes to $3F00
+    lda $2002        ; reset PPU latch
+    lda #$3F
+    sta $2006        ; high byte of PPU address
+    lda #$00
+    sta $2006        ; low byte
 
-
-    ;Reset scroll
+        ;Reset scroll
 
     jsr reset_scroll
 

@@ -94,6 +94,16 @@ load_palettes:
 		cpx #$20
 		bne @loop
 
+
+    ldx #$00
+    @bg_pal_loop:
+        lda bg_pal, x       ; bg_pal = .incbin "palettevalues.pal"
+        sta $2007
+        inx
+        cpx #$10            ; only first 16 bytes
+        bne @bg_pal_loop
+
+
 jsr func_vblank_wait
 
 enable_rendering:
@@ -162,7 +172,9 @@ dheeg:
 .include "background.s"
 bg:
     .incbin "lvlMap_Checked.nam"
+bg_pal:
+	.incbin "bg_palettes.pal"
 ; Character memory
 .segment "CHARS"
-	.incbin "spriteRom.chr"
+	.incbin "spriteRomCHeck.chr"
 
