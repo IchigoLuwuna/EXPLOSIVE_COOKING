@@ -162,6 +162,8 @@ dheeg:
 	dheeg_bottom_right: .byte $00, $04, $00, $00
 	dheeg_16x16_addr = $00
 
+button_sprite: .byte $66, $05, $00, $4E
+
 
 ; Includes
 .include "bitmasks.s"

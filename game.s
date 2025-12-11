@@ -33,6 +33,8 @@ state_game_init:
 	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo
+
+	jsr func_init_button_prompts
 	
 	; Set player initial position
 	ldx #$7F

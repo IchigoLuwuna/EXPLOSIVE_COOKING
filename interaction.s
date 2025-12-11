@@ -140,6 +140,7 @@ input_handling:
     jsr func_cook
 
 interaction_end:
+    jsr func_update_button_prompt
     rts
 
 
@@ -405,4 +406,112 @@ func_check_station_collision:
                     rts
     :
     lda #$00
+    rts
+
+
+
+
+
+BUTTON_OAM_ADDR = $0290
+
+BUTTON_A_INDEX = $05
+BUTTON_B_INDEX = $06
+BUTTON_DOWN_INDEX = $1B
+BUTTON_RIGHT_INDEX = $33
+
+;-----------------------
+; Initialize button prompt data in OAM
+;-----------------------
+func_init_button_prompts:
+    ; load defined bytes into OAM
+    ldy #$00
+    :
+        lda button_sprite, y
+		sta BUTTON_OAM_ADDR, y
+		iny
+		cpy #$04
+    bmi :-
+
+    rts
+
+;-----------------------
+; Set button prompt type and location depending on current station
+;-----------------------
+func_update_button_prompt:
+    ; if(!at_station)
+    ;       remove button;
+    ;       return;
+    lda game_flags
+    and #AT_STATION
+    cmp #AT_STATION
+    beq :+
+        lda #$FF    ; set y pos to top of screen so it's not visible
+        sta BUTTON_OAM_ADDR
+        jmp update_button_prompt_end
+    :
+
+    ; switch(station_index)
+    lda station_index
+    cmp #MAT_SCRAP_INDEX
+    bne :+
+        lda #MAT_SCRAP_POSY
+        sta BUTTON_OAM_ADDR + $00
+
+        lda #BUTTON_A_INDEX
+        sta BUTTON_OAM_ADDR + $01
+
+        lda #$00
+        sta BUTTON_OAM_ADDR + $02
+
+        lda #MAT_SCRAP_POSX
+        sta BUTTON_OAM_ADDR + $03
+        jmp update_button_prompt_end
+    :
+    cmp #STTN_POT_INDEX
+    bne :+
+        lda #STTN_POT_POSY
+        sta BUTTON_OAM_ADDR + $00
+
+        lda #BUTTON_A_INDEX
+        sta BUTTON_OAM_ADDR + $01
+
+        lda #$00
+        sta BUTTON_OAM_ADDR + $02
+
+        lda #STTN_POT_POSX
+        sta BUTTON_OAM_ADDR + $03
+        jmp update_button_prompt_end
+    :
+    cmp #STTN_FORGE_INDEX
+    bne :+
+        lda #STTN_FORGE_POSY
+        sta BUTTON_OAM_ADDR + $00
+
+        lda #BUTTON_DOWN_INDEX
+        sta BUTTON_OAM_ADDR + $01
+
+        lda #$00
+        sta BUTTON_OAM_ADDR + $02
+
+        lda #STTN_FORGE_POSX
+        sta BUTTON_OAM_ADDR + $03
+        jmp update_button_prompt_end
+    :
+    cmp #STTN_DROP_INDEX
+    bne :+
+        lda #STTN_DROP_POSY
+        sta BUTTON_OAM_ADDR + $00
+
+        lda #BUTTON_A_INDEX
+        sta BUTTON_OAM_ADDR + $01
+
+        lda #$00
+        sta BUTTON_OAM_ADDR + $02
+
+        lda #STTN_DROP_POSX
+        sta BUTTON_OAM_ADDR + $03
+        jmp update_button_prompt_end
+    :
+
+update_button_prompt_end:
     rts
