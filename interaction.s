@@ -414,10 +414,13 @@ func_check_station_collision:
 
 BUTTON_OAM_ADDR = $0290
 
-BUTTON_A_INDEX = $05
-BUTTON_B_INDEX = $06
-BUTTON_DOWN_INDEX = $1B
-BUTTON_RIGHT_INDEX = $33
+BUTTON_A_INDEX =        $05
+BUTTON_B_INDEX =        $06
+BUTTON_DOWN_INDEX =     $1B
+BUTTON_RIGHT_INDEX =    $33
+
+FLIP_HORIZONTALLY =     %01000000
+FLIP_VERTICALLY =       %10000000
 
 ;-----------------------
 ; Initialize button prompt data in OAM
@@ -483,15 +486,52 @@ func_update_button_prompt:
         jmp update_button_prompt_end
     :
     cmp #STTN_FORGE_INDEX
-    bne :+
+    bne :+++++
         lda #STTN_FORGE_POSY
         sta BUTTON_OAM_ADDR + $00
 
-        lda #BUTTON_DOWN_INDEX
-        sta BUTTON_OAM_ADDR + $01
+        jsr func_get_cooking_input
+        cmp #%00000000
+        bne :+
+            lda #BUTTON_DOWN_INDEX
+            sta BUTTON_OAM_ADDR + $01
 
-        lda #$00
-        sta BUTTON_OAM_ADDR + $02
+            lda #FLIP_VERTICALLY
+            sta BUTTON_OAM_ADDR + $02
+
+            jmp forge_button_switch_end
+        :
+        cmp #%00000001
+        bne :+
+            lda #BUTTON_RIGHT_INDEX
+            sta BUTTON_OAM_ADDR + $01
+
+            lda #$00
+            sta BUTTON_OAM_ADDR + $02
+
+            jmp forge_button_switch_end
+        :
+        cmp #%00000010
+        bne :+
+            lda #BUTTON_DOWN_INDEX
+            sta BUTTON_OAM_ADDR + $01
+
+            lda #$00
+            sta BUTTON_OAM_ADDR + $02
+
+            jmp forge_button_switch_end
+        :
+        cmp #%00000011
+        bne :+
+            lda #BUTTON_RIGHT_INDEX
+            sta BUTTON_OAM_ADDR + $01
+
+            lda #FLIP_HORIZONTALLY
+            sta BUTTON_OAM_ADDR + $02
+
+            jmp forge_button_switch_end
+        :
+    forge_button_switch_end:
 
         lda #STTN_FORGE_POSX
         sta BUTTON_OAM_ADDR + $03
