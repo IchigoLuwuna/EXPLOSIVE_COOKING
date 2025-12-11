@@ -3,6 +3,16 @@ MAT_SCRAP_INDEX =   %00000011
 MAT_SCRAP_POSX =    $4E
 MAT_SCRAP_POSY =    $66
 
+; material: powder
+MAT_POWDER_INDEX =  %00000101
+MAT_POWDER_POSX =   $4E
+MAT_POWDER_POSY =   $66
+
+; material: plastic
+MAT_PLASTIC_INDEX =  %00000111
+MAT_PLASTIC_POSX =   $4E
+MAT_PLASTIC_POSY =   $66
+
 ; station: cooking pot
 STTN_POT_INDEX =    %00000010
 STTN_POT_POSX =     $6E
@@ -71,6 +81,34 @@ func_handle_interactions:
     lda #MAT_SCRAP_POSY
     sta reg_c
     lda #MAT_SCRAP_INDEX
+    sta reg_d
+
+    jsr func_check_station_collision
+    cmp #$00
+    beq :+
+        jmp input_handling
+    :
+
+    ; check material powder
+    lda #MAT_POWDER_POSX
+    sta reg_b
+    lda #MAT_POWDER_POSY
+    sta reg_c
+    lda #MAT_POWDER_INDEX
+    sta reg_d
+
+    jsr func_check_station_collision
+    cmp #$00
+    beq :+
+        jmp input_handling
+    :
+
+    ; check material plastic
+    lda #MAT_PLASTIC_POSX
+    sta reg_b
+    lda #MAT_PLASTIC_POSY
+    sta reg_c
+    lda #MAT_PLASTIC_INDEX
     sta reg_d
 
     jsr func_check_station_collision
