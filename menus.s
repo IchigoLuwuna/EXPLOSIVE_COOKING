@@ -171,7 +171,7 @@ state_menu_start_loop:
     lda joypad
     and #PAD_START
     beq @wait_vblank        ; not pressed, skip
-    lda reg_c
+    lda #$00
     and #PAD_START
     bne @wait_vblank        ; held from previous frame, skip
 
