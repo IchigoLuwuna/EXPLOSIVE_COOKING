@@ -37,12 +37,8 @@
 	arrow_x = $32
 	arrow_y = $33
 	arrow_tile = $34
-	
+
 	first_wall_addr = $E0	; 16bt array
-	menu_selection = $31  ; 0 = START, 1 = EXIT
-	arrow_x = $32
-	arrow_y = $33
-	arrow_tile = $34
 	enemy_mask = $40       ; one byte to hold bitmask
 	ammo_count = $41 ; holds the amount of bullets (starts at max)
 	L_byte = $42 ; low byte for the background
