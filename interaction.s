@@ -10,9 +10,13 @@ STTN_POT_POSY =     $66
 
 ; station: forge
 STTN_FORGE_INDEX =  %00000100
+STTN_FORGE_POSX =   $8E
+STTN_FORGE_POSY =   $66
 
 ; station: ammo
-STTN_AMMO_INDEX =  %00000110
+STTN_DROP_INDEX =   %00000110
+STTN_DROP_POSX =    $4E
+STTN_DROP_POSY =    $86
 
 ; player
 PLR_POSX_ADDR = $0203
@@ -21,11 +25,17 @@ PLR_POSY_ADDR = $0200
 INTERACT_HEIGHT = $10
 
 ;------------------------------
+; materialInventory = 0;
+; cookingStatus = 0;
 ; requiredMaterials = random(0,255);
 ; inputSquence = random(0,255);
 ; cookingStatus = 0;
 ;------------------------------
 func_initialize_cook:
+    lda #$00
+    sta material_inventory
+    sta cooking_status
+
     jsr func_random_to_acc
     sta required_materials
 
@@ -75,6 +85,34 @@ func_handle_interactions:
     lda #STTN_POT_POSY
     sta reg_c
     lda #STTN_POT_INDEX
+    sta reg_d
+    
+    jsr func_check_station_collision
+    cmp #$00
+    beq :+
+        jmp input_handling
+    :
+
+    ; check station forge
+    lda #STTN_FORGE_POSX
+    sta reg_b
+    lda #STTN_FORGE_POSY
+    sta reg_c
+    lda #STTN_FORGE_INDEX
+    sta reg_d
+    
+    jsr func_check_station_collision
+    cmp #$00
+    beq :+
+        jmp input_handling
+    :
+
+    ; check station drop
+    lda #STTN_DROP_POSX
+    sta reg_b
+    lda #STTN_DROP_POSY
+    sta reg_c
+    lda #STTN_DROP_INDEX
     sta reg_d
     
     jsr func_check_station_collision
@@ -142,25 +180,30 @@ func_cook:
     lda cooking_status
     and #COOKING_STATUS_TYPE
     cmp #%00000000
-    bne :++  ; case start:
-        ; if station is pot: check required materials
+    bne :+++  ; case start:
+        ; if station is pot: check input
         lda station_index
         cmp #STTN_POT_INDEX
-        bne :+
-            ; if current materials == required materials: check input
-            lda required_materials
-            cmp material_inventory
-            bne :+
-                ; if A is held: all checks succeeded -> set status to forging
-                lda joypad
-                and #PAD_A
-                cmp #$00
-                beq :+
+        bne :++
+            ; if A is held: check required materials
+            lda joypad
+            and #PAD_A
+            cmp #$00
+            beq :++
+                ; if current materials == required materials: all checks succeeded -> set status to forging
+                lda required_materials
+                cmp material_inventory
+                bne :+
                     ; set status to forging
                     lda cooking_status
                     and #%11001111
                     ora #%00010000
                     sta cooking_status
+                    jmp cook_end
+                :
+                ; if current materials != required materials: wrong input -> reset material inventory
+                lda #$00
+                sta material_inventory
         :
         jmp cook_end    ; break
     :
@@ -224,7 +267,7 @@ func_cook:
     bne :++  ; case ready:
         ; if station is ammo drop off zone: check required input
         lda station_index
-        cmp #STTN_AMMO_INDEX
+        cmp #STTN_DROP_INDEX
         bne :+
             lda joypad
             and #PAD_A
@@ -250,6 +293,7 @@ cook_forge:
         and #%11001111
         ora #%00100000
         sta cooking_status
+    :
 cook_end:
     rts
 
@@ -279,6 +323,9 @@ func_handle_material:
 ;------------------------------
 func_finish_cook:
     ; add bullets or something?
+
+    jsr func_initialize_cook
+
     rts
 
 
@@ -288,14 +335,21 @@ func_finish_cook:
 func_get_cooking_input:
     lda input_sequence
     sta reg_b
-
-@loop:
     lda cooking_status
     and #COOKING_STATUS_COUNTER
+    sta reg_c
+
+@loop:
+    lda reg_c
     cmp #$00
     beq :+
+        ; decrement counter
+        sec
         sbc #$01
         clc
+        sta reg_c
+
+        ; shift input sequence
         lda reg_b
         lsr
         lsr
