@@ -1,6 +1,6 @@
 .segment "CODE"
 state_menu_start:
-
+    jmp state_game_init
 state_menu_start_init:
 
 
@@ -212,4 +212,4 @@ start_text:
 exit_text:
   .byte 9,29,13,25      ; " EXIT"
 
-  arrow_oam:    .res 4   ; 4 bytes for 1 sprite: Y, tile, attributes, X
+arrow_oam:    .res 4   ; 4 bytes for 1 sprite: Y, tile, attributes, X

@@ -22,13 +22,13 @@ state_game_init:
 
 	; Initialize OAM
 	ldy #$00
-	:
-		lda dheeg, y
-		sta $0200, y
-		iny
+	init_oam_loop:
+		lda dheeg, y 
+		sta $0200, y 
+		iny 
 		cpy #$10
-	bmi :-
-
+	bmi init_oam_loop
+	
 	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo
@@ -48,6 +48,10 @@ state_game_init:
     sta $2000
 	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
 	sta $2001
+
+	lda #5
+	jsr add_score
+
 
 ; allows jumping without reinitialising
 state_game_loop:
@@ -143,5 +147,6 @@ forever:
 
 	inc clock
 	jsr func_vblank_wait
-
+	jsr display_score   ; safe to write to PPU now
+	jsr reset_scroll
 jmp forever
