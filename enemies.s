@@ -1,16 +1,19 @@
 
 enemies_init_timers:
     ldx #$00
-    init_loop:
-        lda clock
-        clc
-        adc #$08
-        clc 
-        sta enemyClock, x
-        inx
-        cpx #$08
-        bne init_loop
-
+init_loop:
+    lda clock
+    clc
+    adc #$50              ; base delay
+    clc
+    adc enemyIntervals, x ; stagger start times
+    sta enemyClock, x
+    lda enemyIntervals, x
+    sta enemyStep, x
+    inx
+    cpx #$08
+    bne init_loop
+    rts
 
 enemies_to_oam:
     ldy #$00
@@ -46,17 +49,28 @@ enemies_init:
 
 
    
-
 enemy_loop:
     lda #$00
-    sta reg_d          ; enemy index = 0
+    sta reg_d            ; enemy index
 
 enemy_loop_start:
     lda reg_d
     cmp #$08
-    beq enemy_done     ; finished all 8 enemies
+    beq enemy_done       ; all enemies done
 
-    ; Compute OAM offset: each enemy = 16 bytes, base $2010
+
+    tax
+    lda clock
+    cmp enemyClock, x
+    bcc skip_enemy   ; skip if clock < enemyClock if enemyClock > clock (not ready yet)
+
+    ; --- Move enemy ---
+    lda reg_d
+    cmp #$04
+    bcc move_right      ; enemies 0-3 → right
+
+    ; enemies 4-7 → move left
+move_left:
     lda reg_d
     asl
     asl
@@ -64,18 +78,42 @@ enemy_loop_start:
     asl
     adc #$10
     clc
-
-
-
     ldx #$FF
     ldy #$00
     jsr func_move_16x16
+    jmp enemy_continue
 
-    inc reg_d           ; next enemy
+
+move_right:
+    lda reg_d
+    asl
+    asl
+    asl
+    asl
+    adc #$10
+    clc
+    ldx #$01
+    ldy #$00
+    jsr func_move_16x16
+
+enemy_continue:
+    inc reg_d
+    jmp enemy_loop_start
+
+skip_enemy:
+    inc reg_d
     jmp enemy_loop_start
 
 enemy_done:
     rts
+
+
+enemy_dead:
+    ldx #$FF        ; X = 0 movement
+    ldy #$00        ; Y = 0 movement
+    jsr func_move_16x16
+    rts
+
 
 evilDheegs:
 
@@ -128,3 +166,18 @@ evilDheegs:
     .byte $B0, $02, $02, $C8
     .byte $B8, $03, $02, $C0
     .byte $B8, $04, $02, $C8
+
+enemy_mask_table:
+    .byte %00000001
+    .byte %00000010
+    .byte %00000100
+    .byte %00001000
+    .byte %00010000
+    .byte %00100000
+    .byte %01000000
+    .byte %10000000
+
+enemyIntervals:
+    .byte $20, $40, $60, $80, $A0, $C0, $E0, $FF
+enemyStep:
+    .res 8   ; reserve 8 bytes for enemy intervals
