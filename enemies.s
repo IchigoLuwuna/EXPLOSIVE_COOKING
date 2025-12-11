@@ -1,11 +1,24 @@
 
+enemies_init_timers:
+    ldx #$00
+    init_loop:
+        lda clock
+        clc
+        adc #$08
+        clc 
+        sta enemyClock, x
+        inx
+        cpx #$08
+        bne init_loop
+
+
 enemies_to_oam:
     ldy #$00
 @loop:
     lda evilDheegs, y
     sta $0210, y
     iny
-    cpy #$20
+    cpy #$80   ; 128 bytes for 8 enemies
     bne @loop
     rts
 
@@ -13,6 +26,10 @@ enemies_to_oam:
 
 
 enemies_init:
+
+	lda #$00
+	sta enemy_alive
+    sta enemy_mask
 	jsr func_random_to_acc      ; get random byte in A
 	and #%01111111              ; limit to 0-127 (screen height)
 	ldy #$00                     ; base sprite offset in OAM for enemy 0
@@ -31,48 +48,83 @@ enemies_init:
    
 
 enemy_loop:
+    lda #$00
+    sta reg_d          ; enemy index = 0
 
-    ldy reg_d              ; A = enemy index
-                        ; Y = enemy index
-
-    lda enemy_alive
-    and enemy_mask,y         ; mask bit
-    bne enemy_skip         ; if bit=1 → skip enemy
-
-    ; Compute OAM offset (A = index)
-
-    tya
-    asl
-    asl
-    asl
-    asl                    ; ×16
-    adc #$10               ; base OAM offset
-    clc
-    ; movement
-    ldx #$FF               ; dx
-    ldy #$00               ; dy
-    jsr func_move_16x16
-    rts
-
-enemy_skip:
-    inc reg_d
+enemy_loop_start:
     lda reg_d
-    cmp #2
-    bne enemy_loop
-    rts
+    cmp #$08
+    beq enemy_done     ; finished all 8 enemies
 
+    ; Compute OAM offset: each enemy = 16 bytes, base $2010
+    lda reg_d
+    asl
+    asl
+    asl
+    asl
+    adc #$10
+    clc
+
+
+
+    ldx #$FF
+    ldy #$00
+    jsr func_move_16x16
+
+    inc reg_d           ; next enemy
+    jmp enemy_loop_start
+
+enemy_done:
+    rts
 
 evilDheegs:
 
-	amount_of_evilDheegs = $02
-; Enemy 0
-    .byte $80, $01, $01, $F0  ; top-left ; Y pos , tile , attr , x pos
-    .byte $80, $02, $01, $F0+8 ; top-right
-    .byte $88, $03, $01, $F0   ; bottom-left
-    .byte $88, $04, $01, $F0+8 ; bottom-right
-	; Enemy 1
-    .byte $90, $01, $02, $10   ; top-left
-    .byte $90, $02, $02, $18   ; top-right
-    .byte $98, $03, $02, $10   ; bottom-left
-    .byte $98, $04, $02, $18   ; bottom-right
-	
+    amount_of_evilDheegs = $08 ; now 8 enemies
+
+; Enemy 0 (left)
+    .byte $80, $01, $01, $00 ; y tile attr x
+    .byte $80, $02, $01, $08
+    .byte $88, $03, $01, $00
+    .byte $88, $04, $01, $08
+
+; Enemy 1 (left)
+    .byte $90, $01, $02, $10
+    .byte $90, $02, $02, $18
+    .byte $98, $03, $02, $10
+    .byte $98, $04, $02, $18
+
+; Enemy 2 (left)
+    .byte $A0, $01, $02, $20
+    .byte $A0, $02, $02, $28
+    .byte $A8, $03, $02, $20
+    .byte $A8, $04, $02, $28
+
+; Enemy 3 (left)
+    .byte $B0, $01, $02, $30
+    .byte $B0, $02, $02, $38
+    .byte $B8, $03, $02, $30
+    .byte $B8, $04, $02, $38
+
+; Enemy 4 (right)
+    .byte $80, $01, $02, $F0
+    .byte $80, $02, $02, $F8
+    .byte $88, $03, $02, $F0
+    .byte $88, $04, $02, $F8
+
+; Enemy 5 (right)
+    .byte $90, $01, $02, $E0
+    .byte $90, $02, $02, $E8
+    .byte $98, $03, $02, $E0
+    .byte $98, $04, $02, $E8
+
+; Enemy 6 (right)
+    .byte $A0, $01, $02, $D0
+    .byte $A0, $02, $02, $D8
+    .byte $A8, $03, $02, $D0
+    .byte $A8, $04, $02, $D8
+
+; Enemy 7 (right)
+    .byte $B0, $01, $02, $C0
+    .byte $B0, $02, $02, $C8
+    .byte $B8, $03, $02, $C0
+    .byte $B8, $04, $02, $C8

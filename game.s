@@ -4,12 +4,10 @@ state_game_init:
 	jsr func_clear_nametable
 	jsr func_seed_random
 
-	lda #$00
-	sta enemy_alive
 
 	jsr func_vblank_wait ; wait for safe vblank
 
-
+	jsr enemies_init_timers
 
 	; Flush shadow OAM
 	@clear_oam:
@@ -111,8 +109,7 @@ forever:
 
 
 
-   lda #0
- 	sta reg_d              ; enemy index = 0
+
 
 	jsr enemy_loop
 	

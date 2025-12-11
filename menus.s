@@ -1,6 +1,6 @@
 .segment "CODE"
 state_menu_start:
-
+    jmp state_game_init
 state_menu_start_init:
 
 
