@@ -47,6 +47,8 @@
 	update = $47  ; single byte
 	temp   = $48  ; uses $48-$4D (6 bytes)
 
+	kitchen_hp = $60 ; 1bt: contains the kitchen's HP
+
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
 	.addr nmi
