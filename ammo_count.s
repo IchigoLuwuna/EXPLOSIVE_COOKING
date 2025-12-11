@@ -1,4 +1,5 @@
-ammo_sprite_slot = $0230
+
+ammo_sprite_slot = $0290
 
 
 init_ammo:
@@ -47,4 +48,4 @@ ammo_tiles:
     .byte $22  ; tile 2
     .byte $23  ; tile 3
 
-ammo_sprite: .byte $05, $20, $00, $10  ; Y=5, tile=0, attr=1, X=16
+ammo_sprite: .byte $07, $20, $00, $10  ; Y=5, tile=0, attr=1, X=16

@@ -48,6 +48,8 @@
 	temp   = $48  ; uses $48-$4D (6 bytes)
 
 	kitchen_hp = $60 ; 1bt: contains the kitchen's HP
+	enemyClock = $4E ; 8 bytes 4E - 55 
+
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -107,7 +109,6 @@ load_palettes:
 		inx
 		cpx #$20
 		bne @loop
-
 jsr func_vblank_wait
 
 enable_rendering:
@@ -177,7 +178,7 @@ dheeg:
 
 ; Binary Includes
 bg:
-    .incbin "level_background_binary.nam"
+    .incbin "lvlMap_Checked.nam"
 
 ; Character memory
 .segment "CHARS"

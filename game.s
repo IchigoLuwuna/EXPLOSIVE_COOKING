@@ -4,12 +4,10 @@ state_game_init:
 	jsr func_seed_random
 	jsr func_initialize_walls
 
-    lda #$00
-    sta enemy_alive ; all enemies alive (0 = alive)
 
 	jsr func_vblank_wait ; wait for safe vblank
 
-
+	jsr enemies_init_timers
 
 	; Flush shadow OAM
 	@clear_oam:
@@ -33,6 +31,9 @@ state_game_init:
 	jsr init_ammo
 
 	; Set player initial position
+	lda #$00
+	sta $0200
+	sta $0203
 	ldx #$7F
 	ldy #$7F
 	lda dheeg_16x16_addr
@@ -48,11 +49,11 @@ state_game_init:
 	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
 	sta $2001
 
-	lda #5
-	jsr add_score
-
 	lda #$FF
 	sta kitchen_hp
+
+	ldx #$03
+	jsr enemy_die
 
 
 ; allows jumping without reinitialising
@@ -146,10 +147,11 @@ forever:
 
 
 
-	lda #$00
-	sta reg_d              ; enemy index = 0
+
 
 	jsr enemy_loop
+
+
 
 	inc clock
 	jsr func_vblank_wait
