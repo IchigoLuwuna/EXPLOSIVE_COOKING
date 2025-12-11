@@ -23,12 +23,12 @@ state_game_init:
 	; Initialize OAM
 	ldy #$00
 	init_oam_loop:
-		lda dheeg, y 
-		sta $0200, y 
-		iny 
+		lda dheeg, y
+		sta $0200, y
+		iny
 		cpy #$10
 	bmi init_oam_loop
-	
+
 	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo
@@ -66,13 +66,17 @@ forever:
 	lda reg_d
 	and #ZAPPER_HALF_PULLED
 	cmp #ZAPPER_HALF_PULLED ; if was half pulled last frame
-	bne :++
+	bne :+
 		lda zapper
 		and #ZAPPER_HALF_PULLED
 		cmp #00 ; if not half pulled this frame
 		bne :+
 			jsr game_sub_state_zap
-		:
+			lda reg_b
+			cmp #$00
+			beq:+
+				lda #$05
+				jsr add_score
 	:
 
 	; Read joypad
