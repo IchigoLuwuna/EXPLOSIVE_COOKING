@@ -22,12 +22,16 @@ INTERACT_HEIGHT = $10
 
 ;------------------------------
 ; requiredMaterials = random(0,255);
-; requiredButtons = random(0,255);
+; inputSquence = random(0,255);
 ; cookingStatus = 0;
 ;------------------------------
 func_initialize_cook:
-    ; randomly select required materials
-    ; randomly select required button inputs
+    jsr func_random_to_acc
+    sta required_materials
+
+    jsr func_random_to_acc
+    sta input_sequence
+
     lda #$00
     sta cooking_status
 
