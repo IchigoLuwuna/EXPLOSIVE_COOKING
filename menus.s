@@ -22,8 +22,8 @@ state_menu_start_init:
     bne @clear_oam
 
     jsr func_clear_nametable
-
-
+   
+	
     ; Drawing menu the middle
 	lda #$00
 	sta $2000
