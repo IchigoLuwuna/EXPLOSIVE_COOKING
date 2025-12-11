@@ -33,6 +33,9 @@ enemies_init:
 	lda #$00
 	sta enemy_alive
     sta enemy_mask
+
+
+    
 	jsr func_random_to_acc      ; get random byte in A
 	and #%01111111              ; limit to 0-127 (screen height)
 	ldy #$00                     ; base sprite offset in OAM for enemy 0
@@ -58,8 +61,13 @@ enemy_loop_start:
     cmp #$08
     beq enemy_done       ; all enemies done
 
+    ldx reg_d
+    lda enemy_alive
+    and enemy_mask_table, x
+    bne skip_enemy  ; skip if dea
 
-    tax
+    ldx reg_d
+    
     lda clock
     cmp enemyClock, x
     bcc skip_enemy   ; skip if clock < enemyClock if enemyClock > clock (not ready yet)
@@ -100,7 +108,7 @@ enemy_continue:
     inc reg_d
     jmp enemy_loop_start
 
-skip_enemy:
+skip_enemy: 
     inc reg_d
     jmp enemy_loop_start
 
@@ -108,12 +116,38 @@ enemy_done:
     rts
 
 
-enemy_dead:
-    ldx #$FF        ; X = 0 movement
-    ldy #$00        ; Y = 0 movement
+enemy_die:
+    lda enemy_alive, x
+    ora enemy_mask_table, x
+    sta enemy_alive       ; mark enemy dead
+
+    txa
+    sta reg_d             ; store enemy index
+    jsr calculate_enemy_adress
+
+    lda reg_oam           ; base OAM offset
+    ldx #$00
+    ldy #$FF              ; move offscreen
     jsr func_move_16x16
     rts
 
+calculate_enemy_adress:
+    txa         ; enemy index → need to compute OAM offset
+    asl
+    asl
+    asl
+    asl
+    adc #$10              
+    sta reg_oam   
+
+
+enemy_respawn_random:
+	jsr func_random_to_acc
+	and #%01111111
+	ldy #$10                     ; base sprite offset in OAM for enemy 1 (next 16x16 block)
+	lda #$00
+	jsr func_move_16x16 
+    rts 
 
 evilDheegs:
 
@@ -167,6 +201,12 @@ evilDheegs:
     .byte $B8, $03, $02, $C0
     .byte $B8, $04, $02, $C8
 
+
+enemyIntervals:
+    .byte $20, $40, $60, $80, $A0, $C0, $E0, $FF
+enemyStep:
+    .res 8   ; reserve 8 bytes for enemy intervals
+reg_oam:  .res 1  ; temporary storage for OAM address
 enemy_mask_table:
     .byte %00000001
     .byte %00000010
@@ -176,8 +216,3 @@ enemy_mask_table:
     .byte %00100000
     .byte %01000000
     .byte %10000000
-
-enemyIntervals:
-    .byte $20, $40, $60, $80, $A0, $C0, $E0, $FF
-enemyStep:
-    .res 8   ; reserve 8 bytes for enemy intervals

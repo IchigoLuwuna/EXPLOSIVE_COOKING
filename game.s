@@ -46,6 +46,10 @@ state_game_init:
 	lda #%00011110 ; enables sprites, background, leftmost 8 pixels
 	sta $2001
 
+	ldx #$03
+	jsr enemy_die
+
+
 ; allows jumping without reinitialising
 state_game_loop:
 forever:
@@ -112,7 +116,9 @@ forever:
 
 
 	jsr enemy_loop
-	
+		
+
+
 	inc clock
 	jsr func_vblank_wait
 
