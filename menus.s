@@ -1,6 +1,6 @@
 .segment "CODE"
 state_menu_start:
-    jmp state_game_init
+    ;jmp state_game_init
 state_menu_start_init:
 
 
@@ -22,8 +22,8 @@ state_menu_start_init:
     bne @clear_oam
 
     jsr func_clear_nametable
-   
-	
+
+
     ; Drawing menu the middle
 	lda #$00
 	sta $2000

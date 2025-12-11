@@ -28,7 +28,7 @@ enemies_init:
 ;--------------------------------------------------------
 
 
-   
+
 
 enemy_loop:
 
@@ -51,13 +51,55 @@ enemy_loop:
     ; movement
     ldx #$FF               ; dx
     ldy #$00               ; dy
+
+	pha ; put OAM offset on stack
+
     jsr func_move_16x16
+
+	; /-----------------\
+	; | Enemy collision |
+	; \-----------------/
+	pla
+	sta reg_swap
+	tax ; enemy offset is in x
+	ldy $0200, x
+	tya ; y pos is now in a
+	ldy reg_swap ; enemy offset is in y
+	ldx $0203, y ; x now contains enemy x pos
+	tay ; y now contains enemy y pos
+
+	lda reg_d ; enemy walls collision clobbers d so it has to be pushed
+	pha
+	lda reg_swap ; enemy offset needs to be stored for later
+	pha
+
+	jsr func_enemy_walls_collision
+	sta reg_swap ; swap now contains returned variable
+
+	pla
+	sta reg_d ; restore d
+	pla
+	tay ; y now contains enemy offset
+	lda reg_swap ; a now contains return code
+
+	cmp #$01 ; if enemy hit wall
+	bne :+
+		dec kitchen_hp
+		; TODO replace this bit of code with the enemy dying, current enemy offset is in y rn
+		ldy reg_d
+		lda #$FF
+		sta $0200, y
+		;
+	:
+
+	; -------------------
+
     rts
 
 enemy_skip:
     inc reg_d
     lda reg_d
-    cmp #2
+    cmp #$02
     bne enemy_loop
     rts
 
@@ -75,4 +117,4 @@ evilDheegs:
     .byte $90, $02, $00, $18   ; top-right
     .byte $98, $03, $00, $10   ; bottom-left
     .byte $98, $04, $00, $18   ; bottom-right
-	
+

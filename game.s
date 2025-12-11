@@ -1,6 +1,5 @@
 state_game:
 state_game_init:
-
 	jsr func_clear_nametable
 	jsr func_seed_random
 	jsr func_initialize_walls
@@ -23,12 +22,12 @@ state_game_init:
 	; Initialize OAM
 	ldy #$00
 	init_oam_loop:
-		lda dheeg, y 
-		sta $0200, y 
-		iny 
+		lda dheeg, y
+		sta $0200, y
+		iny
 		cpy #$10
 	bmi init_oam_loop
-	
+
 	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo
@@ -51,6 +50,9 @@ state_game_init:
 
 	lda #5
 	jsr add_score
+
+	lda #$FF
+	sta kitchen_hp
 
 
 ; allows jumping without reinitialising
@@ -140,7 +142,7 @@ forever:
 
 
 
-	lda #0
+	lda #$00
 	sta reg_d              ; enemy index = 0
 
 	jsr enemy_loop

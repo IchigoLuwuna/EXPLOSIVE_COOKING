@@ -105,12 +105,10 @@ func_enemy_walls_collision:
     lda #first_wall_addr    ; store pWall in register b
     sta reg_b
 
-    ; store player pos in reg_c and reg_d
-    txa
-    sta reg_c
+    ; store enemy pos in reg_c and reg_d
+    stx reg_c
 
-    tya
-    sta reg_d
+    sty reg_d
 
     txa
     pha
