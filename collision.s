@@ -181,7 +181,7 @@ func_initialize_walls:
     sta first_wall_addr + $01
     lda #$08
     sta first_wall_addr + $02
-    lda #$F0
+    lda #$C0
     sta first_wall_addr + $03
 
     lda #$48
@@ -199,7 +199,7 @@ func_initialize_walls:
     sta first_wall_addr + $09
     lda #$08
     sta first_wall_addr + $0A
-    lda #$F0
+    lda #$C0
     sta first_wall_addr + $0B
 
     lda #$48
