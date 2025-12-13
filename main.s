@@ -63,6 +63,8 @@
 ; if it's empty
 .segment "STARTUP"
 
+.segment "RAM"
+
 ; Main code segment for the program
 .segment "CODE"
 reset:
@@ -175,6 +177,7 @@ dheeg:
 .include "ammo_count.s"
 .include "background.s"
 .include "high_score.s"
+.include "audio.s"
 
 ; Binary Includes
 bg:
