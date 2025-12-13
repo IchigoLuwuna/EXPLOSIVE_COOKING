@@ -11,15 +11,6 @@ func_seed_random:
     rts
 
 func_random_to_acc:
-    ; push registers
-    php     ; push processor
-    txa     ; push x
-    pha
-    lda reg_b   ; push register b
-    pha
-
-    ; start function
-
     ; store bit 7 in register b
     lda #%10000000
     and lfsr    ; isolate bit 7
@@ -47,15 +38,6 @@ func_random_to_acc:
     asl lfsr
     ora lfsr
     sta lfsr
-
-    ; end function
-
-    ; pull registers
-    pla  ; pullh register b
-    sta reg_b
-    pla     ; pull x
-    tax
-	plp     ; pull processor
 
     lda lfsr
 
