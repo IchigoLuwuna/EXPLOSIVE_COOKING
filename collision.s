@@ -177,11 +177,11 @@ enemy_walls_collision_end:
 func_initialize_walls:
     lda #$46
     sta first_wall_addr + $00
-    lda #$50
+    lda #$20
     sta first_wall_addr + $01
     lda #$08
     sta first_wall_addr + $02
-    lda #$80
+    lda #$F0
     sta first_wall_addr + $03
 
     lda #$48
@@ -195,11 +195,11 @@ func_initialize_walls:
 
     lda #$B3
     sta first_wall_addr + $08
-    lda #$50
+    lda #$20
     sta first_wall_addr + $09
     lda #$08
     sta first_wall_addr + $0A
-    lda #$80
+    lda #$F0
     sta first_wall_addr + $0B
 
     lda #$48
