@@ -12,19 +12,19 @@ draw_background:
     lda #%00000000
     sta $2001
 
-
+    ; Set PPU address to $2000 (nametable start)
    ; Set PPU address to $2000
-    lda #$20
-    sta $2006
-    lda #$00
-    sta $2006
+lda #$20
+sta $2006
+lda #$00
+sta $2006
 
-    lda #<bg
-    sta L_byte
-    lda #>bg
-    sta H_byte
+lda #<bg
+sta L_byte
+lda #>bg
+sta H_byte
 
-    ldx #$04          ; 4 × 256 = 1024 bytes
+ldx #$04          ; 4 × 256 = 1024 bytes
 
 next_page:
     ldy #$00
