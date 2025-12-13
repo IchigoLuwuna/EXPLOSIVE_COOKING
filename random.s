@@ -65,7 +65,7 @@ func_acc_to_bool:
     ldx #%00000000
     cmp #$00    ; turn accumulator into boolean
     beq :+
-    ldx #%00000001
+        ldx #%00000001
     :
     txa
     rts

@@ -48,23 +48,19 @@ loop:
     lda $00, y   ; wall x
     sec
     sbc #$10     ; player width
-    clc
     cmp reg_c
     bpl :+  ; if player position x is too low to collide, skip
         lda $00, y      ; wall x
         adc $02, y      ; wall width
-        clc
         cmp reg_c
         bmi :+  ; if player position x is too high to collide, skip
             lda $01, y      ; wall y
             sec
             sbc #$10        ; player height
-            clc
             cmp reg_d
             bpl :+  ; if player position y is too low to collide, skip
                 lda $01, y      ; wall y
                 adc $03, y      ; wall height
-                clc
                 cmp reg_d
                 bmi :+  ; if player position y is too high to collide, skip
                     ; player will collide with this wall
@@ -122,23 +118,19 @@ enemy_collision_loop:
     lda $00, y   ; wall x
     sec
     sbc #$10     ; enemy width
-    clc
     cmp reg_c
     bpl :+  ; if enemy position x is too low to collide, skip
         lda $00, y      ; wall x
         adc $02, y      ; wall width
-        clc
         cmp reg_c
         bmi :+  ; if enemy position x is too high to collide, skip
             lda $01, y      ; wall y
             sec
             sbc #$10        ; enemy height
-            clc
             cmp reg_d
             bpl :+  ; if enemy position y is too low to collide, skip
                 lda $01, y      ; wall y
                 adc $03, y      ; wall height
-                clc
                 cmp reg_d
                 bmi :+  ; if enemy position y is too high to collide, skip
                     ; enemy will collide with this wall
