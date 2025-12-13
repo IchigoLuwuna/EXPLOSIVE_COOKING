@@ -53,7 +53,10 @@ state_game_init:
 	sta $2001
 
 	lda #$FF
-	sta kitchen_hp
+	sta kitchen_hp ; set kitchen HP to max
+
+	lda #$00
+	sta clock ; reset clock
 
 	ldx #$03
 	jsr enemy_die
@@ -166,6 +169,12 @@ forever:
 
 
 	inc clock
+	bne :+ ; if clock is 0
+		; Award player 10 points for surviving 256 frames
+		lda #$01
+		jsr add_score ; add 10 to score
+	:
+
 	jsr func_vblank_wait
 	jsr display_score   ; safe to write to PPU now
 	jsr reset_scroll
