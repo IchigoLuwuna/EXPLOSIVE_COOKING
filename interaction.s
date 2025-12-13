@@ -5,27 +5,27 @@ MAT_SCRAP_POSY =    $66
 
 ; material: powder
 MAT_POWDER_INDEX =  %00000101
-MAT_POWDER_POSX =   $4E
-MAT_POWDER_POSY =   $66
+MAT_POWDER_POSX =   $46
+MAT_POWDER_POSY =   $86
 
 ; material: plastic
 MAT_PLASTIC_INDEX =  %00000111
-MAT_PLASTIC_POSX =   $4E
-MAT_PLASTIC_POSY =   $66
+MAT_PLASTIC_POSX =   $56
+MAT_PLASTIC_POSY =   $86
 
 ; station: cooking pot
 STTN_POT_INDEX =    %00000010
 STTN_POT_POSX =     $6E
-STTN_POT_POSY =     $66
+STTN_POT_POSY =     $56
 
 ; station: forge
 STTN_FORGE_INDEX =  %00000100
-STTN_FORGE_POSX =   $8E
-STTN_FORGE_POSY =   $66
+STTN_FORGE_POSX =   $9E
+STTN_FORGE_POSY =   $56
 
-; station: ammo
+; station: drop
 STTN_DROP_INDEX =   %00000110
-STTN_DROP_POSX =    $4E
+STTN_DROP_POSX =    $9E
 STTN_DROP_POSY =    $86
 
 ; player
