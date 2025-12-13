@@ -84,7 +84,7 @@ game_sub_state_zap_enter:
 jsr func_vblank_wait
 
 ; Enable sprites
-lda #%00010000 ; set bit 4 (render sprites) to 1
+lda #%00010100 ; set bit 4 (render sprites) to 1
 sta $2001
 
 ; Initial test to early out in case of a miss
@@ -336,6 +336,8 @@ game_sub_state_zap_ll:
 game_sub_state_zap_return:
 	lda #$02
 	sta reg_oam_addr
+
+	jsr func_vblank_wait
 
 	; Enable sprites and bg
 	lda #%00011110 ; set bit 3 (render bg) and 4 (render sprites) to 1
