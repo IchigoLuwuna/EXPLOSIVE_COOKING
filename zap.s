@@ -353,8 +353,7 @@ sta reg_b
 jsr func_vblank_wait ; ensure data is synced with PPU
 
 func_is_light_detected_loop:
-	jsr func_get_input
-	lda zapper
+	jsr func_fast_zapper_read
 	and #ZAPPER_LIGHT_NOT_DETECTED
 	cmp #$00
 	bne :+
@@ -369,3 +368,12 @@ func_is_light_detected_loop:
 	jmp func_is_light_detected_loop
 func_is_light_detected_return:
 rts
+
+; Quickly poll zapper and write to accumulator
+func_fast_zapper_read: ; return -> a
+	lda #$01
+	sta cport2
+	lda #$00
+	sta cport2
+	lda cport2
+	rts
