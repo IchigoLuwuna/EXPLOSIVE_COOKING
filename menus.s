@@ -115,6 +115,10 @@ ldx #$00
 ; ----------------------------
 state_menu_start_loop:
 @forever:
+    ldy clock
+    iny
+    sty clock
+
     jsr func_get_input
 
     ; Move arrow UP

@@ -29,9 +29,19 @@
 	enemy_alive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
 
 	station_index = $20
-	cooking_status = $21
+	cooking_status = $21 ; 1bt
+		; 0, 1, 2, 3: times pressed
+		; 4 and 5: %00=not cooking, %01=start succeeded, %10=forging succeeded
 	bullets = $22
 	material_inventory = $23
+	required_materials = $24
+	input_sequence = $25	; 4 x 2bits
+		; bit 	7 6 5 4 3 2 1 0
+		; input 3	2	1	0
+		; 	%00 = up
+		; 	%01 = right
+		;	%10 = down
+		; 	%11 = left
 
 	menu_selection = $31  ; 0 = START, 1 = EXIT
 	arrow_x = $32
@@ -157,6 +167,8 @@ dheeg:
 	dheeg_bottom_left: .byte $00, $03, $00, $00
 	dheeg_bottom_right: .byte $00, $04, $00, $00
 	dheeg_16x16_addr = $00
+
+button_sprite: .byte $66, $05, $00, $4E
 
 
 ; Includes

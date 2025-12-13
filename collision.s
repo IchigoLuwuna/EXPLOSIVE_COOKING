@@ -81,11 +81,11 @@ loop:
 next_loop:
     lda reg_b
     sec
-    sbc #$0C
+    sbc #$10
     clc
     cmp #first_wall_addr
     beq :+
-        adc #$10
+        adc #$14
         clc
         sta reg_b
         jmp loop
@@ -155,11 +155,11 @@ enemy_collision_loop:
 next_enemy_collision_loop:
     lda reg_b
     sec
-    sbc #$0C
+    sbc #$10
     clc
     cmp #first_wall_addr
     beq :+
-        adc #$10
+        adc #$14
         clc
         sta reg_b
         jmp enemy_collision_loop
@@ -177,7 +177,7 @@ enemy_walls_collision_end:
 func_initialize_walls:
     lda #$46
     sta first_wall_addr + $00
-    lda #$50
+    lda #$20
     sta first_wall_addr + $01
     lda #$08
     sta first_wall_addr + $02
@@ -190,12 +190,12 @@ func_initialize_walls:
     sta first_wall_addr + $05
     lda #$80
     sta first_wall_addr + $06
-    lda #$08
+    lda #$10
     sta first_wall_addr + $07
 
     lda #$B3
     sta first_wall_addr + $08
-    lda #$50
+    lda #$20
     sta first_wall_addr + $09
     lda #$08
     sta first_wall_addr + $0A
@@ -204,11 +204,20 @@ func_initialize_walls:
 
     lda #$48
     sta first_wall_addr + $0C
-    lda #$A7
+    lda #$9F
     sta first_wall_addr + $0D
     lda #$80
     sta first_wall_addr + $0E
-    lda #$08
+    lda #$10
     sta first_wall_addr + $0F
+
+    lda #$73
+    sta first_wall_addr + $10
+    lda #$7F
+    sta first_wall_addr + $11
+    lda #$1B
+    sta first_wall_addr + $12
+    lda #$20
+    sta first_wall_addr + $13
 
     rts

@@ -3,6 +3,7 @@ state_game_init:
 	jsr func_clear_nametable
 	jsr func_seed_random
 	jsr func_initialize_walls
+	jsr func_initialize_cook
 
 
 	jsr func_vblank_wait ; wait for safe vblank
@@ -30,12 +31,14 @@ state_game_init:
 	jsr enemies_init
 	jsr init_ammo
 
+	jsr func_init_button_prompts
+
 	; Set player initial position
 	lda #$00
 	sta $0200
 	sta $0203
-	ldx #$7F
-	ldy #$7F
+	ldx #$75
+	ldy #$58
 	lda dheeg_16x16_addr
 	jsr func_move_16x16
 
@@ -154,7 +157,7 @@ forever:
 		:
 	:
 
-
+	jsr func_handle_interactions
 
 
 
