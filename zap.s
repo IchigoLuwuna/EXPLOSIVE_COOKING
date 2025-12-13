@@ -348,7 +348,7 @@ rts
 func_is_light_detected: ; return -> b
 lda #$00
 sta reg_b
-jsr func_vblank_wait
+jsr func_vblank_wait ; ensure data is synced with PPU
 
 func_is_light_detected_loop:
 	jsr func_get_input
@@ -366,5 +366,4 @@ func_is_light_detected_loop:
 
 	jmp func_is_light_detected_loop
 func_is_light_detected_return:
-jsr func_vblank_wait
 rts
