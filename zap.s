@@ -72,6 +72,7 @@ game_sub_state_zap_enter:
 		clc
 	tya
 	adc #$10
+	clc
 	tay
 	cpy #$80 ; loop over all 8 enemies
 	bne :-

@@ -3,10 +3,10 @@ enemies_init_timers:
     ldx #$00
 init_loop:
     lda clock
-    clc
     adc #$50              ; base delay
     clc
     adc enemyIntervals, x ; stagger start times
+	clc
     sta enemyClock, x
     lda enemyIntervals, x
     sta enemyStep, x

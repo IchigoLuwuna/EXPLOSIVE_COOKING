@@ -130,6 +130,7 @@ enable_rendering:
 ; Game Start
 lda #$02
 sta reg_oam_addr
+clc
 jmp state_menu_start
 
 ; Subroutines
