@@ -181,16 +181,16 @@ func_initialize_walls:
     sta first_wall_addr + $01
     lda #$08
     sta first_wall_addr + $02
-    lda #$C0
+    lda #$80
     sta first_wall_addr + $03
 
     lda #$48
     sta first_wall_addr + $04
-    lda #$56
+    lda #$4E
     sta first_wall_addr + $05
     lda #$80
     sta first_wall_addr + $06
-    lda #$08
+    lda #$10
     sta first_wall_addr + $07
 
     lda #$B3
@@ -199,7 +199,7 @@ func_initialize_walls:
     sta first_wall_addr + $09
     lda #$08
     sta first_wall_addr + $0A
-    lda #$C0
+    lda #$80
     sta first_wall_addr + $0B
 
     lda #$48
@@ -208,7 +208,7 @@ func_initialize_walls:
     sta first_wall_addr + $0D
     lda #$80
     sta first_wall_addr + $0E
-    lda #$08
+    lda #$10
     sta first_wall_addr + $0F
 
     rts
