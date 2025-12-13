@@ -394,7 +394,9 @@ func_handle_material:
 ;------------------------------
 ;------------------------------
 func_finish_cook:
-    ; add bullets or something?
+    ; add 3 bullets
+    lda #$03
+    jsr add_ammo
 
     jsr func_initialize_cook
 
