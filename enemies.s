@@ -30,7 +30,7 @@ enemies_to_oam:
 
 enemies_init:
 
-	lda #$00
+	lda #$FF
 	sta enemy_alive
     sta enemy_mask
 
