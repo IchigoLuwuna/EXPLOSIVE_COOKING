@@ -3,17 +3,25 @@ ammo_sprite_slot = $0290
 
 
 init_ammo:
-    lda #$01
+    lda #$03
     sta ammo_count
     jsr draw_ammo
     rts
 
+;--------------------------
+; adds register A to ammo_count
+;--------------------------
 add_ammo:
-    lda ammo_count
-    cmp #$03          ; max ammo = 3
-    bcs @done
-    inc ammo_count
-@done:
+    adc ammo_count
+    clc
+    cmp #$06          ; max ammo = 6
+    bpl :+
+        sta ammo_count
+        jmp add_ammo_end
+    :
+    lda #$06
+    sta ammo_count
+add_ammo_end:
     jsr update_ammo
     rts
 
