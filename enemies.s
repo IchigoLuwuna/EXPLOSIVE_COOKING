@@ -65,7 +65,7 @@ enemy_loop_start:
     ldx reg_d
     lda enemy_alive
     and enemy_mask_table, x
-	cmp #$00
+
     bne :+ ; skip if dead
 		jmp skip_enemy
 	:

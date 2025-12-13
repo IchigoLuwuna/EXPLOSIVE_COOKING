@@ -58,6 +58,11 @@ state_game_init:
 	lda #$00
 	sta clock ; reset clock
 
+
+	lda #$04 ; %00000100
+	sta reg_b
+	jsr enemy_die
+
 ; allows jumping without reinitialising
 state_game_loop:
 forever:
