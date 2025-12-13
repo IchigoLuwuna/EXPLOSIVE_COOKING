@@ -47,6 +47,7 @@ func_initialize_cook:
     sta cooking_status
 
     jsr func_random_to_acc
+    and #MATERIALS
     sta required_materials
 
     jsr func_random_to_acc
@@ -348,9 +349,41 @@ func_handle_material:
 	        and #PAD_A
 	        cmp #PAD_A
 	        beq :+
-                ldy material_inventory  ; get 1 scrap
-                iny
-                sty material_inventory
+                lda material_inventory  ; get 1 scrap
+                ora #MATERIALS_SCRAP
+                sta material_inventory
+        :
+        rts ; break
+    :
+    cmp #MAT_POWDER_INDEX    ; case material_powder:
+    bne :++
+        lda joypad                      ; if A is pressed
+	    and #PAD_A
+	    cmp #PAD_A
+	    bne :+
+            lda joypad_previous         ; if A was not pressed last frame
+	        and #PAD_A
+	        cmp #PAD_A
+	        beq :+
+                lda material_inventory  ; get 1 powder
+                ora #MATERIALS_POWDER
+                sta material_inventory
+        :
+        rts ; break
+    :
+    cmp #MAT_PLASTIC_INDEX    ; case material_plastic:
+    bne :++
+        lda joypad                      ; if A is pressed
+	    and #PAD_A
+	    cmp #PAD_A
+	    bne :+
+            lda joypad_previous         ; if A was not pressed last frame
+	        and #PAD_A
+	        cmp #PAD_A
+	        beq :+
+                lda material_inventory  ; get 1 plastic
+                ora #MATERIALS_PLASTIC
+                sta material_inventory
         :
         rts ; break
     :
@@ -495,7 +528,7 @@ func_update_button_prompt:
     lda station_index
     cmp #MAT_SCRAP_INDEX
     bne :+
-        lda #MAT_SCRAP_POSY
+        lda #MAT_SCRAP_POSY + $0C
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -504,13 +537,13 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #MAT_SCRAP_POSX
+        lda #MAT_SCRAP_POSX - $0A
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #STTN_POT_INDEX
     bne :+
-        lda #STTN_POT_POSY
+        lda #STTN_POT_POSY - $04
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -519,13 +552,13 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #STTN_POT_POSX
+        lda #STTN_POT_POSX + $06
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #STTN_FORGE_INDEX
     bne :+++++
-        lda #STTN_FORGE_POSY
+        lda #STTN_FORGE_POSY - $04
         sta BUTTON_OAM_ADDR + $00
 
         jsr func_get_cooking_input
@@ -571,13 +604,13 @@ func_update_button_prompt:
         :
     forge_button_switch_end:
 
-        lda #STTN_FORGE_POSX
+        lda #STTN_FORGE_POSX + $06
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #STTN_DROP_INDEX
     bne :+
-        lda #STTN_DROP_POSY
+        lda #STTN_DROP_POSY + $0C
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -586,7 +619,7 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #STTN_DROP_POSX
+        lda #STTN_DROP_POSX + $16
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
