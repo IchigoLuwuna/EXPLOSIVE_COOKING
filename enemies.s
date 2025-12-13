@@ -90,11 +90,11 @@ move_left:
     clc
 
     ; movement
-    ldx #$FF               ; dx
-    ldy #$00               ; dy
+    ldx #$FF               
+    ldy #$00               
 
     jsr func_move_16x16
-
+    jmp enemy_continue
 move_right:
     lda reg_d
     asl
