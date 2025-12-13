@@ -65,9 +65,10 @@ enemy_loop_start:
     ldx reg_d
     lda enemy_alive
     and enemy_mask_table, x
-    bne skip_enemy  ; skip if dea
-
-    ldx reg_d
+	cmp #$00
+    bne :+ ; skip if dead
+		jmp skip_enemy
+	:
 
     lda clock
     cmp enemyClock, x
@@ -154,33 +155,48 @@ skip_enemy:
 
 
 enemy_done:
+	jsr func_hide_dead_enemies
     rts
 
 
-enemy_die:
-    lda enemy_alive, x
-    ora enemy_mask_table, x
-    sta enemy_alive       ; mark enemy dead
-
-    txa
-    sta reg_d             ; store enemy index
-    jsr calculate_enemy_adress
-
-    lda reg_oam           ; base OAM offset
-    ldx #$00
-    ldy #$FF              ; move offscreen
+enemy_die: ; input -> B -> enemy mask
+	; mark enemies as dead
+	lda reg_b
+	eor #$FF ; invert mask
+	and enemy_alive ; AND masks together
+    sta enemy_alive ; mark masked enemies dead
+	
+	; hide dead enemies
+	jsr func_hide_dead_enemies
 
     rts
 
-calculate_enemy_adress:
-    txa         ; enemy index → need to compute OAM offset
-    asl
-    asl
-    asl
-    asl
-    adc #$10
-    sta reg_oam
+func_hide_dead_enemies:
+	lda enemy_alive
+	sta reg_b ; copy enemy_alive into B
+	ldx #$08 ; amount of iterations
+	ldy #$00 ; enemy offset
 
+	func_hide_dead_enemies_loop:
+		lda #$01
+		and reg_b ; current enemy alive state is now in A. zero flag is also set if enemy is dead
+		bne :+ ; skip if enemy is alive
+			lda #$FF
+			sta $0210, y
+			sta $0214, y
+			sta $0218, y
+			sta $021C, y
+		:
+		lsr reg_b ; go to next enemy
+		tya
+		clc
+		adc #$10 ; go to next enemy in OAM
+		clc
+		tay
+		dex
+		bne func_hide_dead_enemies_loop
+
+	rts
 
 enemy_respawn_random:
 	jsr func_random_to_acc
@@ -247,7 +263,6 @@ enemyIntervals:
     .byte $20, $40, $60, $80, $A0, $C0, $E0, $FF
 enemyStep:
     .res 8   ; reserve 8 bytes for enemy intervals
-reg_oam:  .res 1  ; temporary storage for OAM address
 enemy_mask_table:
     .byte %00000001
     .byte %00000010

@@ -74,12 +74,21 @@ forever:
 		and #ZAPPER_HALF_PULLED
 		cmp #00 ; if not half pulled this frame
 		bne :+
-			jsr game_sub_state_zap
-			lda reg_b
-			cmp #$00
-			beq:+
+			; zapper trigger is fully pulled
+			lda ammo_count ; load ammo count to check if empty
+			beq :+ ; skip if zero flag is set -> no ammo
+			dec ammo_count ; decrease ammo count
+
+			jsr game_sub_state_zap ; shoot >:D
+			lda reg_b ; load into a -> sets 0 flag if reg_b is empty
+			beq :+ ; skip if zero flag is set -> no enemy has been hit
+				; an enemy has been hit
+				jsr enemy_die
+				
+				; award 50 points for hitting an enemy
 				lda #$05
 				jsr add_score
+				;
 	:
 
 	; Read joypad
