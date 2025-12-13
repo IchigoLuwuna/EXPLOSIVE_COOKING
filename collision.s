@@ -211,11 +211,11 @@ func_initialize_walls:
     lda #$10
     sta first_wall_addr + $0F
 
-    lda #$6E
+    lda #$73
     sta first_wall_addr + $10
     lda #$7F
     sta first_wall_addr + $11
-    lda #$20
+    lda #$1B
     sta first_wall_addr + $12
     lda #$20
     sta first_wall_addr + $13
