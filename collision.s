@@ -76,7 +76,7 @@ loop:
                     lda #$01
                     jmp player_walls_collision_end
     :
-    
+
     ; to next iteration or break out of loop
 next_loop:
     lda reg_b
@@ -100,7 +100,79 @@ next_loop:
 player_walls_collision_end:
     rts
 
+; Input parameters -> x & y: enemy position
+func_enemy_walls_collision:
+    lda #first_wall_addr    ; store pWall in register b
+    sta reg_b
 
+    ; store enemy pos in reg_c and reg_d
+    stx reg_c
+
+    sty reg_d
+
+    txa
+    pha
+    tya
+    pha
+
+    ; loop over all walls
+enemy_collision_loop:
+    ; collision checks with current wall
+    ldy reg_b
+    lda $00, y   ; wall x
+    sec
+    sbc #$10     ; enemy width
+    clc
+    cmp reg_c
+    bpl :+  ; if enemy position x is too low to collide, skip
+        lda $00, y      ; wall x
+        adc $02, y      ; wall width
+        clc
+        cmp reg_c
+        bmi :+  ; if enemy position x is too high to collide, skip
+            lda $01, y      ; wall y
+            sec
+            sbc #$10        ; enemy height
+            clc
+            cmp reg_d
+            bpl :+  ; if enemy position y is too low to collide, skip
+                lda $01, y      ; wall y
+                adc $03, y      ; wall height
+                clc
+                cmp reg_d
+                bmi :+  ; if enemy position y is too high to collide, skip
+                    ; enemy will collide with this wall
+                    pla
+                    tay
+                    pla
+                    tax
+
+                    lda #$01
+                    jmp enemy_walls_collision_end
+    :
+
+    ; to next iteration or break out of loop
+next_enemy_collision_loop:
+    lda reg_b
+    sec
+    sbc #$0C
+    clc
+    cmp #first_wall_addr
+    beq :+
+        adc #$10
+        clc
+        sta reg_b
+        jmp enemy_collision_loop
+    :
+
+    pla
+    tay
+    pla
+    tax
+
+    lda #$00
+enemy_walls_collision_end:
+    rts
 
 func_initialize_walls:
     lda #$46

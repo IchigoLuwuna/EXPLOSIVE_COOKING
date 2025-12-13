@@ -1,6 +1,6 @@
 .segment "CODE"
 state_menu_start:
-
+    ;jmp state_game_init
 state_menu_start_init:
 
 
@@ -22,21 +22,21 @@ state_menu_start_init:
     bne @clear_oam
 
     jsr func_clear_nametable
-   
-	
+
+
     ; Drawing menu the middle
 	lda #$00
 	sta $2000
 	sta $2001
 
 
-    ; Set scroll to 0,0 
+    ; Set scroll to 0,0
 
     lda #$00
     sta $2005
     lda #$00
     sta $2005
-    
+
     lda $2002
     lda #$21      ; high byte (row 12)
     sta $2006
@@ -49,14 +49,14 @@ state_menu_start_init:
 
     lda #$60        ; row 12 tile = 96
     sec
-    sbc #$02        
+    sbc #$02
     sta arrow_y
 	lda #$60           ; column for X position
 	sec
 	sbc #$08           ; shift left to sit before text
 	sta arrow_x
 
-	lda #$33         ; CHR tile index for arrow
+	lda #$3E         ; CHR tile index for arrow
 	sta arrow_tile
 	lda #$00           ; start on first menu item
 	sta menu_selection
@@ -207,7 +207,7 @@ state_menu_pause_loop:
 
 	jsr func_vblank_wait
 jmp @forever
-
+ 
 
 menu_text:
   .byte 18,9,19,26   ; " MENU"
@@ -216,4 +216,4 @@ start_text:
 exit_text:
   .byte 9,29,13,25      ; " EXIT"
 
-  arrow_oam:    .res 4   ; 4 bytes for 1 sprite: Y, tile, attributes, X
+arrow_oam:    .res 4   ; 4 bytes for 1 sprite: Y, tile, attributes, X

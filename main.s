@@ -1,11 +1,12 @@
 .segment "HEADER"
-	; .byte "NES", $1A      ; iNES header identifier
-	.byte $4E, $45, $53, $1A
-	.byte 2               ; 2x 16KB PRG code
-	.byte 1               ; 1x  8KB CHR data
+	.byte "NES", $1A      ; iNES header identifier
+	.byte $02             ; 2x 16KB PRG code
+	.byte $01             ; 1x  8KB CHR data
 	.byte $01, $00        ; mapper 0, vertical mirroring
+	.byte $00, $01        ; PAL
 
 .segment "ZEROPAGE_DATA"
+
 	reg_b = $00 ; 1bt: extra B register
 	reg_c = $01 ; 1bt: extra C register
 	reg_d = $02 ; 1bt: extra D register
@@ -26,16 +27,6 @@
 	joypad_previous = $12 ; 1bt: Controller readout
 	zapper = $11 ; 1bt: Zapper readout
 	enemy_alive = $30 ; bit 0 = enemy 0, bit 1 = enemy 1
-	menu_selection = $31  ; 0 = START, 1 = EXIT
-	arrow_x = $32
-	arrow_y = $33
-	arrow_tile = $34
-	enemy_mask = $40       ; one byte to hold bitmask
-	ammo_count = $41 ; holds the amount of bullets (starts at max)
-	L_byte = $42 ; low byte for the background
-	H_byte = $43 ; high byte for the background
-
-
 
 	station_index = $20
 	cooking_status = $21 ; 1bt
@@ -52,7 +43,23 @@
 		;	%10 = down
 		; 	%11 = left
 
+	menu_selection = $31  ; 0 = START, 1 = EXIT
+	arrow_x = $32
+	arrow_y = $33
+	arrow_tile = $34
+
 	first_wall_addr = $E0	; 16bt array
+	enemy_mask = $40       ; one byte to hold bitmask
+	ammo_count = $41 ; holds the amount of bullets (starts at max)
+	L_byte = $42 ; low byte for the background
+	H_byte = $43 ; high byte for the background
+	score  = $44  ; uses $44, $45, $46
+	update = $47  ; single byte
+	temp   = $48  ; uses $48-$4D (6 bytes)
+
+	kitchen_hp = $60 ; 1bt: contains the kitchen's HP
+	enemyClock = $4E ; 8 bytes 4E - 55 
+
 
 .segment "VECTORS"
 	;; When an NMI happens (once per frame if enabled) the label nmi:
@@ -112,7 +119,6 @@ load_palettes:
 		inx
 		cpx #$20
 		bne @loop
-
 jsr func_vblank_wait
 
 enable_rendering:
@@ -180,8 +186,12 @@ button_sprite: .byte $66, $05, $00, $4E
 .include "enemies.s"
 .include "ammo_count.s"
 .include "background.s"
+.include "high_score.s"
+
+; Binary Includes
 bg:
-    .incbin "level_background_binary.nam"
+    .incbin "lvlMap_Checked.nam"
+
 ; Character memory
 .segment "CHARS"
 	.incbin "spriteRom.chr"

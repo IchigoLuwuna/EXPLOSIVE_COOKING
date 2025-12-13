@@ -48,8 +48,8 @@ last_chunk:
     iny
     cpy #192
     bne last_chunk ; loop until 192 bytes written
-
-
+    jsr reset_score      ; sets score bytes to 0
+    jsr display_score
     ;Reset scroll
 
     jsr reset_scroll

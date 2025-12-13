@@ -1,9 +1,9 @@
 
-ammo_sprite_slot = $0230
+ammo_sprite_slot = $0290
 
 
 init_ammo:
-    lda #$00
+    lda #$01
     sta ammo_count
     jsr draw_ammo
     rts
@@ -35,7 +35,6 @@ update_ammo:
 draw_ammo:
     ldy #$0        ; start at offset 0
 copy_loop:
-
     lda ammo_sprite, y
     sta ammo_sprite_slot, y
     iny
@@ -49,4 +48,4 @@ ammo_tiles:
     .byte $22  ; tile 2
     .byte $23  ; tile 3
 
-ammo_sprite: .byte $05, $20, $00, $10  ; Y=5, tile=0, attr=1, X=16
+ammo_sprite: .byte $07, $20, $00, $10  ; Y=5, tile=0, attr=1, X=16
