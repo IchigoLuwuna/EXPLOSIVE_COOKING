@@ -72,6 +72,7 @@ game_sub_state_zap_enter:
 		clc
 	tya
 	adc #$10
+	clc
 	tay
 	cpy #$80 ; loop over all 8 enemies
 	bne :-
@@ -139,9 +140,6 @@ game_sub_state_zap_r:
 	sta $0338
 	sta $033C ; enemy slot 3
 
-	; wait for vblank to ensure syncing
-	jsr func_vblank_wait
-
 	jsr func_is_light_detected
 	cmp reg_b
 	bne game_sub_state_zap_rl ; no hit -> go to left side
@@ -153,9 +151,6 @@ game_sub_state_zap_rr:
 	sta $0314
 	sta $0318
 	sta $031C ; enemy slot 1
-
-	; wait for vblank to ensure syncing
-	jsr func_vblank_wait
 
 	jsr func_is_light_detected
 	cmp reg_b
@@ -193,9 +188,6 @@ game_sub_state_zap_rl:
 	sta $0314
 	sta $0318
 	sta $031C ; enemy slot 1
-
-	; wait for vblank to ensure syncing
-	jsr func_vblank_wait
 
 	jsr func_is_light_detected
 	cmp reg_b
@@ -256,9 +248,6 @@ game_sub_state_zap_l:
 	sta $0338
 	sta $033C ; enemy slot 3
 
-	; wait for vblank to ensure syncing
-	jsr func_vblank_wait
-
 	jsr func_is_light_detected
 	cmp reg_b
 	bne game_sub_state_zap_ll ; no hit -> go to left side
@@ -271,9 +260,6 @@ game_sub_state_zap_lr:
 	sta $0354
 	sta $0358
 	sta $035C ; enemy slot 5
-
-	; wait for vblank to ensure syncing
-	jsr func_vblank_wait
 
 	jsr func_is_light_detected
 	cmp reg_b
@@ -313,9 +299,6 @@ game_sub_state_zap_ll:
 	sta $0358
 	sta $035C ; enemy slot 5
 
-	; wait for vblank to ensure syncing
-	jsr func_vblank_wait
-
 	jsr func_is_light_detected
 	cmp reg_b
 	bne :+
@@ -353,8 +336,7 @@ sta reg_b
 jsr func_vblank_wait ; ensure data is synced with PPU
 
 func_is_light_detected_loop:
-	jsr func_get_input
-	lda zapper
+	jsr func_fast_zapper_read
 	and #ZAPPER_LIGHT_NOT_DETECTED
 	cmp #$00
 	bne :+
@@ -368,4 +350,14 @@ func_is_light_detected_loop:
 
 	jmp func_is_light_detected_loop
 func_is_light_detected_return:
+jsr func_vblank_wait
 rts
+
+; Quickly poll zapper and write to accumulator
+func_fast_zapper_read: ; return -> a
+	lda #$01
+	sta cport2
+	lda #$00
+	sta cport2
+	lda cport2
+	rts

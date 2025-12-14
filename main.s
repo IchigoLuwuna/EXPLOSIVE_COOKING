@@ -130,6 +130,7 @@ enable_rendering:
 ; Game Start
 lda #$02
 sta reg_oam_addr
+clc
 jmp state_menu_start
 
 ; Subroutines
@@ -165,7 +166,7 @@ dheeg:
 	dheeg_top_left: .byte $00, $01, $00, $00
 	dheeg_top_right: .byte $00, $02, $00, $00
 	dheeg_bottom_left: .byte $00, $03, $00, $00
-	dheeg_bottom_right: .byte $00, $04, $00, $00
+	dheeg_bottom_right: .byte $00, $03, $40, $00
 	dheeg_16x16_addr = $00
 
 button_sprite: .byte $66, $05, $00, $4E

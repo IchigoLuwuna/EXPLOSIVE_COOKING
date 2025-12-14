@@ -3,10 +3,10 @@ enemies_init_timers:
     ldx #$00
 init_loop:
     lda clock
-    clc
     adc #$50              ; base delay
     clc
     adc enemyIntervals, x ; stagger start times
+	clc
     sta enemyClock, x
     lda enemyIntervals, x
     sta enemyStep, x
@@ -90,10 +90,11 @@ move_left:
     clc
 
     ; movement
-    ldx #$FF               
-    ldy #$00               
+    ldx #$FF
+    ldy #$00
 
     jsr func_move_16x16
+	jsr func_enemy_collision
     jmp enemy_continue
 move_right:
     lda reg_d
@@ -106,6 +107,7 @@ move_right:
     ldx #$01
     ldy #$00
     jsr func_move_16x16
+	jsr func_enemy_collision
 
 enemy_continue:
     inc reg_d
@@ -114,44 +116,6 @@ enemy_continue:
 skip_enemy:
     inc reg_d
     jmp enemy_loop_start
-
-	; /-----------------\
-	; | Enemy collision |
-	; \-----------------/
-	lda reg_d
-	sta reg_swap
-	tax ; enemy offset is in x
-	ldy $0200, x
-	tya ; y pos is now in a
-	ldy reg_swap ; enemy offset is in y
-	ldx $0203, y ; x now contains enemy x pos
-	tay ; y now contains enemy y pos
-
-	lda reg_d ; enemy walls collision clobbers d so it has to be pushed
-	pha
-	lda reg_swap ; enemy offset needs to be stored for later
-	pha
-
-	jsr func_enemy_walls_collision
-	sta reg_swap ; swap now contains returned variable
-
-	pla
-	sta reg_d ; restore d
-	pla
-	tay ; y now contains enemy offset
-	lda reg_swap ; a now contains return code
-
-	cmp #$01 ; if enemy hit wall
-	bne :+
-		dec kitchen_hp
-		; TODO replace this bit of code with the enemy dying, current enemy offset is in y rn
-		ldy reg_d
-		lda #$FF
-		; sta $0200, y
-		;
-	:
-
-	; -------------------
 
 
 enemy_done:
@@ -205,6 +169,49 @@ enemy_respawn_random:
 	lda #$00
 	jsr func_move_16x16
     rts
+
+func_enemy_collision:
+	; /-----------------\
+	; | Enemy collision |
+	; \-----------------/
+	lda reg_d
+	asl
+	asl
+	asl
+	asl ; convert index to offset (x16)
+	sta reg_swap ; enemy offset is now in swap
+	tax
+	lda $0213, x
+	tax
+	lda reg_swap
+	tay
+	lda $0210, y
+	tay
+
+	lda reg_swap ; enemy offset needs to be stored for later
+	pha
+	lda reg_d ; enemy walls collision clobbers d so it has to be pushed
+	pha
+
+	jsr func_enemy_walls_collision
+	sta reg_swap ; swap now contains returned variable
+
+	pla
+	sta reg_d ; restore d
+	pla
+	tay ; y now contains enemy offset
+	lda reg_swap ; a now contains return code
+
+	beq :+ ; if enemy hit wall
+		dec kitchen_hp
+		ldy reg_d ; get enemy index
+		lda enemy_mask_table, y ; get current enemy mask
+		sta reg_b ; put enemy mask into b
+		jsr enemy_die
+		;
+	:
+	; -------------------
+rts
 
 evilDheegs:
 

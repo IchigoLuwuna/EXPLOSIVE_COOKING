@@ -45,6 +45,7 @@ add_score:
     lda #%00000001
     ora update ; ora = logical inclusive OR on accumulator
     sta update
+	clc
     rts
 
 
@@ -75,6 +76,7 @@ try10:
     inx
 
 @finished:
+	clc
     rts 
 
 
@@ -112,6 +114,7 @@ display_score:
     bne @loop
     lda digit_tiles
     sta $2007
+	clc
     rts
 
 
