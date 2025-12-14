@@ -67,6 +67,11 @@ enemy_loop_start:
     and enemy_mask_table, x
     bne clock_check  ; skip if alive
 
+
+    lda enemy_respawn_clock, x
+    cmp clock
+    bne skip_enemy   ; not ready yet
+
     jsr enemy_respawn_random
 
 
@@ -131,7 +136,13 @@ enemy_die: ; input -> B -> enemy mask
 	
 	; hide dead enemies
 	jsr func_hide_dead_enemies
-
+    lda clock
+    jsr func_random_to_acc
+    and #%00111111  ; random offset 0-63 ticks
+    clc
+    adc clock       ; add to current clock
+    ldx reg_d           ; load enemy index into X
+    sta enemy_respawn_clock, X
     rts
 
 func_hide_dead_enemies:

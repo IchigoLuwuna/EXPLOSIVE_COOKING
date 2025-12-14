@@ -59,6 +59,7 @@
 
 	kitchen_hp = $60 ; 1bt: contains the kitchen's HP
 	enemyClock = $4E ; 8 bytes 4E - 55 
+	enemy_respawn_clock = $56 ; 8 bytes 56 - 5F
 
 
 .segment "VECTORS"
