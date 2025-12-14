@@ -125,7 +125,7 @@ func_handle_interactions:
     sta reg_c
     lda #STTN_POT_INDEX
     sta reg_d
-    
+
     jsr func_check_station_collision
     cmp #$00
     beq :+
@@ -139,7 +139,7 @@ func_handle_interactions:
     sta reg_c
     lda #STTN_FORGE_INDEX
     sta reg_d
-    
+
     jsr func_check_station_collision
     cmp #$00
     beq :+
@@ -153,19 +153,19 @@ func_handle_interactions:
     sta reg_c
     lda #STTN_DROP_INDEX
     sta reg_d
-    
+
     jsr func_check_station_collision
     cmp #$00
     beq :+
         jmp input_handling
     :
-    
+
     ; if x and y of every station are outside 8 pixel range
     lda #INV_AT_STATION     ; set at_station flag to false
     and game_flags
     sta game_flags
     jmp interaction_end     ; skip input handling
-    
+
 input_handling:
     ; if first bit is 1: handle material
     lda station_index
@@ -486,12 +486,14 @@ func_check_station_collision:
 
 
 BUTTON_OAM_ADDR = $0290
-MATERIALS_OAM_ADDR = $0294
+RECIPE_OAM_ADDR = $0294
+INVENTORY_OAM_ADDR = $02A4
+CRATE_LABELS_OAM_ADDR = $02B4
 
 BUTTON_A_INDEX =        $05
 BUTTON_B_INDEX =        $06
 BUTTON_DOWN_INDEX =     $1B
-BUTTON_RIGHT_INDEX =    $33
+BUTTON_RIGHT_INDEX =    $3E
 
 FLIP_HORIZONTALLY =     %01000000
 FLIP_VERTICALLY =       %10000000
@@ -509,10 +511,29 @@ func_init_button_prompts:
 		cpy #$04
     bmi :-
 
+	; Recipe sprites
     ldy #$00
     :
-        lda required_material_sprites, y
-		sta MATERIALS_OAM_ADDR, y
+        lda recipe_sprites, y
+		sta RECIPE_OAM_ADDR, y
+		iny
+		cpy #$0C
+    bmi :-
+
+	; Inventory
+	ldy #$00
+	:
+	lda inventory_sprites, y
+	sta INVENTORY_OAM_ADDR, y
+	iny
+	cpy #$0C
+	bmi :-
+
+	; Crate labels
+    ldy #$00
+    :
+        lda label_sprites, y
+		sta CRATE_LABELS_OAM_ADDR, y
 		iny
 		cpy #$0C
     bmi :-
@@ -545,7 +566,7 @@ func_update_button_prompt:
         lda #BUTTON_A_INDEX
         sta BUTTON_OAM_ADDR + $01
 
-        lda #$00
+        lda #$03
         sta BUTTON_OAM_ADDR + $02
 
         lda #MAT_SCRAP_POSX + $06
@@ -560,7 +581,7 @@ func_update_button_prompt:
         lda #BUTTON_A_INDEX
         sta BUTTON_OAM_ADDR + $01
 
-        lda #$00
+        lda #$03
         sta BUTTON_OAM_ADDR + $02
 
         lda #MAT_POWDER_POSX + $06
@@ -575,7 +596,7 @@ func_update_button_prompt:
         lda #BUTTON_A_INDEX
         sta BUTTON_OAM_ADDR + $01
 
-        lda #$00
+        lda #$03
         sta BUTTON_OAM_ADDR + $02
 
         lda #MAT_PLASTIC_POSX + $06
@@ -590,7 +611,7 @@ func_update_button_prompt:
         lda #BUTTON_A_INDEX
         sta BUTTON_OAM_ADDR + $01
 
-        lda #$00
+        lda #$03
         sta BUTTON_OAM_ADDR + $02
 
         lda #STTN_POT_POSX - $0A
@@ -618,7 +639,7 @@ func_update_button_prompt:
             lda #BUTTON_RIGHT_INDEX
             sta BUTTON_OAM_ADDR + $01
 
-            lda #$00
+            lda #$03
             sta BUTTON_OAM_ADDR + $02
 
             jmp forge_button_switch_end
@@ -628,7 +649,7 @@ func_update_button_prompt:
             lda #BUTTON_DOWN_INDEX
             sta BUTTON_OAM_ADDR + $01
 
-            lda #$00
+            lda #$03
             sta BUTTON_OAM_ADDR + $02
 
             jmp forge_button_switch_end
@@ -639,6 +660,7 @@ func_update_button_prompt:
             sta BUTTON_OAM_ADDR + $01
 
             lda #FLIP_HORIZONTALLY
+			ora #$03
             sta BUTTON_OAM_ADDR + $02
 
             jmp forge_button_switch_end
@@ -657,7 +679,7 @@ func_update_button_prompt:
         lda #BUTTON_A_INDEX
         sta BUTTON_OAM_ADDR + $01
 
-        lda #$00
+        lda #$03
         sta BUTTON_OAM_ADDR + $02
 
         lda #STTN_DROP_POSX + $06
@@ -679,7 +701,7 @@ draw_required_materials_start:
 draw_required_materials:
     ldy #$00
     :
-		sta MATERIALS_OAM_ADDR, y
+		sta RECIPE_OAM_ADDR, y
 		iny
         iny
         iny

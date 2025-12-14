@@ -58,7 +58,7 @@
 	temp   = $48  ; uses $48-$4D (6 bytes)
 
 	kitchen_hp = $60 ; 1bt: contains the kitchen's HP
-	enemyClock = $4E ; 8 bytes 4E - 55 
+	enemyClock = $4E ; 8 bytes 4E - 55
 
 
 .segment "VECTORS"
@@ -169,12 +169,22 @@ dheeg:
 	dheeg_bottom_right: .byte $00, $03, $40, $00
 	dheeg_16x16_addr = $00
 
-button_sprite: .byte $66, $05, $00, $4E
+button_sprite: .byte $66, $05, $03, $4E
 
-required_material_sprites:
-	scrap_sprite: .byte $66, $44, $00, $7B
-	powder_sprite: .byte $66, $42, $00, $83
-	plastic_sprite: .byte $66, $43, $00, $8B
+recipe_sprites:
+	recipe_scrap_sprite: .byte $66, $44, $00, $7B
+	recipe_powder_sprite: .byte $66, $42, $00, $83
+	recipe_plastic_sprite: .byte $66, $43, $00, $8B
+
+inventory_sprites:
+	inventory_scrap_sprite: .byte $FF, $44, $00, $7B
+	inventory_powder_sprite: .byte $FF, $42, $00, $83
+	inventory_plastic_sprite: .byte $FF, $43, $00, $8B
+
+label_sprites:
+	label_scrap_sprite: .byte $32, $44, $00, $74
+	label_powder_sprite: .byte $32, $42, $00, $54
+	label_plastic_sprite: .byte $63, $43, $00, $54
 
 ; Includes
 .include "bitmasks.s"
