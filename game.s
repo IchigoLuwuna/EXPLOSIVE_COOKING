@@ -35,7 +35,7 @@ state_game_init:
 	lda #$00
 	sta $0200
 	sta $0203
-	ldx #$75
+	ldx #$95
 	ldy #$68
 	lda dheeg_16x16_addr
 	jsr func_move_16x16

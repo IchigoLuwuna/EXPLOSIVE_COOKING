@@ -130,6 +130,7 @@ enable_rendering:
 ; Game Start
 lda #$02
 sta reg_oam_addr
+clc
 jmp state_menu_start
 
 ; Subroutines
@@ -170,6 +171,10 @@ dheeg:
 
 button_sprite: .byte $66, $05, $00, $4E
 
+required_material_sprites:
+	scrap_sprite: .byte $66, $05, $00, $7B
+	powder_sprite: .byte $66, $05, $00, $83
+	plastic_sprite: .byte $66, $05, $00, $8B
 
 ; Includes
 .include "bitmasks.s"
