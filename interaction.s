@@ -1,32 +1,32 @@
 ; material: scrap
 MAT_SCRAP_INDEX =   %00000011
-MAT_SCRAP_POSX =    $4E
-MAT_SCRAP_POSY =    $6E
+MAT_SCRAP_POSX =    $6E
+MAT_SCRAP_POSY =    $3E
 
 ; material: powder
 MAT_POWDER_INDEX =  %00000101
-MAT_POWDER_POSX =   $46
-MAT_POWDER_POSY =   $8E
+MAT_POWDER_POSX =   $4E
+MAT_POWDER_POSY =   $36
 
 ; material: plastic
 MAT_PLASTIC_INDEX =  %00000111
-MAT_PLASTIC_POSX =   $66
-MAT_PLASTIC_POSY =   $8E
+MAT_PLASTIC_POSX =   $4E
+MAT_PLASTIC_POSY =   $56
 
 ; station: cooking pot
 STTN_POT_INDEX =    %00000010
-STTN_POT_POSX =     $6E
-STTN_POT_POSY =     $5E
+STTN_POT_POSX =     $8E
+STTN_POT_POSY =     $6E
 
 ; station: forge
 STTN_FORGE_INDEX =  %00000100
 STTN_FORGE_POSX =   $9E
-STTN_FORGE_POSY =   $5E
+STTN_FORGE_POSY =   $8E
 
 ; station: drop
 STTN_DROP_INDEX =   %00000110
-STTN_DROP_POSX =    $9E
-STTN_DROP_POSY =    $8E
+STTN_DROP_POSX =    $4E
+STTN_DROP_POSY =    $9E
 
 ; player
 PLR_POSX_ADDR = $0203
@@ -530,7 +530,7 @@ func_update_button_prompt:
     lda station_index
     cmp #MAT_SCRAP_INDEX
     bne :+
-        lda #MAT_SCRAP_POSY + $04
+        lda #MAT_SCRAP_POSY - $0C
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -539,13 +539,13 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #MAT_SCRAP_POSX - $0A
+        lda #MAT_SCRAP_POSX + $06
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #MAT_POWDER_INDEX
     bne :+
-        lda #MAT_POWDER_POSY + $04
+        lda #MAT_POWDER_POSY - $04
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -554,13 +554,13 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #MAT_POWDER_POSX - $02
+        lda #MAT_POWDER_POSX + $06
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #MAT_PLASTIC_INDEX
     bne :+
-        lda #MAT_PLASTIC_POSY + $04
+        lda #MAT_PLASTIC_POSY + $0C
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -569,13 +569,13 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #MAT_PLASTIC_POSX + $0E
+        lda #MAT_PLASTIC_POSX + $06
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #STTN_POT_INDEX
     bne :+
-        lda #STTN_POT_POSY - $0C
+        lda #STTN_POT_POSY + $04
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -584,13 +584,13 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #STTN_POT_POSX + $06
+        lda #STTN_POT_POSX - $0A
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #STTN_FORGE_INDEX
     bne :+++++
-        lda #STTN_FORGE_POSY - $0C
+        lda #STTN_FORGE_POSY + $06
         sta BUTTON_OAM_ADDR + $00
 
         jsr func_get_cooking_input
@@ -636,13 +636,13 @@ func_update_button_prompt:
         :
     forge_button_switch_end:
 
-        lda #STTN_FORGE_POSX + $06
+        lda #STTN_FORGE_POSX + $16
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
     cmp #STTN_DROP_INDEX
     bne :+
-        lda #STTN_DROP_POSY + $04
+        lda #STTN_DROP_POSY + $14
         sta BUTTON_OAM_ADDR + $00
 
         lda #BUTTON_A_INDEX
@@ -651,7 +651,7 @@ func_update_button_prompt:
         lda #$00
         sta BUTTON_OAM_ADDR + $02
 
-        lda #STTN_DROP_POSX + $16
+        lda #STTN_DROP_POSX + $06
         sta BUTTON_OAM_ADDR + $03
         jmp update_button_prompt_end
     :
