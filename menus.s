@@ -142,7 +142,7 @@ state_menu_start_loop:
     cmp #$00
     beq @arrow_start
     lda #$80       ; Y for EXIT
-    jmp @arrow_done
+
 @arrow_start:
     lda #$70      ; Y for START
 
