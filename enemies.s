@@ -67,10 +67,6 @@ enemy_loop_start:
     and enemy_mask_table, x
     bne clock_check  ; skip if alive
 
-    ldx reg_d
-    lda enemy_mask_table, x  ; mask of this enemy
-    ora enemy_alive           ; set its bit alive
-    sta enemy_alive
     jsr enemy_respawn_random
 
 
@@ -166,6 +162,11 @@ func_hide_dead_enemies:
 	rts
 
 enemy_respawn_random: ; needs reg_d to be index
+
+    ldx reg_d
+    lda enemy_mask_table, x  ; mask of this enemy
+    ora enemy_alive           ; set its bit alive
+    sta enemy_alive
 	jsr func_random_to_acc
     and #%01111111   ; 0–127
 
