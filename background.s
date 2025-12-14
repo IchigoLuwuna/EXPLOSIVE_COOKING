@@ -13,44 +13,32 @@ draw_background:
     sta $2001
 
     ; Set PPU address to $2000 (nametable start)
-    lda #$20
-    sta $2006
-    lda #$00
-    sta $2006
+   ; Set PPU address to $2000
+lda #$20
+sta $2006
+lda #$00
+sta $2006
 
+lda #<bg
+sta L_byte
+lda #>bg
+sta H_byte
 
-    ;Setup zero-page pointer
-
-    lda #<bg
-    sta L_byte
-    lda #>bg
-    sta H_byte
-    ldx #$00          ; page counter
+ldx #$04          ; 4 × 256 = 1024 bytes
 
 next_page:
     ldy #$00
 page_loop:
-    lda (L_byte), y ; load byte from bg
-    sta $2007
-    iny
-    bne page_loop ; loop until 256 bytes written
-
-    inc H_byte
-    inx
-    cpx #$03
-    bne next_page ; loop for 4 pages
-
-    ; last 192 bytes
-    ldy #$00
-last_chunk:
     lda (L_byte), y
     sta $2007
     iny
-    cpy #192
-    bne last_chunk ; loop until 192 bytes written
-    jsr reset_score      ; sets score bytes to 0
-    jsr display_score
-    ;Reset scroll
+    bne page_loop
+
+    inc H_byte
+    dex
+    bne next_page
+
+        ;Reset scroll
 
     jsr reset_scroll
 

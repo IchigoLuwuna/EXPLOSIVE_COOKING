@@ -30,7 +30,7 @@ enemies_to_oam:
 
 enemies_init:
 
-	lda #$00
+	lda #$FF
 	sta enemy_alive
     sta enemy_mask
 
@@ -65,9 +65,10 @@ enemy_loop_start:
     ldx reg_d
     lda enemy_alive
     and enemy_mask_table, x
-    bne skip_enemy  ; skip if dea
 
-    ldx reg_d
+    bne :+ ; skip if dead
+		jmp skip_enemy
+	:
 
     lda clock
     cmp enemyClock, x
@@ -89,11 +90,11 @@ move_left:
     clc
 
     ; movement
-    ldx #$FF               ; dx
-    ldy #$00               ; dy
+    ldx #$FF               
+    ldy #$00               
 
     jsr func_move_16x16
-
+    jmp enemy_continue
 move_right:
     lda reg_d
     asl
@@ -154,33 +155,48 @@ skip_enemy:
 
 
 enemy_done:
+	jsr func_hide_dead_enemies
     rts
 
 
-enemy_die:
-    lda enemy_alive, x
-    ora enemy_mask_table, x
-    sta enemy_alive       ; mark enemy dead
-
-    txa
-    sta reg_d             ; store enemy index
-    jsr calculate_enemy_adress
-
-    lda reg_oam           ; base OAM offset
-    ldx #$00
-    ldy #$FF              ; move offscreen
+enemy_die: ; input -> B -> enemy mask
+	; mark enemies as dead
+	lda reg_b
+	eor #$FF ; invert mask
+	and enemy_alive ; AND masks together
+    sta enemy_alive ; mark masked enemies dead
+	
+	; hide dead enemies
+	jsr func_hide_dead_enemies
 
     rts
 
-calculate_enemy_adress:
-    txa         ; enemy index → need to compute OAM offset
-    asl
-    asl
-    asl
-    asl
-    adc #$10
-    sta reg_oam
+func_hide_dead_enemies:
+	lda enemy_alive
+	sta reg_b ; copy enemy_alive into B
+	ldx #$08 ; amount of iterations
+	ldy #$00 ; enemy offset
 
+	func_hide_dead_enemies_loop:
+		lda #$01
+		and reg_b ; current enemy alive state is now in A. zero flag is also set if enemy is dead
+		bne :+ ; skip if enemy is alive
+			lda #$FF
+			sta $0210, y
+			sta $0214, y
+			sta $0218, y
+			sta $021C, y
+		:
+		lsr reg_b ; go to next enemy
+		tya
+		clc
+		adc #$10 ; go to next enemy in OAM
+		clc
+		tay
+		dex
+		bne func_hide_dead_enemies_loop
+
+	rts
 
 enemy_respawn_random:
 	jsr func_random_to_acc
@@ -198,56 +214,55 @@ evilDheegs:
     .byte $80, $01, $01, $00 ; y tile attr x
     .byte $80, $02, $01, $08
     .byte $88, $03, $01, $00
-    .byte $88, $04, $01, $08
+    .byte $88, $03, $42, $08
 
 ; Enemy 1 (left)
     .byte $90, $01, $02, $10
     .byte $90, $02, $02, $18
     .byte $98, $03, $02, $10
-    .byte $98, $04, $02, $18
+    .byte $98, $03, $42, $18
 
 ; Enemy 2 (left)
     .byte $A0, $01, $02, $20
     .byte $A0, $02, $02, $28
     .byte $A8, $03, $02, $20
-    .byte $A8, $04, $02, $28
+    .byte $A8, $03, $42, $28
 
 ; Enemy 3 (left)
     .byte $B0, $01, $02, $30
     .byte $B0, $02, $02, $38
     .byte $B8, $03, $02, $30
-    .byte $B8, $04, $02, $38
+    .byte $B8, $03, $42, $38
 
 ; Enemy 4 (right)
     .byte $80, $01, $02, $F0
     .byte $80, $02, $02, $F8
     .byte $88, $03, $02, $F0
-    .byte $88, $04, $02, $F8
+    .byte $88, $03, $42, $F8
 
 ; Enemy 5 (right)
     .byte $90, $01, $02, $E0
     .byte $90, $02, $02, $E8
     .byte $98, $03, $02, $E0
-    .byte $98, $04, $02, $E8
+    .byte $98, $03, $42, $E8
 
 ; Enemy 6 (right)
     .byte $A0, $01, $02, $D0
     .byte $A0, $02, $02, $D8
     .byte $A8, $03, $02, $D0
-    .byte $A8, $04, $02, $D8
+    .byte $A8, $03, $42, $D8
 
 ; Enemy 7 (right)
     .byte $B0, $01, $02, $C0
     .byte $B0, $02, $02, $C8
     .byte $B8, $03, $02, $C0
-    .byte $B8, $04, $02, $C8
+    .byte $B8, $03, $42, $C8
 
 
 enemyIntervals:
     .byte $20, $40, $60, $80, $A0, $C0, $E0, $FF
 enemyStep:
     .res 8   ; reserve 8 bytes for enemy intervals
-reg_oam:  .res 1  ; temporary storage for OAM address
 enemy_mask_table:
     .byte %00000001
     .byte %00000010

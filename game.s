@@ -37,8 +37,8 @@ state_game_init:
 	lda #$00
 	sta $0200
 	sta $0203
-	ldx #$75
-	ldy #$58
+	ldx #$95
+	ldy #$68
 	lda dheeg_16x16_addr
 	jsr func_move_16x16
 
@@ -53,11 +53,10 @@ state_game_init:
 	sta $2001
 
 	lda #$FF
-	sta kitchen_hp
+	sta kitchen_hp ; set kitchen HP to max
 
-	ldx #$03
-	jsr enemy_die
-
+	lda #$00
+	sta clock ; reset clock
 
 ; allows jumping without reinitialising
 state_game_loop:
@@ -77,12 +76,21 @@ forever:
 		and #ZAPPER_HALF_PULLED
 		cmp #00 ; if not half pulled this frame
 		bne :+
-			jsr game_sub_state_zap
-			lda reg_b
-			cmp #$00
-			beq:+
+			; zapper trigger is fully pulled
+			lda ammo_count ; load ammo count to check if empty
+			beq :+ ; skip if zero flag is set -> no ammo
+			dec ammo_count ; decrease ammo count
+
+			jsr game_sub_state_zap ; shoot >:D
+			lda reg_b ; load into a -> sets 0 flag if reg_b is empty
+			beq :+ ; skip if zero flag is set -> no enemy has been hit
+				; an enemy has been hit
+				jsr enemy_die
+				
+				; award 50 points for hitting an enemy
 				lda #$05
 				jsr add_score
+				;
 	:
 
 	; Read joypad
@@ -157,6 +165,12 @@ forever:
 
 
 	inc clock
+	bne :+ ; if clock is 0
+		; Award player 10 points for surviving 256 frames
+		lda #$01
+		jsr add_score ; add 10 to score
+	:
+
 	jsr func_vblank_wait
 	jsr display_score   ; safe to write to PPU now
 	jsr reset_scroll

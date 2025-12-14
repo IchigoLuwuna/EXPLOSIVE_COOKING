@@ -84,7 +84,7 @@ game_sub_state_zap_enter:
 jsr func_vblank_wait
 
 ; Enable sprites
-lda #%00010000 ; set bit 4 (render sprites) to 1
+lda #%00010100 ; set bit 4 (render sprites) to 1
 sta $2001
 
 ; Initial test to early out in case of a miss
@@ -225,14 +225,14 @@ game_sub_state_zap_l:
 	sta $034C
 
 	; Restore enemy slot 5
-	lda $0250
-	sta $0340
-	lda $0254
-	sta $0344
-	lda $0258
-	sta $0348
-	lda $025C
-	sta $034C
+	lda $0260
+	sta $0350
+	lda $0264
+	sta $0354
+	lda $0268
+	sta $0358
+	lda $026C
+	sta $035C
 
 	; Hide enemies 0-3
 	lda #$FF ; prepare y position off-screen
@@ -337,6 +337,8 @@ game_sub_state_zap_return:
 	lda #$02
 	sta reg_oam_addr
 
+	jsr func_vblank_wait
+
 	; Enable sprites and bg
 	lda #%00011110 ; set bit 3 (render bg) and 4 (render sprites) to 1
 	sta $2001
@@ -344,11 +346,12 @@ rts
 
 
 
-; Constantly polls zapper and returns 1 if light is detected or 0 if it is not detected after an amount of frames (cycle count can be changed to decrease difficulty)
+; Constantly polls zapper and returns 1 if light is detected or 0 if it is not detected after a full draw cycle
 func_is_light_detected: ; return -> b
 lda #$00
 sta reg_b
-ldy #$00 ; y -> vblank counter
+jsr func_vblank_wait ; ensure data is synced with PPU
+
 func_is_light_detected_loop:
 	jsr func_get_input
 	lda zapper
@@ -361,13 +364,8 @@ func_is_light_detected_loop:
 		jmp func_is_light_detected_return
 	:
 	bit $2002
-	bpl :+
-		iny
-		cpy #$01 ; show for 1 frames
-		beq func_is_light_detected_return
-	:
+	bmi func_is_light_detected_return
 
 	jmp func_is_light_detected_loop
 func_is_light_detected_return:
-jsr func_vblank_wait
 rts
