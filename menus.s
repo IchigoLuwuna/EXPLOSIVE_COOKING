@@ -46,21 +46,6 @@ state_menu_start_init:
     ; Initialize arrow sprite
     ; ----------------------------
 
-    lda #$60        ; row 12 tile = 96
-    sec
-    sbc #$02
-	clc
-    sta arrow_y
-	lda #$60           ; column for X position
-	sec
-	sbc #$08           ; shift left to sit before text
-	clc
-	sta arrow_x
-
-	lda #$3E         ; CHR tile index for arrow
-	sta arrow_tile
-	lda #$00           ; start on first menu item
-	sta menu_selection
     
 ldx #$00
 @menu_loop:
@@ -118,33 +103,9 @@ state_menu_start_loop:
     sec
     sbc #$01
 	clc
-    bmi @menu_selection_zero
     sta menu_selection
 
-@menu_selection_zero:
-    lda #$00
-    sta menu_selection
 
-@check_down:
-    lda joypad
-    and #PAD_DOWN
-    beq @update_arrow
-    lda menu_selection
-    cmp #1
-    bcs @update_arrow
-    clc
-    adc #1
-    sta menu_selection
-
-; Update arrow Y position based on selection
-@update_arrow:
-    lda menu_selection
-    cmp #$00
-    beq @arrow_start
-    lda #$80       ; Y for EXIT
-
-@arrow_start:
-    lda #$70      ; Y for START
 
 ; Check START button
 ; Check START button

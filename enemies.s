@@ -79,7 +79,18 @@ clock_check:
     lda clock
     cmp enemyClock, x
     bcc skip_enemy   ; skip if clock < enemyClock if enemyClock > clock (not ready yet)
+
+
+    
     ; --- Move enemy ---
+
+    inc enemy_frame_toggle
+    lda enemy_frame_toggle
+    cmp #$04   ; move every 4 frames instead of 2
+    bcc skip_enemy
+    lda #$00
+    sta enemy_frame_toggle
+
     lda reg_d
     cmp #$04
     bcc move_right      ; enemies 0-3 → right
@@ -92,7 +103,7 @@ move_left:
     asl
     asl
     adc #$10
-
+    clc
     ; movement
     ldx #$FF
     ldy #$00
@@ -160,6 +171,8 @@ func_hide_dead_enemies:
 			sta $0214, y
 			sta $0218, y
 			sta $021C, y
+            lda #$00
+            sta $0213 , y 
 		:
 		lsr reg_b ; go to next enemy
 		tya
@@ -172,7 +185,7 @@ func_hide_dead_enemies:
     
 	rts
 
-enemy_respawn_random: ; needs reg_d to be index
+enemy_respawn_random: 
 
     ldx reg_d
     lda enemy_mask_table, x  ; mask of this enemy
@@ -180,7 +193,7 @@ enemy_respawn_random: ; needs reg_d to be index
     sta enemy_alive
 	jsr func_random_to_acc
     and #%01111111   ; 0–127
-
+    adc #$30
     tay
     lda reg_d
     asl
@@ -189,6 +202,8 @@ enemy_respawn_random: ; needs reg_d to be index
     asl
     adc #$10
     clc
+    
+
 
 	ldx #$FF
     
@@ -227,15 +242,20 @@ func_enemy_collision:
 	tay ; y now contains enemy offset
 	lda reg_swap ; a now contains return code
 
-	beq :+ ; if enemy hit wall
+	beq :++ ; if enemy hit wall
 		dec kitchen_hp
+        bne :+
+            jmp state_menu_lose_start
+        :
 		ldy reg_d ; get enemy index
 		lda enemy_mask_table, y ; get current enemy mask
 		sta reg_b ; put enemy mask into b
 		jsr enemy_die
 		;
+
 	:
 	; -------------------
+
 rts
 
 evilDheegs:
