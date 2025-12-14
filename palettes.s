@@ -10,7 +10,7 @@ palettes:
 .byte $0f, $09, $19, $29 ; greenish
 
 ; Sprite Palette
-.byte $0f, $19, $17, $36   ;
+.byte $0f, $0f, $19, $36   ;
 .byte $0f, $16, $1a, $11
 .byte $0f, $16, $1a, $11
 .byte $0f, $30, $30, $30 ; black and white
