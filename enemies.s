@@ -190,7 +190,7 @@ enemy_respawn_random: ; needs reg_d to be index
     adc #$10
     clc
 
-	ldx #$00
+	ldx #$FF
     
 	jsr func_move_16x16
     rts
