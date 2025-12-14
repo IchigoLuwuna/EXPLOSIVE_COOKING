@@ -145,6 +145,8 @@ nmi:
 	sta $4014 ; write to OAMDMA PPU register at hardware address $4014
 
 	jsr famistudio_update
+	ldx #FAMISTUDIO_SFX_CH0
+	jsr famistudio_sfx_update
 
 	; pull state after interrupt
 	pla
@@ -181,6 +183,7 @@ dheeg:
 .include "high_score.s"
 .include "music.s"
 .include "famistudio_ca65.s"
+.include "shoot_sfx.s"
 
 ; Binary Includes
 bg:

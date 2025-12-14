@@ -143,7 +143,7 @@ FAMISTUDIO_CFG_PAL_SUPPORT   = 1
 ; FAMISTUDIO_CFG_NTSC_SUPPORT  = 1
 
 ; Support for sound effects playback + number of SFX that can play at once.
-; FAMISTUDIO_CFG_SFX_SUPPORT   = 1
+FAMISTUDIO_CFG_SFX_SUPPORT   = 1
 ; FAMISTUDIO_CFG_SFX_STREAMS   = 2
 
 ; Blaarg's smooth vibrato technique. Eliminates phase resets ("pops") on square channels.
@@ -185,7 +185,7 @@ FAMISTUDIO_USE_VOLUME_TRACK      = 1
 
 ; Must be enabled if any song uses slides on the volume track. Volume track must be enabled too.
 ; More information at: https://famistudio.org/doc/pianoroll/#editing-volume-tracks-effects
-; FAMISTUDIO_USE_VOLUME_SLIDES     = 1
+FAMISTUDIO_USE_VOLUME_SLIDES     = 1
 
 ; Must be enabled if any song uses the pitch track. The pitch track allows manipulating the pitch at the track level
 ; independently from instruments.
@@ -198,7 +198,7 @@ FAMISTUDIO_USE_SLIDE_NOTES       = 1
 
 ; Must be enabled if any song uses slide notes on the noise channel too.
 ; More information at: https://famistudio.org/doc/pianoroll/#slide-notes
-; FAMISTUDIO_USE_NOISE_SLIDE_NOTES = 1
+FAMISTUDIO_USE_NOISE_SLIDE_NOTES = 1
 
 ; Must be enabled if any song uses the vibrato speed/depth effect track.
 ; More information at: https://famistudio.org/doc/pianoroll/#vibrato-depth-speed

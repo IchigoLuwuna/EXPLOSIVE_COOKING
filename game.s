@@ -74,6 +74,10 @@ forever:
 		and #ZAPPER_HALF_PULLED
 		cmp #00 ; if not half pulled this frame
 		bne :+
+		 	lda #0
+			ldx #FAMISTUDIO_SFX_CH0
+			jsr famistudio_sfx_play
+			
 			jsr game_sub_state_zap
 			lda reg_b
 			cmp #$00

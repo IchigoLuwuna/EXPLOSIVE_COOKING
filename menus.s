@@ -65,6 +65,11 @@ state_menu_start_init:
     ldx #<_music_data_escape
     ldy #>_music_data_escape
     jsr famistudio_init
+
+    ldx #<_shoot_sfx
+    ldy #>_shoot_sfx
+    jsr famistudio_sfx_init
+
     lda #0
     jsr famistudio_music_play
 
