@@ -25,7 +25,7 @@ state_game_init:
 		iny
 		cpy #$10
 	bmi init_oam_loop
-
+	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo
 

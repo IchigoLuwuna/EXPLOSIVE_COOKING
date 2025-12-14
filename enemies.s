@@ -65,15 +65,19 @@ enemy_loop_start:
     ldx reg_d
     lda enemy_alive
     and enemy_mask_table, x
+    bne clock_check  ; skip if alive
 
-    bne :+ ; skip if dead
-		jmp skip_enemy
-	:
+    ldx reg_d
+    lda enemy_mask_table, x  ; mask of this enemy
+    ora enemy_alive           ; set its bit alive
+    sta enemy_alive
+    jsr enemy_respawn_random
 
+
+clock_check:
     lda clock
     cmp enemyClock, x
     bcc skip_enemy   ; skip if clock < enemyClock if enemyClock > clock (not ready yet)
-
     ; --- Move enemy ---
     lda reg_d
     cmp #$04
@@ -87,7 +91,6 @@ move_left:
     asl
     asl
     adc #$10
-    clc
 
     ; movement
     ldx #$FF
@@ -159,14 +162,24 @@ func_hide_dead_enemies:
 		tay
 		dex
 		bne func_hide_dead_enemies_loop
-
+    
 	rts
 
-enemy_respawn_random:
+enemy_respawn_random: ; needs reg_d to be index
 	jsr func_random_to_acc
-	and #%01111111
-	ldy #$10                     ; base sprite offset in OAM for enemy 1 (next 16x16 block)
-	lda #$00
+    and #%01111111   ; 0–127
+
+    tay
+    lda reg_d
+    asl
+    asl
+    asl
+    asl
+    adc #$10
+    clc
+
+	ldy #$FF
+    
 	jsr func_move_16x16
     rts
 
@@ -218,52 +231,52 @@ evilDheegs:
     amount_of_evilDheegs = $08 ; now 8 enemies
 
 ; Enemy 0 (left)
-    .byte $80, $01, $01, $00 ; y tile attr x
-    .byte $80, $02, $01, $08
-    .byte $88, $03, $01, $00
-    .byte $88, $03, $42, $08
+    .byte $80, $01, $01, $FF ; y tile attr x
+    .byte $80, $02, $01, $FF
+    .byte $88, $03, $01, $FF
+    .byte $88, $03, $42, $FF
 
 ; Enemy 1 (left)
-    .byte $90, $01, $01, $10
-    .byte $90, $02, $01, $18
-    .byte $98, $03, $01, $10
-    .byte $98, $03, $42, $18
+    .byte $90, $01, $01, $FF
+    .byte $90, $02, $01, $FF
+    .byte $98, $03, $01, $FF
+    .byte $98, $03, $42, $FF
 
 ; Enemy 2 (left)
-    .byte $A0, $01, $01, $20
-    .byte $A0, $02, $01, $28
-    .byte $A8, $03, $01, $20
-    .byte $A8, $03, $42, $28
+    .byte $A0, $01, $01, $FF
+    .byte $A0, $02, $01, $FF
+    .byte $A8, $03, $01, $FF
+    .byte $A8, $03, $42, $FF
 
 ; Enemy 3 (left)
-    .byte $B0, $01, $01, $30
-    .byte $B0, $02, $01, $38
-    .byte $B8, $03, $01, $30
-    .byte $B8, $03, $42, $38
+    .byte $B0, $01, $01, $FF
+    .byte $B0, $02, $01, $FF
+    .byte $B8, $03, $01, $FF
+    .byte $B8, $03, $42, $FF
 
 ; Enemy 4 (right)
-    .byte $80, $01, $01, $F0
-    .byte $80, $02, $01, $F8
-    .byte $88, $03, $01, $F0
-    .byte $88, $03, $42, $F8
+    .byte $80, $01, $01, $FF
+    .byte $80, $02, $01, $FF
+    .byte $88, $03, $01, $FF
+    .byte $88, $03, $42, $FF
 
 ; Enemy 5 (right)
-    .byte $90, $01, $01, $E0
-    .byte $90, $02, $01, $E8
-    .byte $98, $03, $01, $E0
-    .byte $98, $03, $42, $E8
+    .byte $90, $01, $01, $FF
+    .byte $90, $02, $01, $FF
+    .byte $98, $03, $01, $FF
+    .byte $98, $03, $42, $FF
 
 ; Enemy 6 (right)
-    .byte $A0, $01, $01, $D0
-    .byte $A0, $02, $01, $D8
-    .byte $A8, $03, $01, $D0
-    .byte $A8, $03, $42, $D8
+    .byte $A0, $01, $01, $FF
+    .byte $A0, $02, $01, $FF
+    .byte $A8, $03, $01, $FF
+    .byte $A8, $03, $42, $FF
 
 ; Enemy 7 (right)
-    .byte $B0, $01, $01, $C0
-    .byte $B0, $02, $01, $C8
-    .byte $B8, $03, $01, $C0
-    .byte $B8, $03, $42, $C8
+    .byte $B0, $01, $01, $FF
+    .byte $B0, $02, $01, $FF
+    .byte $B8, $03, $01, $FF
+    .byte $B8, $03, $42, $FF
 
 
 enemyIntervals:
