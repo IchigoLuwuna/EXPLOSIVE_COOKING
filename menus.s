@@ -165,6 +165,8 @@ state_menu_start_loop:
 
 state_menu_pause:
 state_menu_pause_loop:
+
+
 @forever:
 	lda joypad
 	sta reg_c ; store state of joypad on previous frame in reg_c -> allows for non-repeating actions on held input

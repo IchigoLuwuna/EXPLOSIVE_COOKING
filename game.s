@@ -1,4 +1,5 @@
 state_game:
+    jmp state_menu_lose_start
 state_game_init:
 	jsr func_clear_nametable
 	jsr func_seed_random

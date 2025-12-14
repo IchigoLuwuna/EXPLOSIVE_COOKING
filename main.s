@@ -193,7 +193,7 @@ required_material_sprites:
 .include "ammo_count.s"
 .include "background.s"
 .include "high_score.s"
-
+.include "game_over.s"
 ; Binary Includes
 bg:
     .incbin "lvlMap_Checked.nam"

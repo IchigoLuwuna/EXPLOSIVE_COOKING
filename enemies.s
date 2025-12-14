@@ -138,7 +138,7 @@ enemy_die: ; input -> B -> enemy mask
 	jsr func_hide_dead_enemies
     lda clock
     jsr func_random_to_acc
-    and #%00111111  ; random offset 0-63 ticks
+    and #%00111111  ; random offset between 0-63
     clc
     adc clock       ; add to current clock
     ldx reg_d           ; load enemy index into X
@@ -190,7 +190,7 @@ enemy_respawn_random: ; needs reg_d to be index
     adc #$10
     clc
 
-	ldy #$FF
+	ldx #$00
     
 	jsr func_move_16x16
     rts
