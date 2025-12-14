@@ -181,7 +181,7 @@ dheeg:
 .include "ammo_count.s"
 .include "background.s"
 .include "high_score.s"
-.include "music.s"
+.include "song_shatterhand.s"
 .include "famistudio_ca65.s"
 .include "shoot_sfx.s"
 

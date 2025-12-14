@@ -62,8 +62,8 @@ state_menu_start_init:
 	sta menu_selection
 
     lda #0
-    ldx #<_music_data_escape
-    ldy #>_music_data_escape
+    ldx #<_music_data_shatterhand
+    ldy #>_music_data_shatterhand
     jsr famistudio_init
 
     ldx #<_shoot_sfx
