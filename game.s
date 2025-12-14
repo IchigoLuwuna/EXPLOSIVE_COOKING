@@ -7,7 +7,6 @@ state_game_init:
 
 
 	jsr func_vblank_wait ; wait for safe vblank
-
 	jsr enemies_init_timers
 
 	; Flush shadow OAM
@@ -27,7 +26,6 @@ state_game_init:
 		cpy #$10
 	bmi init_oam_loop
 
-	jsr enemies_to_oam
 	jsr enemies_init
 	jsr init_ammo
 
@@ -158,10 +156,7 @@ forever:
 
 	jsr func_handle_interactions
 
-
-
 	jsr enemy_loop
-
 
 
 	inc clock

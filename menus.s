@@ -40,16 +40,15 @@ state_menu_start_init:
     lda $2002
     lda #$21      ; high byte (row 12)
     sta $2006
-    lda #$8E      ; low byte (column 12)
+    lda #$68      ; low byte (column 12)
     sta $2006
 
      ; ----------------------------
     ; Initialize arrow sprite
     ; ----------------------------
 
-    lda #$60        ; row 12 tile = 96
-    sec
-    sbc #$02
+    lda #$70        ; row 12 tile = 96
+
     sta arrow_y
 	lda #$60           ; column for X position
 	sec
@@ -60,13 +59,13 @@ state_menu_start_init:
 	sta arrow_tile
 	lda #$00           ; start on first menu item
 	sta menu_selection
-
+    
 ldx #$00
 @menu_loop:
     lda menu_text, x
     sta $2007
     inx
-    cpx #4
+    cpx #18
     bne @menu_loop
 
 
@@ -87,19 +86,7 @@ ldx #$00
 
 
 
-    lda $2002
-    lda #$22
-    sta $2006
-    lda #$0E
-    sta $2006
 
-	ldx #$00
-@exit_loop:
-    lda exit_text, x
-    sta $2007
-    inx
-    cpx #4
-    bne @exit_loop
 
 	lda #$00
 	sta $2005
@@ -124,52 +111,22 @@ state_menu_start_loop:
     ; Move arrow UP
     lda joypad
     and #PAD_UP
-    beq @check_down
+
     lda menu_selection
     sec
     sbc #1
     cmp #$00
     bmi @menu_selection_zero
     sta menu_selection
-    jmp @check_down
+
 @menu_selection_zero:
     lda #$00
     sta menu_selection
 
-@check_down:
-    lda joypad
-    and #PAD_DOWN
-    beq @update_arrow
-    lda menu_selection
-    cmp #1
-    bcs @update_arrow
-    clc
-    adc #1
-    sta menu_selection
 
-; Update arrow Y position based on selection
-@update_arrow:
-    lda menu_selection
-    cmp #$00
-    beq @arrow_start
-    lda #$80       ; Y for EXIT
-    jmp @arrow_done
+
 @arrow_start:
     lda #$70      ; Y for START
-@arrow_done:
-    sta arrow_y
-
-; Write arrow sprite to shadow OAM
-    lda arrow_y
-    sta $0200        ; Y
-    lda arrow_tile
-    sta $0201        ; Tile
-    lda #$00
-    sta $0202        ; Attributes
-    lda arrow_x
-    sta $0203        ; X
-    lda #$02
-    sta $4014        ; DMA to OAM
 
 ; Check START button
 ; Check START button
@@ -210,9 +167,9 @@ jmp @forever
  
 
 menu_text:
-  .byte 18,9,19,26   ; " MENU"
+  .byte 9,29,21,17,20,24,13,27,9,0,7,20,20,15,13,19,11,4   ; " explosive cooking!"
 start_text:
-  .byte 0 ,24,25,5,23,25  ; " START"
+  .byte 62 ,24,25,5,23,25  ; " START"
 exit_text:
   .byte 9,29,13,25      ; " EXIT"
 
