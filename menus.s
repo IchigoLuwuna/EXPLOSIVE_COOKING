@@ -88,41 +88,6 @@ ldx #$00
  ;Menu loop — handle arrow movement + selection
 ; ----------------------------
 state_menu_start_loop:
-@forever:
-    ldy clock
-    iny
-    sty clock
-
-    jsr func_get_input
-
-    ; Move arrow UP
-    lda joypad
-    and #PAD_UP
-
-    lda menu_selection
-    sec
-    sbc #$01
-	clc
-    sta menu_selection
-
-
-
-; Check START button
-; Check START button
-    lda joypad
-    and #PAD_START
-    beq @wait_vblank        ; not pressed, skip
-    lda reg_c
-    and #PAD_START
-    bne @wait_vblank        ; held from previous frame, skip
-
-    ; Only start game if START is selected
-    lda menu_selection
-    bne @wait_vblank        ; if not START, do nothing
-    jmp state_game           ; otherwise start game
-@wait_vblank:
-    jsr func_vblank_wait
-    jmp @forever
 
 state_menu_pause:
 state_menu_pause_loop:
@@ -139,7 +104,7 @@ state_menu_pause_loop:
 		and reg_c
 		cmp #PAD_START
 		beq :+ ; skip if start is held
-		jmp state_game_loop
+		jmp state_game
 	:
 
 	jsr func_vblank_wait
