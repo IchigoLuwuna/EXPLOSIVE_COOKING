@@ -65,7 +65,7 @@ enemy_loop_start:
     ldx reg_d
     lda enemy_alive
     and enemy_mask_table, x
-	cmp #$00
+
     bne :+ ; skip if dead
 		jmp skip_enemy
 	:
@@ -90,11 +90,11 @@ move_left:
     clc
 
     ; movement
-    ldx #$FF               ; dx
-    ldy #$00               ; dy
+    ldx #$FF               
+    ldy #$00               
 
     jsr func_move_16x16
-
+    jmp enemy_continue
 move_right:
     lda reg_d
     asl
@@ -214,49 +214,49 @@ evilDheegs:
     .byte $80, $01, $01, $00 ; y tile attr x
     .byte $80, $02, $01, $08
     .byte $88, $03, $01, $00
-    .byte $88, $04, $01, $08
+    .byte $88, $03, $42, $08
 
 ; Enemy 1 (left)
     .byte $90, $01, $02, $10
     .byte $90, $02, $02, $18
     .byte $98, $03, $02, $10
-    .byte $98, $04, $02, $18
+    .byte $98, $03, $42, $18
 
 ; Enemy 2 (left)
     .byte $A0, $01, $02, $20
     .byte $A0, $02, $02, $28
     .byte $A8, $03, $02, $20
-    .byte $A8, $04, $02, $28
+    .byte $A8, $03, $42, $28
 
 ; Enemy 3 (left)
     .byte $B0, $01, $02, $30
     .byte $B0, $02, $02, $38
     .byte $B8, $03, $02, $30
-    .byte $B8, $04, $02, $38
+    .byte $B8, $03, $42, $38
 
 ; Enemy 4 (right)
     .byte $80, $01, $02, $F0
     .byte $80, $02, $02, $F8
     .byte $88, $03, $02, $F0
-    .byte $88, $04, $02, $F8
+    .byte $88, $03, $42, $F8
 
 ; Enemy 5 (right)
     .byte $90, $01, $02, $E0
     .byte $90, $02, $02, $E8
     .byte $98, $03, $02, $E0
-    .byte $98, $04, $02, $E8
+    .byte $98, $03, $42, $E8
 
 ; Enemy 6 (right)
     .byte $A0, $01, $02, $D0
     .byte $A0, $02, $02, $D8
     .byte $A8, $03, $02, $D0
-    .byte $A8, $04, $02, $D8
+    .byte $A8, $03, $42, $D8
 
 ; Enemy 7 (right)
     .byte $B0, $01, $02, $C0
     .byte $B0, $02, $02, $C8
     .byte $B8, $03, $02, $C0
-    .byte $B8, $04, $02, $C8
+    .byte $B8, $03, $42, $C8
 
 
 enemyIntervals:
