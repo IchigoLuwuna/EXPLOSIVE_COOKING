@@ -486,6 +486,7 @@ func_check_station_collision:
 
 
 BUTTON_OAM_ADDR = $0290
+MATERIALS_OAM_ADDR = $0294
 
 BUTTON_A_INDEX =        $05
 BUTTON_B_INDEX =        $06
@@ -508,6 +509,14 @@ func_init_button_prompts:
 		cpy #$04
     bmi :-
 
+    ldy #$00
+    :
+        lda required_material_sprites, y
+		sta MATERIALS_OAM_ADDR, y
+		iny
+		cpy #$0C
+    bmi :-
+
     rts
 
 ;-----------------------
@@ -523,7 +532,7 @@ func_update_button_prompt:
     beq :+
         lda #$FF    ; set y pos to top of screen so it's not visible
         sta BUTTON_OAM_ADDR
-        jmp update_button_prompt_end
+        jmp draw_required_materials_start
     :
 
     ; switch(station_index)
@@ -541,7 +550,7 @@ func_update_button_prompt:
 
         lda #MAT_SCRAP_POSX + $06
         sta BUTTON_OAM_ADDR + $03
-        jmp update_button_prompt_end
+        jmp draw_required_materials_start
     :
     cmp #MAT_POWDER_INDEX
     bne :+
@@ -556,7 +565,7 @@ func_update_button_prompt:
 
         lda #MAT_POWDER_POSX + $06
         sta BUTTON_OAM_ADDR + $03
-        jmp update_button_prompt_end
+        jmp draw_required_materials_start
     :
     cmp #MAT_PLASTIC_INDEX
     bne :+
@@ -571,7 +580,7 @@ func_update_button_prompt:
 
         lda #MAT_PLASTIC_POSX + $06
         sta BUTTON_OAM_ADDR + $03
-        jmp update_button_prompt_end
+        jmp draw_required_materials_start
     :
     cmp #STTN_POT_INDEX
     bne :+
@@ -586,7 +595,7 @@ func_update_button_prompt:
 
         lda #STTN_POT_POSX - $0A
         sta BUTTON_OAM_ADDR + $03
-        jmp update_button_prompt_end
+        jmp draw_required_materials_start
     :
     cmp #STTN_FORGE_INDEX
     bne :+++++
@@ -638,7 +647,7 @@ func_update_button_prompt:
 
         lda #STTN_FORGE_POSX + $16
         sta BUTTON_OAM_ADDR + $03
-        jmp update_button_prompt_end
+        jmp draw_required_materials_start
     :
     cmp #STTN_DROP_INDEX
     bne :+
@@ -653,8 +662,31 @@ func_update_button_prompt:
 
         lda #STTN_DROP_POSX + $06
         sta BUTTON_OAM_ADDR + $03
-        jmp update_button_prompt_end
+        jmp draw_required_materials_start
     :
+draw_required_materials_start:
+    ; draw required materials if not yet put in pot
+    lda cooking_status
+    and #COOKING_STATUS_TYPE
+    cmp #%00000000
+    bne :+
+        ; set Y to $66
+        lda #$66
+        jmp draw_required_materials
+    :
+    ; set Y to $FF
+    lda #$FF
+draw_required_materials:
+    ldy #$00
+    :
+		sta MATERIALS_OAM_ADDR, y
+		iny
+        iny
+        iny
+        iny
+		cpy #$0C
+        bmi :-
 
 update_button_prompt_end:
+
     rts
