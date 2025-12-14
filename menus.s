@@ -61,6 +61,14 @@ state_menu_start_init:
 	lda #$00           ; start on first menu item
 	sta menu_selection
 
+    lda #0
+    ldx #<_music_data_escape
+    ldy #>_music_data_escape
+    jsr famistudio_init
+    lda #0
+    jsr famistudio_music_play
+
+
 ldx #$00
 @menu_loop:
     lda menu_text, x

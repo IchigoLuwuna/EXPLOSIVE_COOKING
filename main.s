@@ -63,7 +63,7 @@
 ; if it's empty
 .segment "STARTUP"
 
-.segment "RAM"
+.segment "BSS"
 
 ; Main code segment for the program
 .segment "CODE"
@@ -144,6 +144,8 @@ nmi:
 	lda reg_oam_addr
 	sta $4014 ; write to OAMDMA PPU register at hardware address $4014
 
+	jsr famistudio_update
+
 	; pull state after interrupt
 	pla
 	tay
@@ -177,7 +179,8 @@ dheeg:
 .include "ammo_count.s"
 .include "background.s"
 .include "high_score.s"
-.include "audio.s"
+.include "music.s"
+.include "famistudio_ca65.s"
 
 ; Binary Includes
 bg:
