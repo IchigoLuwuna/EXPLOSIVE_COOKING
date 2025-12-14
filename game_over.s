@@ -78,7 +78,7 @@ state_menu_lose_loop:
 		and reg_c
 		cmp #PAD_START
 		beq :+ ; skip if start is held
-		jmp state_game_loop
+		jmp state_game_init
 	:
 
 	jsr func_vblank_wait
