@@ -174,19 +174,19 @@ dheeg:
 button_sprite: .byte $66, $05, $03, $4E
 
 recipe_sprites:
-	recipe_scrap_sprite: .byte $66, $44, $00, $7B
-	recipe_powder_sprite: .byte $66, $42, $00, $83
-	recipe_plastic_sprite: .byte $66, $43, $00, $8B
+	recipe_scrap_sprite: .byte $66, $44, $03, $7B
+	recipe_powder_sprite: .byte $66, $42, $03, $83
+	recipe_plastic_sprite: .byte $66, $43, $03, $8B
 
 inventory_sprites:
-	inventory_scrap_sprite: .byte $FF, $44, $00, $7B
-	inventory_powder_sprite: .byte $FF, $42, $00, $83
-	inventory_plastic_sprite: .byte $FF, $43, $00, $8B
+	inventory_scrap_sprite: .byte $FF, $44, $03, $7B
+	inventory_powder_sprite: .byte $FF, $42, $03, $83
+	inventory_plastic_sprite: .byte $FF, $43, $03, $8B
 
 label_sprites:
-	label_scrap_sprite: .byte $32, $44, $00, $74
-	label_powder_sprite: .byte $32, $42, $00, $54
-	label_plastic_sprite: .byte $63, $43, $00, $54
+	label_scrap_sprite: .byte $32, $44, $03, $74
+	label_powder_sprite: .byte $32, $42, $03, $54
+	label_plastic_sprite: .byte $63, $43, $03, $54
 
 ; Includes
 .include "bitmasks.s"

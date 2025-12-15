@@ -81,7 +81,7 @@ clock_check:
     bcc skip_enemy   ; skip if clock < enemyClock if enemyClock > clock (not ready yet)
 
 
-    
+
     ; --- Move enemy ---
 
     inc enemy_frame_toggle
@@ -144,7 +144,7 @@ enemy_die: ; input -> B -> enemy mask
 	eor #$FF ; invert mask
 	and enemy_alive ; AND masks together
     sta enemy_alive ; mark masked enemies dead
-	
+
 	; hide dead enemies
 	jsr func_hide_dead_enemies
     lda clock
@@ -172,7 +172,7 @@ func_hide_dead_enemies:
 			sta $0218, y
 			sta $021C, y
             lda #$00
-            sta $0213 , y 
+            sta $0213 , y
 		:
 		lsr reg_b ; go to next enemy
 		tya
@@ -182,10 +182,10 @@ func_hide_dead_enemies:
 		tay
 		dex
 		bne func_hide_dead_enemies_loop
-    
+
 	rts
 
-enemy_respawn_random: 
+enemy_respawn_random:
 
     ldx reg_d
     lda enemy_mask_table, x  ; mask of this enemy
@@ -202,11 +202,11 @@ enemy_respawn_random:
     asl
     adc #$10
     clc
-    
+
 
 
 	ldx #$FF
-    
+
 	jsr func_move_16x16
     rts
 
@@ -266,49 +266,49 @@ evilDheegs:
     .byte $80, $01, $01, $FF ; y tile attr x
     .byte $80, $02, $01, $FF
     .byte $88, $03, $01, $FF
-    .byte $88, $03, $42, $FF
+    .byte $88, $03, $41, $FF
 
 ; Enemy 1 (left)
     .byte $90, $01, $01, $FF
     .byte $90, $02, $01, $FF
     .byte $98, $03, $01, $FF
-    .byte $98, $03, $42, $FF
+    .byte $98, $03, $41, $FF
 
 ; Enemy 2 (left)
     .byte $A0, $01, $01, $FF
     .byte $A0, $02, $01, $FF
     .byte $A8, $03, $01, $FF
-    .byte $A8, $03, $42, $FF
+    .byte $A8, $03, $41, $FF
 
 ; Enemy 3 (left)
     .byte $B0, $01, $01, $FF
     .byte $B0, $02, $01, $FF
     .byte $B8, $03, $01, $FF
-    .byte $B8, $03, $42, $FF
+    .byte $B8, $03, $41, $FF
 
 ; Enemy 4 (right)
     .byte $80, $01, $01, $FF
     .byte $80, $02, $01, $FF
     .byte $88, $03, $01, $FF
-    .byte $88, $03, $42, $FF
+    .byte $88, $03, $41, $FF
 
 ; Enemy 5 (right)
     .byte $90, $01, $01, $FF
     .byte $90, $02, $01, $FF
     .byte $98, $03, $01, $FF
-    .byte $98, $03, $42, $FF
+    .byte $98, $03, $41, $FF
 
 ; Enemy 6 (right)
     .byte $A0, $01, $01, $FF
     .byte $A0, $02, $01, $FF
     .byte $A8, $03, $01, $FF
-    .byte $A8, $03, $42, $FF
+    .byte $A8, $03, $41, $FF
 
 ; Enemy 7 (right)
     .byte $B0, $01, $01, $FF
     .byte $B0, $02, $01, $FF
     .byte $B8, $03, $01, $FF
-    .byte $B8, $03, $42, $FF
+    .byte $B8, $03, $41, $FF
 
 
 enemyIntervals:
