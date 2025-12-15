@@ -50,7 +50,7 @@ ldx #$00
     inx
     cpx #9
     bne @lose_loop
-    
+
 	lda #$00
 	sta $2005
 	lda #$00
@@ -61,7 +61,7 @@ ldx #$00
     lda #%00011110
     sta $2001
 ; ----------------------------
- ;Menu lose loop 
+ ;Menu lose loop
 ; ----------------------------
 state_menu_lose_loop:
 
@@ -78,12 +78,12 @@ state_menu_lose_loop:
 		and reg_c
 		cmp #PAD_START
 		beq :+ ; skip if start is held
-		jmp state_game_init
+		jmp reset ; hot resets the game because it's 2:30am and I ain't fixing one byte of memory randomly not getting written correctly on a hot game init
 	:
 
 	jsr func_vblank_wait
 jmp @forever
- 
+
 
 
 lose_text:
