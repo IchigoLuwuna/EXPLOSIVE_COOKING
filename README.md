@@ -3,7 +3,7 @@
 **Members:**
 - Finn
 - Luna
-- Ryan
+- Rayan
 - Tim
 
 ## User manual
