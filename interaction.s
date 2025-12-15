@@ -48,6 +48,9 @@ func_initialize_cook:
 
     jsr func_random_to_acc
     and #MATERIALS
+	bne :+ ; default to all materials if empty
+		lda #MATERIALS
+	:
     sta required_materials
 
     jsr func_random_to_acc
@@ -630,6 +633,7 @@ func_update_button_prompt:
             sta BUTTON_OAM_ADDR + $01
 
             lda #FLIP_VERTICALLY
+			ora #$03
             sta BUTTON_OAM_ADDR + $02
 
             jmp forge_button_switch_end
@@ -687,28 +691,139 @@ func_update_button_prompt:
         jmp draw_required_materials_start
     :
 draw_required_materials_start:
-    ; draw required materials if not yet put in pot
-    lda cooking_status
-    and #COOKING_STATUS_TYPE
-    cmp #%00000000
-    bne :+
-        ; set Y to $66
-        lda #$66
-        jmp draw_required_materials
-    :
-    ; set Y to $FF
-    lda #$FF
-draw_required_materials:
-    ldy #$00
-    :
-		sta RECIPE_OAM_ADDR, y
-		iny
-        iny
-        iny
-        iny
-		cpy #$0C
-        bmi :-
+	jsr func_update_recipe_prompt
+	jsr func_update_inventory_display
 
 update_button_prompt_end:
 
     rts
+
+; Updates the recipe displayed above the cooking pot
+func_update_recipe_prompt:
+	; Scrap check -> bit 0
+	lda required_materials ; load in recipe mask
+	and #$01 ; sets zero flag if bit 0 is clear
+	beq :+ ; if set -> show; else -> hide
+		lda recipe_scrap_sprite + $00
+		sta RECIPE_OAM_ADDR + $00
+		jmp :++ ; skip else
+	:
+		lda #$FF
+		sta RECIPE_OAM_ADDR + $00
+	:
+
+	; Powder check -> bit 1
+	lda required_materials ; load in recipe mask
+	and #$02 ; sets zero flag if bit 1 is clear
+	beq :+ ; if set -> show; else -> hide
+		lda recipe_powder_sprite + $00
+		sta RECIPE_OAM_ADDR + $04
+		jmp :++ ; skip else
+	:
+		lda #$FF
+		sta RECIPE_OAM_ADDR + $04
+	:
+
+	; Scrap check -> bit 2
+	lda required_materials ; load in recipe mask
+	and #$04 ; sets zero flag if bit 2 is clear
+	beq :+ ; if set -> show; else -> hide
+		lda recipe_plastic_sprite + $00
+		sta RECIPE_OAM_ADDR + $08
+		jmp :++ ; skip else
+	:
+		lda #$FF
+		sta RECIPE_OAM_ADDR + $08
+	:
+
+	lda cooking_status ; get cooking status
+	and #$F0 ; get last 4 bits
+	beq :+ ; zero flag clear if cooking status is past material collection -> hide sprites
+		lda #$FF
+		sta RECIPE_OAM_ADDR + $00
+		sta RECIPE_OAM_ADDR + $04
+		sta RECIPE_OAM_ADDR + $08
+	:
+
+rts
+
+func_update_inventory_display:
+	; Scrap check -> bit 0
+	lda material_inventory; load in recipe mask
+	and #$01 ; sets zero flag if bit 0 is clear
+	beq :+ ; if set -> show; else -> hide
+		; Y position
+		lda PLR_POSY_ADDR
+		sec
+		sbc #$0C
+		clc
+		sta INVENTORY_OAM_ADDR + $00
+		lda PLR_POSX_ADDR
+
+		; X position
+		sec
+		sbc #$04
+		clc
+		sta INVENTORY_OAM_ADDR + $03
+
+		jmp :++ ; skip else
+	:
+		lda #$FF
+		sta INVENTORY_OAM_ADDR + $00
+	:
+
+	; Powder check -> bit 1
+	lda material_inventory ; load in recipe mask
+	and #$02 ; sets zero flag if bit 1 is clear
+	beq :+ ; if set -> show; else -> hide
+		; Y position
+		lda PLR_POSY_ADDR
+		sec
+		sbc #$0C
+		clc
+		sta INVENTORY_OAM_ADDR + $04
+
+		; X position
+		lda PLR_POSX_ADDR
+		adc #$04
+		clc
+		sta INVENTORY_OAM_ADDR + $07
+
+		jmp :++ ; skip else
+	:
+		lda #$FF
+		sta INVENTORY_OAM_ADDR + $04
+	:
+
+	; Scrap check -> bit 2
+	lda material_inventory ; load in recipe mask
+	and #$04 ; sets zero flag if bit 2 is clear
+	beq :+ ; if set -> show; else -> hide
+		; Y position
+		lda PLR_POSY_ADDR
+		sec
+		sbc #$0C
+		clc
+		sta INVENTORY_OAM_ADDR + $08
+
+		; X position
+		lda PLR_POSX_ADDR
+		adc #$0C
+		clc
+		sta INVENTORY_OAM_ADDR + $0B
+
+		jmp :++ ; skip else
+	:
+		lda #$FF
+		sta INVENTORY_OAM_ADDR + $08
+	:
+
+	lda cooking_status ; get cooking status
+	and #$F0 ; get last 4 bits
+	beq :+ ; zero flag clear if cooking status is past material collection -> hide sprites
+		lda #$FF
+		sta INVENTORY_OAM_ADDR + $00
+		sta INVENTORY_OAM_ADDR + $04
+		sta INVENTORY_OAM_ADDR + $08
+	:
+rts

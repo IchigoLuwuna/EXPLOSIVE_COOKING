@@ -13,5 +13,5 @@ palettes:
 .byte $0f, $0f, $19, $36   ;
 .byte $0f, $16, $1a, $11
 .byte $0f, $16, $1a, $11
-.byte $0f, $00, $10, $20 ; black and white
+.byte $0f, $20, $20, $20 ; black and white
 
