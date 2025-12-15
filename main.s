@@ -59,6 +59,8 @@
 
 	kitchen_hp = $60 ; 1bt: contains the kitchen's HP
 	enemyClock = $4E ; 8 bytes 4E - 55
+	enemy_respawn_clock = $56 ; 8 bytes 56 - 5F
+	enemy_frame_toggle = $5D ; 1bt: toggles every frame to animate enemies
 
 
 .segment "VECTORS"
@@ -202,7 +204,7 @@ label_sprites:
 .include "ammo_count.s"
 .include "background.s"
 .include "high_score.s"
-
+.include "game_over.s"
 ; Binary Includes
 bg:
     .incbin "lvlMap_Checked.nam"

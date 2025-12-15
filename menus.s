@@ -39,35 +39,20 @@ state_menu_start_init:
     lda $2002
     lda #$21      ; high byte (row 12)
     sta $2006
-    lda #$8E      ; low byte (column 12)
+    lda #$68      ; low byte (column 12)
     sta $2006
 
      ; ----------------------------
     ; Initialize arrow sprite
     ; ----------------------------
 
-    lda #$60        ; row 12 tile = 96
-    sec
-    sbc #$02
-	clc
-    sta arrow_y
-	lda #$60           ; column for X position
-	sec
-	sbc #$08           ; shift left to sit before text
-	clc
-	sta arrow_x
-
-	lda #$3E         ; CHR tile index for arrow
-	sta arrow_tile
-	lda #$00           ; start on first menu item
-	sta menu_selection
-
+    
 ldx #$00
 @menu_loop:
     lda menu_text, x
     sta $2007
     inx
-    cpx #4
+    cpx #18
     bne @menu_loop
 
 
@@ -88,19 +73,7 @@ ldx #$00
 
 
 
-    lda $2002
-    lda #$22
-    sta $2006
-    lda #$0E
-    sta $2006
 
-	ldx #$00
-@exit_loop:
-    lda exit_text, x
-    sta $2007
-    inx
-    cpx #4
-    bne @exit_loop
 
 	lda #$00
 	sta $2005
@@ -115,82 +88,11 @@ ldx #$00
  ;Menu loop — handle arrow movement + selection
 ; ----------------------------
 state_menu_start_loop:
-@forever:
-    ldy clock
-    iny
-    sty clock
-
-    jsr func_get_input
-
-    ; Move arrow UP
-    lda joypad
-    and #PAD_UP
-    beq @check_down
-    lda menu_selection
-    sec
-    sbc #$01
-	clc
-    bmi @menu_selection_zero
-    sta menu_selection
-    jmp @check_down
-@menu_selection_zero:
-    lda #$00
-    sta menu_selection
-
-@check_down:
-    lda joypad
-    and #PAD_DOWN
-    beq @update_arrow
-    lda menu_selection
-    cmp #$01
-    bcs @update_arrow
-    adc #$01
-	clc
-    sta menu_selection
-
-; Update arrow Y position based on selection
-@update_arrow:
-	clc
-    lda menu_selection
-    beq @arrow_start
-    lda #$80       ; Y for EXIT
-    jmp @arrow_done
-@arrow_start:
-    lda #$70      ; Y for START
-@arrow_done:
-    sta arrow_y
-
-; Write arrow sprite to shadow OAM
-    lda arrow_y
-    sta $0200        ; Y
-    lda arrow_tile
-    sta $0201        ; Tile
-    lda #$00
-    sta $0202        ; Attributes
-    lda arrow_x
-    sta $0203        ; X
-    lda #$02
-    sta $4014        ; DMA to OAM
-
-; Check START button
-; Check START button
-    lda joypad
-    and #PAD_START
-    beq @wait_vblank        ; not pressed, skip
-    lda reg_c
-    and #PAD_START
-    bne @wait_vblank        ; held from previous frame, skip
-
-    ; Only start game if START is selected
-    lda menu_selection
-    bne @wait_vblank        ; if not START, do nothing
-    jmp state_game           ; otherwise start game
-@wait_vblank:
-    jsr func_vblank_wait
-    jmp @forever
 
 state_menu_pause:
 state_menu_pause_loop:
+
+
 @forever:
 	lda joypad
 	sta reg_c ; store state of joypad on previous frame in reg_c -> allows for non-repeating actions on held input
@@ -202,7 +104,7 @@ state_menu_pause_loop:
 		and reg_c
 		cmp #PAD_START
 		beq :+ ; skip if start is held
-		jmp state_game_loop
+		jmp state_game
 	:
 
 	jsr func_vblank_wait
@@ -210,9 +112,9 @@ jmp @forever
  
 
 menu_text:
-  .byte 18,9,19,26   ; " MENU"
+  .byte 9,29,21,17,20,24,13,27,9,0,7,20,20,15,13,19,11,4   ; " explosive cooking!"
 start_text:
-  .byte 0 ,24,25,5,23,25  ; " START"
+  .byte 62 ,24,25,5,23,25  ; " START"
 exit_text:
   .byte 9,29,13,25      ; " EXIT"
 
