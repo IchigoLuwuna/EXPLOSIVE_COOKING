@@ -1,5 +1,5 @@
 
-ammo_sprite_slot = $0290
+ammo_sprite_slot = $02C0
 
 
 init_ammo:
