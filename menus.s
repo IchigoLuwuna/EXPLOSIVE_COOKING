@@ -88,12 +88,6 @@ ldx #$00
  ;Menu loop — handle arrow movement + selection
 ; ----------------------------
 state_menu_start_loop:
-
-state_menu_pause:
-state_menu_pause_loop:
-
-
-@forever:
 	lda joypad
 	sta reg_c ; store state of joypad on previous frame in reg_c -> allows for non-repeating actions on held input
 	jsr func_get_input	; get controller input and store in joypad ($00)
@@ -108,8 +102,25 @@ state_menu_pause_loop:
 	:
 
 	jsr func_vblank_wait
-jmp @forever
- 
+jmp state_menu_start_loop
+
+state_menu_pause:
+state_menu_pause_loop:
+	lda joypad
+	sta reg_c ; store state of joypad on previous frame in reg_c -> allows for non-repeating actions on held input
+	jsr func_get_input	; get controller input and store in joypad ($00)
+	lda joypad
+	and #PAD_START
+	cmp #PAD_START
+	bne :+
+		and reg_c
+		cmp #PAD_START
+		beq :+ ; skip if start is held
+		jmp state_game_loop
+	:
+
+	jsr func_vblank_wait
+jmp state_menu_pause_loop
 
 menu_text:
   .byte 9,29,21,17,20,24,13,27,9,0,7,20,20,15,13,19,11,4   ; " explosive cooking!"
