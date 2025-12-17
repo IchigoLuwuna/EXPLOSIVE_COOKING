@@ -44,6 +44,8 @@ state_game_init:
 
 
 	jsr draw_background  ; rendering off inside
+	jsr draw_ammo
+	jsr update_ammo
 
 
 	lda #%10000000
@@ -79,6 +81,7 @@ forever:
 			lda ammo_count ; load ammo count to check if empty
 			beq :+ ; skip if zero flag is set -> no ammo
 			dec ammo_count ; decrease ammo count
+			jsr update_ammo
 
 			jsr game_sub_state_zap ; shoot >:D
 			lda reg_b ; load into a -> sets 0 flag if reg_b is empty
