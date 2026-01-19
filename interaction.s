@@ -32,52 +32,65 @@ STTN_DROP_POSY =    $9E
 PLR_POSX_ADDR = $0203
 PLR_POSY_ADDR = $0200
 
-INTERACT_HEIGHT = $10
+INTERACT_SIZE = $10
+PLAYER_SIZE = $10
 
-;------------------------------
-; materialInventory = 0;
-; cookingStatus = 0;
-; requiredMaterials = random(0,255);
-; inputSquence = random(0,255);
-; cookingStatus = 0;
-;------------------------------
+
+; ---------------------------------------------
+; [effect]
+; param: [param]
+; return: [return value] -> [register]
+; ---------------------------------------------
+;func_[name]:
+;   [code]
+;
+;func_[name]_end:
+;    rts
+
+
+
+; ---------------------------------------------
+; Initialize data for func_handle_interactions
+; ---------------------------------------------
 func_initialize_cook:
     lda #$00
-    sta material_inventory
-    sta cooking_status
+    sta material_inventory  ; materialInventory = 0;
+    sta cooking_status      ; cookingStatus = 0;
 
-    jsr func_random_to_acc
+    jsr func_random_to_acc  ; requiredMaterials = random(0,255);
     and #MATERIALS
-	bne :+ ; default to all materials if empty
-		lda #MATERIALS
-	:
     sta required_materials
 
-    jsr func_random_to_acc
+    jsr func_random_to_acc  ; inputSquence = random(0,255);
     sta input_sequence
 
-    lda #$00
-    sta cooking_status
-
+func_initialize_func_cook_end:
     rts
 
 
+
+; ---------------------------------------------
+; Perform game logic for interactions between player1 and the kitchen
+; ---------------------------------------------
+func_handle_interactions:
 ;------------------------------
 ; for(station in cooking_stations)
-;   if(player.position within 8 pixels)
+;   if(player colliding with station.hitbox)
 ;       station_index = station.index
 ;       at_station = true
-;       jmp input handling
-; else
-;   at_station = false
+;   else
+;       at_station = false
+;       return
 ;
 ; if(station_index.isMaterial())
 ;   HandleMaterial();
 ; else
 ;   Cook()
 ;------------------------------
-func_handle_interactions:
+
+    ; -----------------------
     ; get current cooking station index
+    ; -----------------------
 
     ; check material scrap
     lda #MAT_SCRAP_POSX
@@ -163,38 +176,47 @@ func_handle_interactions:
         jmp input_handling
     :
 
-    ; if x and y of every station are outside 8 pixel range
+    ; if not in range of any stations
     lda #INV_AT_STATION     ; set at_station flag to false
     and game_flags
     sta game_flags
-    jmp interaction_end     ; skip input handling
+    jmp func_handle_interactions_end     ; skip input handling
 
+    ; -----------------------
+    ; Handle input and game logic
+    ; -----------------------
 input_handling:
-    ; if first bit is 1: handle material
     lda station_index
     and #%00000001
     cmp #%00000001
-    bne :+
+    bne :+  ; if first bit is 1: handle material
         jsr func_handle_material
-        jmp interaction_end
-    :
-    ; else: cook
+        jmp func_handle_interactions_end
+    :       ; else: cook (handle station)
     jsr func_cook
 
-interaction_end:
+func_handle_interactions_end:
     jsr func_update_button_prompt
     rts
 
 
+
+; --------------------------
+; Handle input and interactions with stations
+; --------------------------
+func_cook:
 ;------------------------------
 ; switch(cooking_status)
 ; {
 ;   case start:
 ;       if station_index == pot.index
-;           if current_material == required_material
-;               if a is held
+;           if a is held
+;               if current_material == required_material
 ;                   cooking_status.type = forging;
-;       break;
+;               else
+;                   reset material inventory
+;       return;
+;
 ;   case forging:
 ;       if station_index == forge.index
 ;           reg_a = GetForgeInput();
@@ -206,24 +228,31 @@ interaction_end:
 ;                       ++cooking_status;
 ;                       if cooking_status == 3
 ;                           cooking_status.type = ready;
-;                   break;
+;                   return;
 ;               ...
 ;           }
 ;
-;       break;
+;       return;
+;
 ;   case ready:
-;       if station_index == ammo.index
+;       if station_index == drop.index
 ;           if a is held
 ;               FinishCook();
-;       break;
+;       return;
 ; }
 ;------------------------------
-func_cook:
+
+    ; -------------------------
     ; switch(cooking_status)
+    ; -------------------------
     lda cooking_status
     and #COOKING_STATUS_TYPE
+    ; -------------------------
+    ; case start:
+    ; -------------------------
+case_start:
     cmp #%00000000
-    bne :+++  ; case start:
+    bne case_forging
         ; if station is pot: check input
         lda station_index
         cmp #STTN_POT_INDEX
@@ -242,25 +271,32 @@ func_cook:
                     and #%11001111
                     ora #%00010000
                     sta cooking_status
-                    jmp cook_end
+                    jmp func_cook_end    ; return
                 :
                 ; if current materials != required materials: wrong input -> reset material inventory
                 lda #$00
                 sta material_inventory
         :
-        jmp cook_end    ; break
-    :
+        jmp func_cook_end    ; return
+    ; -------------------------
+    ; case forging:
+    ; -------------------------
+case_forging:
     cmp #%00010000
-    bne :++++++++++  ; case forging:
+    bne case_ready
         ; if station is forge: check required input
         lda station_index
         cmp #STTN_FORGE_INDEX
-        bne :+++++++++
-            ; put next input into register A
+        bne @switch2_end
+            ; -------------------------
+            ; switch(next_input)
+            ; -------------------------
             jsr func_get_cooking_input
-            ; switch(reg_a)
+            ; -------------------------
+            ; case UP:
+            ; -------------------------
             cmp #$00
-            bne :++  ; case UP
+            bne :++
                 ; if pressing up and no other directional input: increment cooking status
                 lda joypad
                 and #%11110000
@@ -268,10 +304,13 @@ func_cook:
                 bne :+
                     jmp cook_forge
                 :
-                jmp cook_end    ; break
+                jmp func_cook_end    ; return
             :
+            ; -------------------------
+            ; case RIGHT:
+            ; -------------------------
             cmp #$01
-            bne :++  ; case RIGHT
+            bne :++
                 ; if pressing right and no other directional input: increment cooking status
                 lda joypad
                 and #%11110000
@@ -279,10 +318,13 @@ func_cook:
                 bne :+
                     jmp cook_forge
                 :
-                jmp cook_end    ; break
+                jmp func_cook_end    ; return
             :
+            ; -------------------------
+            ; case DOWN:
+            ; -------------------------
             cmp #$02
-            bne :++  ; case DOWN
+            bne :++
                 ; if pressing down and no other directional input: increment cooking status
                 lda joypad
                 and #%11110000
@@ -290,10 +332,13 @@ func_cook:
                 bne :+
                     jmp cook_forge
                 :
-                jmp cook_end    ; break
+                jmp func_cook_end    ; return
             :
+            ; -------------------------
+            ; case LEFT:
+            ; -------------------------
             cmp #$03
-            bne :++  ; case LEFT
+            bne :++ 
                 ; if pressing left and no other directional input: increment cooking status
                 lda joypad
                 and #%11110000
@@ -301,13 +346,16 @@ func_cook:
                 bne :+
                     jmp cook_forge
                 :
-                jmp cook_end    ; break
+                jmp func_cook_end    ; return
             :
-        :
-        jmp cook_end    ; break
-    :
+    @switch2_end:
+        jmp func_cook_end    ; return
+    ; -------------------------
+    ; case ready:
+    ; -------------------------
+case_ready:
     cmp #%00100000
-    bne :++  ; case ready:
+    bne @switch1_end
         ; if station is ammo drop off zone: check required input
         lda station_index
         cmp #STTN_DROP_INDEX
@@ -320,9 +368,13 @@ func_cook:
                 lda #$00
                 sta cooking_status
         :
-        jmp cook_end    ; break
-    :
-    jmp cook_end
+        jmp func_cook_end    ; return
+    ; -------------------------
+    ; end of switch
+    ; -------------------------
+@switch1_end:
+    jmp func_cook_end    ; return
+    
 cook_forge:
     lda cooking_status
     adc #$01
@@ -337,9 +389,17 @@ cook_forge:
         ora #%00100000
         sta cooking_status
     :
-cook_end:
+
+func_cook_end:
     rts
 
+
+
+; ---------------------------------------------
+; [effect]
+; param: [param]
+; return: [return value] -> [register]
+; ---------------------------------------------
 func_handle_material:
     lda station_index ; switch(station_index)
     cmp #MAT_SCRAP_INDEX    ; case material_scrap:
@@ -406,9 +466,9 @@ func_finish_cook:
     rts
 
 
-;------------------------------
+; ------------------------------
 ; load the next input in the input sequence into register A
-;------------------------------
+; ------------------------------
 func_get_cooking_input:
     lda input_sequence
     sta reg_b
@@ -437,51 +497,54 @@ func_get_cooking_input:
     lda reg_b
     and #%00000011
 
+func_get_cooking_input_end:
     rts
 
 
-;------------------------------
-; reg_b: station x
-; reg_c: station y
-; reg_d: station index
-; returns:
-;       register A: #$00 if no collision, #$01 if collision
-;------------------------------
+
+; ------------------------------
+; Check if colliding with station interaction hitbox
+; param: hitbox.x -> register B
+; param: hitbox.y -> register C
+; param: station.index -> register D
+; return: #$01 if collided, else #$00 -> regiser A
+; ------------------------------
 func_check_station_collision:
     ; check x
-    lda reg_b ; if(station x - player width - player x < 0)
+    lda reg_b ; if(hitbox.x - player.width - player.x < 0)
     sec
-    sbc #$10
+    sbc #PLAYER_SIZE
     clc
     cmp PLR_POSX_ADDR
     bpl :+  ; if x is outside range, skip other checks
-        lda reg_b ; if(station x + station width - player x > 0)
-        adc #$10
+        lda reg_b ; if(hitbox.x + station.width - player.x > 0)
+        adc #INTERACT_SIZE
         clc
         cmp PLR_POSX_ADDR
         bmi :+  ; if x is outside range, skip other checks
             ; check y
-            lda reg_c ; if(station y - player height - player y < 0)
+            lda reg_c ; if(hitbox.y - player.height - player.y < 0)
             sec
-            sbc #$10
+            sbc #PLAYER_SIZE
             clc
             cmp PLR_POSY_ADDR
             bpl :+  ; if y is outside range, skip other checks
-                lda reg_c ; if(station y + station height - player y > 0)
-                adc #$10
+                lda reg_c ; if(hitbox.y + station.height - player.y > 0)
+                adc #INTERACT_SIZE
                 clc
                 cmp PLR_POSY_ADDR
-                bmi :+
-                    ; runs if x and y are within 8 pixels
+                bmi :+  ; if y is outside range, skip other checks
                     lda reg_d    ; set station index to the one collided with
                     sta station_index
                     lda #AT_STATION         ; set at_station flag to true
                     ora game_flags
                     sta game_flags
                     lda #$01
-                    rts
+                    jmp func_check_station_collision_end
     :
     lda #$00
+
+func_check_station_collision_end:
     rts
 
 
