@@ -356,8 +356,8 @@ rts
 ; Quickly poll zapper and write to accumulator
 func_fast_zapper_read: ; return -> a
 	lda #$01
-	sta cport2
+	sta CPORT2_ADDR
 	lda #$00
-	sta cport2
-	lda cport2
+	sta CPORT2_ADDR
+	lda CPORT2_ADDR
 	rts
