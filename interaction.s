@@ -1,57 +1,48 @@
+; ---------------------------------------------
+; Interaction macros
+
 ; material: scrap
-MAT_SCRAP_INDEX =   %00000011
-MAT_SCRAP_POSX =    $6E
-MAT_SCRAP_POSY =    $3E
+MAT_SCRAP_INDEX     = %00000011
+MAT_SCRAP_POSX      = $6E
+MAT_SCRAP_POSY      = $3E
 
 ; material: powder
-MAT_POWDER_INDEX =  %00000101
-MAT_POWDER_POSX =   $4E
-MAT_POWDER_POSY =   $36
+MAT_POWDER_INDEX    = %00000101
+MAT_POWDER_POSX     = $4E
+MAT_POWDER_POSY     = $36
 
 ; material: plastic
-MAT_PLASTIC_INDEX =  %00000111
-MAT_PLASTIC_POSX =   $4E
-MAT_PLASTIC_POSY =   $56
+MAT_PLASTIC_INDEX   = %00000111
+MAT_PLASTIC_POSX    = $4E
+MAT_PLASTIC_POSY    = $56
 
 ; station: cooking pot
-STTN_POT_INDEX =    %00000010
-STTN_POT_POSX =     $8E
-STTN_POT_POSY =     $6E
+STTN_POT_INDEX      = %00000010
+STTN_POT_POSX       = $8E
+STTN_POT_POSY       = $6E
 
 ; station: forge
-STTN_FORGE_INDEX =  %00000100
-STTN_FORGE_POSX =   $9E
-STTN_FORGE_POSY =   $8E
+STTN_FORGE_INDEX    = %00000100
+STTN_FORGE_POSX     = $9E
+STTN_FORGE_POSY     = $8E
 
 ; station: drop
-STTN_DROP_INDEX =   %00000110
-STTN_DROP_POSX =    $4E
-STTN_DROP_POSY =    $9E
+STTN_DROP_INDEX     = %00000110
+STTN_DROP_POSX      = $4E
+STTN_DROP_POSY      = $9E
 
 ; player
-PLR_POSX_ADDR = $0203
-PLR_POSY_ADDR = $0200
+PLR_POSX_ADDR       = $0203
+PLR_POSY_ADDR       = $0200
 
-INTERACT_SIZE = $10
-PLAYER_SIZE = $10
-
-
+INTERACT_SIZE       = $10
+PLAYER_SIZE         = $10
 ; ---------------------------------------------
-; [effect]
-; param: [param]
-; return: [return value] -> [register]
-; ---------------------------------------------
-;func_[name]:
-;   [code]
-;
-;func_[name]_end:
-;    rts
 
 
 
 ; ---------------------------------------------
 ; Initialize data for func_handle_interactions
-; ---------------------------------------------
 func_initialize_cook:
     lda #$00
     sta material_inventory  ; materialInventory = 0;
@@ -66,14 +57,13 @@ func_initialize_cook:
 
 func_initialize_func_cook_end:
     rts
+; ---------------------------------------------
 
 
 
 ; ---------------------------------------------
 ; Perform game logic for interactions between player1 and the kitchen
-; ---------------------------------------------
 func_handle_interactions:
-;------------------------------
 ; for(station in cooking_stations)
 ;   if(player colliding with station.hitbox)
 ;       station_index = station.index
@@ -86,7 +76,6 @@ func_handle_interactions:
 ;   HandleMaterial();
 ; else
 ;   Cook()
-;------------------------------
 
     ; -----------------------
     ; get current cooking station index
@@ -198,14 +187,13 @@ input_handling:
 func_handle_interactions_end:
     jsr func_update_button_prompt
     rts
+; ---------------------------------------------
 
 
 
-; --------------------------
+; ---------------------------------------------
 ; Handle input and interactions with stations
-; --------------------------
 func_cook:
-;------------------------------
 ; switch(cooking_status)
 ; {
 ;   case start:
@@ -240,7 +228,6 @@ func_cook:
 ;               FinishCook();
 ;       return;
 ; }
-;------------------------------
 
     ; -------------------------
     ; switch(cooking_status)
@@ -392,17 +379,21 @@ cook_forge:
 
 func_cook_end:
     rts
+; ---------------------------------------------
 
 
 
 ; ---------------------------------------------
-; [effect]
-; param: [param]
-; return: [return value] -> [register]
-; ---------------------------------------------
+; Handle input and interactions with materials
 func_handle_material:
-    lda station_index ; switch(station_index)
-    cmp #MAT_SCRAP_INDEX    ; case material_scrap:
+    ; -------------------------
+    ; switch(station_index)
+    ; -------------------------
+    lda station_index
+    ; -------------------------
+    ; case scrap:
+    ; -------------------------
+    cmp #MAT_SCRAP_INDEX
     bne :++
         lda joypad                      ; if A is pressed
 	    and #PAD_A
@@ -416,9 +407,12 @@ func_handle_material:
                 ora #MATERIALS_SCRAP
                 sta material_inventory
         :
-        rts ; break
+        jmp func_handle_material_end    ; return
     :
-    cmp #MAT_POWDER_INDEX    ; case material_powder:
+    ; -------------------------
+    ; case powder:
+    ; -------------------------
+    cmp #MAT_POWDER_INDEX
     bne :++
         lda joypad                      ; if A is pressed
 	    and #PAD_A
@@ -432,9 +426,12 @@ func_handle_material:
                 ora #MATERIALS_POWDER
                 sta material_inventory
         :
-        rts ; break
+        jmp func_handle_material_end    ; return
     :
-    cmp #MAT_PLASTIC_INDEX    ; case material_plastic:
+    ; -------------------------
+    ; case plastic:
+    ; -------------------------
+    cmp #MAT_PLASTIC_INDEX
     bne :++
         lda joypad                      ; if A is pressed
 	    and #PAD_A
@@ -448,14 +445,17 @@ func_handle_material:
                 ora #MATERIALS_PLASTIC
                 sta material_inventory
         :
-        rts ; break
+        jmp func_handle_material_end    ; return
     :
 
+func_handle_material_end:
     rts
+; ---------------------------------------------
 
 
-;------------------------------
-;------------------------------
+
+; ---------------------------------------------
+; Gives rewards for finishing cooking successfuly and initializes next cook
 func_finish_cook:
     ; add 3 bullets
     lda #$03
@@ -463,31 +463,33 @@ func_finish_cook:
 
     jsr func_initialize_cook
 
+func_finish_cook_end:
     rts
+; ---------------------------------------------
 
 
-; ------------------------------
-; load the next input in the input sequence into register A
-; ------------------------------
+
+; ---------------------------------------------
+; Get the next input in the input sequence
+; return: next input -> register A
 func_get_cooking_input:
-    lda input_sequence
+    lda input_sequence  ; reg_b = input_sequence
     sta reg_b
-    lda cooking_status
+    lda cooking_status  ; reg_c = cooking_status.counter
     and #COOKING_STATUS_COUNTER
     sta reg_c
 
+    ; for(index = reg_c; index != 0; --index)
 @loop:
     lda reg_c
     cmp #$00
     beq :+
-        ; decrement counter
-        sec
+        sec         ; decrement counter
         sbc #$01
         clc
         sta reg_c
 
-        ; shift input sequence
-        lda reg_b
+        lda reg_b   ; shift input sequence
         lsr
         lsr
         sta reg_b
@@ -499,16 +501,16 @@ func_get_cooking_input:
 
 func_get_cooking_input_end:
     rts
+; ---------------------------------------------
 
 
 
-; ------------------------------
+; ---------------------------------------------
 ; Check if colliding with station interaction hitbox
 ; param: hitbox.x -> register B
 ; param: hitbox.y -> register C
 ; param: station.index -> register D
 ; return: #$01 if collided, else #$00 -> regiser A
-; ------------------------------
 func_check_station_collision:
     ; check x
     lda reg_b ; if(hitbox.x - player.width - player.x < 0)
@@ -546,29 +548,34 @@ func_check_station_collision:
 
 func_check_station_collision_end:
     rts
+; ---------------------------------------------
 
 
 
+; ---------------------------------------------
+; Sprite macros
+    BUTTON_OAM_ADDR         = $0290
+    RECIPE_OAM_ADDR         = $0294
+    INVENTORY_OAM_ADDR      = $02A4
+    CRATE_LABELS_OAM_ADDR   = $02B4
+
+    BUTTON_A_INDEX          = $05
+    BUTTON_B_INDEX          = $06
+    BUTTON_DOWN_INDEX       = $45
+    BUTTON_RIGHT_INDEX      = $3E
+
+    FLIP_HORIZONTALLY       = %01000000
+    FLIP_VERTICALLY         = %10000000
+; ---------------------------------------------
 
 
-BUTTON_OAM_ADDR = $0290
-RECIPE_OAM_ADDR = $0294
-INVENTORY_OAM_ADDR = $02A4
-CRATE_LABELS_OAM_ADDR = $02B4
 
-BUTTON_A_INDEX =        $05
-BUTTON_B_INDEX =        $06
-BUTTON_DOWN_INDEX =     $45
-BUTTON_RIGHT_INDEX =    $3E
-
-FLIP_HORIZONTALLY =     %01000000
-FLIP_VERTICALLY =       %10000000
-
-;-----------------------
+; ---------------------------------------------
 ; Initialize button prompt data in OAM
-;-----------------------
 func_init_button_prompts:
     ; load defined bytes into OAM
+
+    ; Button sprites
     ldy #$00
     :
         lda button_sprite, y
@@ -586,7 +593,7 @@ func_init_button_prompts:
 		cpy #$0C
     bmi :-
 
-	; Inventory
+	; Inventory sprites
 	ldy #$00
 	:
 	lda inventory_sprites, y
@@ -595,7 +602,7 @@ func_init_button_prompts:
 	cpy #$0C
 	bmi :-
 
-	; Crate labels
+	; Crate labels sprites
     ldy #$00
     :
         lda label_sprites, y
@@ -604,11 +611,14 @@ func_init_button_prompts:
 		cpy #$0C
     bmi :-
 
+func_init_button_prompts_end:
     rts
+; ---------------------------------------------
 
-;-----------------------
+
+
+; ---------------------------------------------
 ; Set button prompt type and location depending on current station
-;-----------------------
 func_update_button_prompt:
     ; if(!at_station)
     ;       remove button;
@@ -622,8 +632,13 @@ func_update_button_prompt:
         jmp draw_required_materials_start
     :
 
+    ; -------------------------
     ; switch(station_index)
+    ; -------------------------
     lda station_index
+    ; -------------------------
+    ; case scrap:
+    ; -------------------------
     cmp #MAT_SCRAP_INDEX
     bne :+
         lda #MAT_SCRAP_POSY - $0C
@@ -639,6 +654,9 @@ func_update_button_prompt:
         sta BUTTON_OAM_ADDR + $03
         jmp draw_required_materials_start
     :
+    ; -------------------------
+    ; case powder:
+    ; -------------------------
     cmp #MAT_POWDER_INDEX
     bne :+
         lda #MAT_POWDER_POSY - $04
@@ -654,6 +672,9 @@ func_update_button_prompt:
         sta BUTTON_OAM_ADDR + $03
         jmp draw_required_materials_start
     :
+    ; -------------------------
+    ; case plastic:
+    ; -------------------------
     cmp #MAT_PLASTIC_INDEX
     bne :+
         lda #MAT_PLASTIC_POSY + $0C
@@ -669,6 +690,9 @@ func_update_button_prompt:
         sta BUTTON_OAM_ADDR + $03
         jmp draw_required_materials_start
     :
+    ; -------------------------
+    ; case pot:
+    ; -------------------------
     cmp #STTN_POT_INDEX
     bne :+
         lda #STTN_POT_POSY + $04
@@ -684,60 +708,83 @@ func_update_button_prompt:
         sta BUTTON_OAM_ADDR + $03
         jmp draw_required_materials_start
     :
+    ; -------------------------
+    ; case forge:
+    ; -------------------------
     cmp #STTN_FORGE_INDEX
     bne :+++++
         lda #STTN_FORGE_POSY + $06
         sta BUTTON_OAM_ADDR + $00
 
+        ; -------------------------
+        ; switch(next_input)
+        ; -------------------------
         jsr func_get_cooking_input
+        ; -------------------------
+        ; case UP:
+        ; -------------------------
         cmp #%00000000
         bne :+
-            lda #BUTTON_DOWN_INDEX
+            lda #BUTTON_DOWN_INDEX      ; load down
             sta BUTTON_OAM_ADDR + $01
 
-            lda #FLIP_VERTICALLY
+            lda #FLIP_VERTICALLY        ; flip
 			ora #$03
             sta BUTTON_OAM_ADDR + $02
 
-            jmp forge_button_switch_end
+            jmp forge_button_switch_end ; return
         :
+        ; -------------------------
+        ; case RIGHT:
+        ; -------------------------
         cmp #%00000001
         bne :+
-            lda #BUTTON_RIGHT_INDEX
+            lda #BUTTON_RIGHT_INDEX     ; load right
             sta BUTTON_OAM_ADDR + $01
 
             lda #$03
             sta BUTTON_OAM_ADDR + $02
 
-            jmp forge_button_switch_end
+            jmp forge_button_switch_end ; return
         :
+        ; -------------------------
+        ; case DOWN:
+        ; -------------------------
         cmp #%00000010
         bne :+
-            lda #BUTTON_DOWN_INDEX
+            lda #BUTTON_DOWN_INDEX      ; load down
             sta BUTTON_OAM_ADDR + $01
 
             lda #$03
             sta BUTTON_OAM_ADDR + $02
 
-            jmp forge_button_switch_end
+            jmp forge_button_switch_end ; return
         :
+        ; -------------------------
+        ; case LEFT:
+        ; -------------------------
         cmp #%00000011
         bne :+
-            lda #BUTTON_RIGHT_INDEX
+            lda #BUTTON_RIGHT_INDEX     ; load right
             sta BUTTON_OAM_ADDR + $01
 
-            lda #FLIP_HORIZONTALLY
+            lda #FLIP_HORIZONTALLY      ; flip
 			ora #$03
             sta BUTTON_OAM_ADDR + $02
 
-            jmp forge_button_switch_end
+            jmp forge_button_switch_end ; return
         :
+        ; -------------------------
+        ; end of switch
+        ; -------------------------
     forge_button_switch_end:
-
         lda #STTN_FORGE_POSX + $16
         sta BUTTON_OAM_ADDR + $03
         jmp draw_required_materials_start
     :
+    ; -------------------------
+    ; case drop:
+    ; -------------------------
     cmp #STTN_DROP_INDEX
     bne :+
         lda #STTN_DROP_POSY + $14
@@ -753,13 +800,18 @@ func_update_button_prompt:
         sta BUTTON_OAM_ADDR + $03
         jmp draw_required_materials_start
     :
+    ; -------------------------
+    ; end of switch
+    ; -------------------------
 draw_required_materials_start:
 	jsr func_update_recipe_prompt
 	jsr func_update_inventory_display
 
-update_button_prompt_end:
-
+func_update_button_prompt_end:
     rts
+; ---------------------------------------------
+
+
 
 ; Updates the recipe displayed above the cooking pot
 func_update_recipe_prompt:

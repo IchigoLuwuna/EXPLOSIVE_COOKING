@@ -1,27 +1,25 @@
-; wall;
-;   AxB rectangle
-;       topleft coordinate
-;       width
-;       height
+; ---------------------------------------------
+; Wall struct
 
-; when attempt movement, check if it would cause collisions
-;   Don't allow movement if it would cause collisions
-;
-; wall* pWall{address of first wall};
-; for(count{0}; count < 4; ++count)
-; {
-;   if(player_future_pos inside *pWall)
-;   {
-;       Return #$01
-;   }
-;   pWall += 4;
-; }
+; left x    : 1 byte
+; top y     : 1 byte
+; width     : 1 byte
+; height    : 1 byte
+; ---------------------------------------------
 
 
-; loads #$01 into A if colliding with wall (otherwise #$00)
-; x: player x movement ($00, $01 or $FF(=-1))
-; y: player y movement ($00, $01 or $FF(=-1))
+
+; ---------------------------------------------
+; Checks if player will collide with walls if it moves by (x, y)
+; param: player x movement (#$00, #$01 or #$FF(=-1)) -> register X
+; param: player y movement (#$00, #$01 or #$FF(=-1)) -> register X
+; return: #$01 if colliding, else #$00 -> register A
 func_player_walls_collision:
+    txa     ; push x movement and y movement
+    pha
+    tya
+    pha
+
     lda #first_wall_addr    ; store pWall in register b
     sta reg_b
 
@@ -36,13 +34,8 @@ func_player_walls_collision:
     clc
     sta reg_d
 
-    txa
-    pha
-    tya
-    pha
-
-    ; loop over all walls
-loop:
+    ; for(wall in pWalls)
+@loop:
     ; collision checks with current wall
     ldy reg_b
     lda $00, y   ; wall x
@@ -64,55 +57,61 @@ loop:
                 cmp reg_d
                 bmi :+  ; if player position y is too high to collide, skip
                     ; player will collide with this wall
-                    pla
-                    tay
-                    pla
-                    tax
 
-                    lda #$01
-                    jmp player_walls_collision_end
+                    lda #$01    ; set return value
+                    sta reg_b
+                    jmp func_player_walls_collision_end ; return
     :
 
     ; to next iteration or break out of loop
-next_loop:
     lda reg_b
     sec
     sbc #$10
     clc
-    cmp #first_wall_addr
+    cmp #first_wall_addr    ; if pWall_current - 16 = pWall, break;
     beq :+
         adc #$14
         clc
         sta reg_b
-        jmp loop
+        jmp @loop
     :
 
-    pla
+    lda #$00    ; set return value
+    sta reg_b
+
+func_player_walls_collision_end:
+    pla     ; pull x movement and y movement
     tay
     pla
     tax
 
-    lda #$00
-player_walls_collision_end:
-    rts
+    lda reg_b   ; get return value
 
-; Input parameters -> x & y: enemy position
+    rts
+; ---------------------------------------------
+
+
+
+; ---------------------------------------------
+; Checks if enemy is colliding with walls
+; param: enemy x position -> register X
+; param: enemy y position -> register X
+; return: #$01 if colliding, else #$00 -> register A
 func_enemy_walls_collision:
+    txa     ; push x and y position
+    pha
+    tya
+    pha
+
     lda #first_wall_addr    ; store pWall in register b
     sta reg_b
 
     ; store enemy pos in reg_c and reg_d
     stx reg_c
-
     sty reg_d
 
-    txa
-    pha
-    tya
-    pha
-
-    ; loop over all walls
-enemy_collision_loop:
+    ; for(wall in pWalls)
+@enemy_collision_loop:
     ; collision checks with current wall
     ldy reg_b
     lda $00, y   ; wall x
@@ -134,48 +133,55 @@ enemy_collision_loop:
                 cmp reg_d
                 bmi :+  ; if enemy position y is too high to collide, skip
                     ; enemy will collide with this wall
-                    pla
-                    tay
-                    pla
-                    tax
 
-                    lda #$01
-                    jmp enemy_walls_collision_end
+                    lda #$01    ; set return value
+                    sta reg_b
+                    jmp func_enemy_walls_collision_end
     :
 
     ; to next iteration or break out of loop
-next_enemy_collision_loop:
     lda reg_b
     sec
     sbc #$10
     clc
-    cmp #first_wall_addr
+    cmp #first_wall_addr    ; if pWall_current - 16 = pWall, break;
     beq :+
         adc #$14
         clc
         sta reg_b
-        jmp enemy_collision_loop
+        jmp @enemy_collision_loop
     :
 
-    pla
+    lda #$00    ; set return value
+    sta reg_b
+
+func_enemy_walls_collision_end:
+    pla     ; pull x and y position
     tay
     pla
     tax
 
-    lda #$00
-enemy_walls_collision_end:
-    rts
+    lda reg_b   ; get return value
 
+    rts
+; ---------------------------------------------
+
+
+
+; ---------------------------------------------
+; Initializes wall array
 func_initialize_walls:
-    lda #$46
+    ; wall 1
+    lda #$46    ; left x
     sta first_wall_addr + $00
-    lda #$30
+    lda #$30    ; top y
     sta first_wall_addr + $01
-    lda #$0A
+    lda #$0A    ; width
     sta first_wall_addr + $02
-    lda #$80
+    lda #$80    ; height
     sta first_wall_addr + $03
 
+    ; wall 2
     lda #$48
     sta first_wall_addr + $04
     lda #$2E
@@ -185,6 +191,7 @@ func_initialize_walls:
     lda #$10
     sta first_wall_addr + $07
 
+    ; wall 3
     lda #$B1
     sta first_wall_addr + $08
     lda #$30
@@ -194,6 +201,7 @@ func_initialize_walls:
     lda #$80
     sta first_wall_addr + $0B
 
+    ; wall 4
     lda #$48
     sta first_wall_addr + $0C
     lda #$AF
@@ -203,6 +211,7 @@ func_initialize_walls:
     lda #$10
     sta first_wall_addr + $0F
 
+    ; wall 5
     lda #$53
     sta first_wall_addr + $10
     lda #$5F
@@ -212,4 +221,6 @@ func_initialize_walls:
     lda #$2F
     sta first_wall_addr + $13
 
+func_initialize_walls_end:
     rts
+; ---------------------------------------------

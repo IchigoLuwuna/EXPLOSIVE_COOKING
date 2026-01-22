@@ -1,11 +1,16 @@
+; ---------------------------------------------
+; Input macros
 CPORT1_ADDR = $4016  ; hardware address of controller port 1
 CPORT2_ADDR = $4017  ; hardware address of controller port 1
+
+; ---------------------------------------------
+
+
 
 ; ---------------------------------------------
 ; get input from controller and zapper
 ; return: joypad state -> joypad (zpg)
 ; return: zapper state -> zapper (zpg)
-; ---------------------------------------------
 func_get_input:
     lda joypad  ; save previous joypad state
     sta joypad_previous
@@ -51,3 +56,4 @@ func_get_input:
 
 func_get_input_end:
     rts
+; ---------------------------------------------
